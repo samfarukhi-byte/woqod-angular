@@ -1,0 +1,605 @@
+{
+  "info": {
+    "name": "WOQOD Total Control - Open API",
+    "description": "Complete API collection for WOQOD Total Control Customer Self-Portal Open API. Access invoices, vehicles, consumption data, and customer profile programmatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "woqod-open-api-v1",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4200/api/open/v1",
+      "type": "string"
+    },
+    {
+      "key": "apiKey",
+      "value": "your_api_key_here",
+      "type": "string"
+    },
+    {
+      "key": "apiSecret",
+      "value": "your_secret_key_here",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Customer",
+      "item": [
+        {
+          "name": "Get Customer Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-API-SECRET",
+                "value": "{{apiSecret}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customer/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["customer", "profile"]
+            },
+            "description": "Retrieve authenticated customer profile details including contact information, credit limit, and account status."
+          },
+          "response": []
+        }
+      ],
+      "description": "Customer profile endpoints"
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        {
+          "name": "Get All Invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-API-SECRET",
+                "value": "{{apiSecret}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices?page=1&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoices"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20",
+                  "description": "Items per page (max: 100)"
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2024-01-01",
+                  "disabled": true,
+                  "description": "Filter from date (YYYY-MM-DD)"
+                },
+                {
+                  "key": "toDate",
+                  "value": "2024-12-31",
+                  "disabled": true,
+                  "description": "Filter to date (YYYY-MM-DD)"
+                },
+                {
+                  "key": "status",
+                  "value": "Paid",
+                  "disabled": true,
+                  "description": "Filter by status: Paid, Pending, Overdue, Cancelled, Partial"
+                }
+              ]
+            },
+            "description": "Retrieve paginated list of customer invoices with optional date range and status filters."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Invoice by Number",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-API-SECRET",
+                "value": "{{apiSecret}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices/INV-2024-05-0123",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoices", "INV-2024-05-0123"]
+            },
+            "description": "Retrieve detailed invoice information including line items for a specific invoice number."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Paid Invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-API-SECRET",
+                "value": "{{apiSecret}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices?status=Paid&page=1&pageSize=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoices"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Paid"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Get all paid invoices."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Pending Invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-API-SECRET",
+                "value": "{{apiSecret}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices?status=Pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoices"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Pending"
+                }
+              ]
+            },
+            "description": "Get all pending/unpaid invoices."
+          },
+          "response": []
+        }
+      ],
+      "description": "Invoice management endpoints"
+    },
+    {
+      "name": "Consumption",
+      "item": [
+        {
+          "name": "Get Consumption Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-API-SECRET",
+                "value": "{{apiSecret}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/consumption/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["consumption", "summary"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "2024-05-01",
+                  "disabled": true,
+                  "description": "Summary from date (YYYY-MM-DD)"
+                },
+                {
+                  "key": "toDate",
+                  "value": "2024-05-31",
+                  "disabled": true,
+                  "description": "Summary to date (YYYY-MM-DD)"
+                }
+              ]
+            },
+            "description": "Get aggregated consumption summary by fuel type, vehicle, and station."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Consumption Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-API-SECRET",
+                "value": "{{apiSecret}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/consumption/transactions?page=1&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["consumption", "transactions"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20"
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2024-05-01",
+                  "disabled": true,
+                  "description": "Filter from date (YYYY-MM-DD)"
+                },
+                {
+                  "key": "toDate",
+                  "value": "2024-05-31",
+                  "disabled": true,
+                  "description": "Filter to date (YYYY-MM-DD)"
+                },
+                {
+                  "key": "vehicleNumber",
+                  "value": "QAT-12345",
+                  "disabled": true,
+                  "description": "Filter by vehicle number"
+                }
+              ]
+            },
+            "description": "Retrieve detailed transaction-level consumption records with optional filters."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Consumption by Date Range",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-API-SECRET",
+                "value": "{{apiSecret}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/consumption/transactions?fromDate=2024-05-01&toDate=2024-05-15",
+              "host": ["{{baseUrl}}"],
+              "path": ["consumption", "transactions"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "2024-05-01"
+                },
+                {
+                  "key": "toDate",
+                  "value": "2024-05-15"
+                }
+              ]
+            },
+            "description": "Get consumption transactions for a specific date range."
+          },
+          "response": []
+        }
+      ],
+      "description": "Consumption and transaction endpoints"
+    },
+    {
+      "name": "Vehicles",
+      "item": [
+        {
+          "name": "Get All Vehicles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-API-SECRET",
+                "value": "{{apiSecret}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Active",
+                  "disabled": true,
+                  "description": "Filter by status: Active, Suspended, Inactive, Terminated"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retrieve list of all registered vehicles with optional status filter."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Vehicle by Number",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-API-SECRET",
+                "value": "{{apiSecret}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/QAT-12345",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles", "QAT-12345"]
+            },
+            "description": "Get detailed information for a specific vehicle by plate number."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Vehicle Consumption",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-API-SECRET",
+                "value": "{{apiSecret}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/QAT-12345/consumption",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles", "QAT-12345", "consumption"],
+              "query": [
+                {
+                  "key": "fromDate",
+                  "value": "2024-05-01",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "2024-05-31",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get consumption data for a specific vehicle with optional date filters."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active Vehicles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-API-SECRET",
+                "value": "{{apiSecret}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/status/Active",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles", "status", "Active"]
+            },
+            "description": "Get all vehicles with Active status."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Suspended Vehicles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-API-SECRET",
+                "value": "{{apiSecret}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/status/Suspended",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles", "status", "Suspended"]
+            },
+            "description": "Get all vehicles with Suspended status."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Inactive Vehicles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-KEY",
+                "value": "{{apiKey}}",
+                "type": "text"
+              },
+              {
+                "key": "X-API-SECRET",
+                "value": "{{apiSecret}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/status/Inactive",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles", "status", "Inactive"]
+            },
+            "description": "Get all vehicles with Inactive status."
+          },
+          "response": []
+        }
+      ],
+      "description": "Vehicle management endpoints"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Pre-request script for all requests",
+          "// Ensure API credentials are set in environment variables",
+          "",
+          "if (!pm.variables.get('apiKey') || pm.variables.get('apiKey') === 'your_api_key_here') {",
+          "    console.warn('⚠️ Please set your API Key in the collection variables');",
+          "}",
+          "",
+          "if (!pm.variables.get('apiSecret') || pm.variables.get('apiSecret') === 'your_secret_key_here') {",
+          "    console.warn('⚠️ Please set your API Secret in the collection variables');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script for all requests",
+          "",
+          "// Check response time",
+          "pm.test('Response time is less than 2000ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});",
+          "",
+          "// Check response format",
+          "pm.test('Response has success field', function () {",
+          "    const jsonData = pm.response.json();",
+          "    pm.expect(jsonData).to.have.property('success');",
+          "});",
+          "",
+          "// Check for successful response",
+          "if (pm.response.code === 200) {",
+          "    pm.test('Successful response has data field', function () {",
+          "        const jsonData = pm.response.json();",
+          "        pm.expect(jsonData.success).to.be.true;",
+          "        pm.expect(jsonData).to.have.property('data');",
+          "    });",
+          "}",
+          "",
+          "// Check for error response",
+          "if (pm.response.code >= 400) {",
+          "    pm.test('Error response has errorCode', function () {",
+          "        const jsonData = pm.response.json();",
+          "        pm.expect(jsonData.success).to.be.false;",
+          "        pm.expect(jsonData).to.have.property('errorCode');",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ]
+}

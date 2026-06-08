@@ -1,0 +1,81 @@
+<div class="csp-modal-backdrop" *ngIf="open" (click)="closed.emit()" aria-hidden="true"></div>
+
+<div
+  class="csp-modal"
+  [class.csp-modal--open]="open"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="request ? 'Request details ' + request.requestId : 'Request details'"
+  *ngIf="open && request"
+>
+  <!-- Header -->
+  <div class="csp-modal__head">
+    <div>
+      <h3 class="csp-modal__title">{{ request.requestId }}</h3>
+      <p class="csp-modal__sub">{{ request.requestType }} · {{ request.customerName }}</p>
+    </div>
+    <button type="button" class="csp-btn-icon" aria-label="Close" (click)="closed.emit()">✕</button>
+  </div>
+
+  <!-- Body -->
+  <div class="csp-modal__body">
+
+    <!-- Status banner -->
+    <div class="csp-modal__section">
+      <div class="d-flex align-items-center gap-2">
+        <span class="csp-badge" [ngClass]="badgeClass()">{{ badgeIcon() }} {{ request.status }}</span>
+        <span style="font-size:13px; color:#62748e;">Stage: {{ request.stage }}</span>
+      </div>
+    </div>
+
+    <!-- Profile changes diff -->
+    <div class="csp-modal__section" *ngIf="request.profileChanges && request.profileChanges.changedFields?.length">
+      <h4 class="csp-card__title" style="font-size:14px; font-weight:600; margin-bottom:8px;">Profile Changes</h4>
+      <app-diff-table [diff]="request.profileChanges"></app-diff-table>
+    </div>
+
+    <!-- Document changes -->
+    <div class="csp-modal__section" *ngIf="documentKeys().length > 0">
+      <h4 class="csp-card__title" style="font-size:14px; font-weight:600; margin-bottom:8px;">Documents</h4>
+      <div *ngFor="let code of documentKeys()" class="csp-doc-review" style="margin-bottom:6px;">
+        <span>📄 {{ docLabel(code) }}</span>
+        <span style="font-size:12px; color:#62748e;">{{ request.documents[code].fileName }} ({{ formatBytes(request.documents[code].fileSize) }})</span>
+      </div>
+    </div>
+
+    <!-- Approval trail -->
+    <div class="csp-modal__section" *ngIf="request.approvalTrail?.length">
+      <h4 class="csp-card__title" style="font-size:14px; font-weight:600; margin-bottom:8px;">Approval Trail</h4>
+      <div class="csp-timeline">
+        <div *ngFor="let entry of request.approvalTrail; let i = index" class="csp-timeline__step">
+          <div class="csp-timeline__dot"></div>
+          <div class="csp-timeline__content">
+            <p class="csp-timeline__action">{{ entry.action }}</p>
+            <p class="csp-timeline__meta">{{ entry.user }} · {{ formatDateTime(entry.timestamp) }}</p>
+            <p class="csp-timeline__remarks" *ngIf="entry.remarks">{{ entry.remarks }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comments -->
+    <div class="csp-modal__section" *ngIf="request.comments">
+      <h4 class="csp-card__title" style="font-size:14px; font-weight:600; margin-bottom:4px;">Submission Comments</h4>
+      <p style="font-size:13px; color:#45556c;">{{ request.comments }}</p>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="csp-modal__footer">
+    <button type="button" class="csp-btn csp-btn--secondary" (click)="closed.emit()">Close</button>
+    <button
+      *ngIf="isResubmittable()"
+      type="button"
+      class="csp-btn csp-btn--primary"
+      (click)="resubmit.emit(request)"
+    >
+      Resubmit
+    </button>
+  </div>
+</div>

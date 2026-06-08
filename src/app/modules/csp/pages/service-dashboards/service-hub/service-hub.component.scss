@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+/* Sub-section cards reuse the premium service-card styling from the main Services page.
+   These rules mirror services.component.scss so the photo fills the gradient header
+   and the emoji icon shows as a fallback if the image fails to load. */
+::ng-deep .woqod-service-icon-wrapper {
+  overflow: hidden;
+}
+
+::ng-deep .woqod-service-icon-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 3;
+  transition: transform 0.4s ease;
+}
+
+::ng-deep .woqod-service-card-premium:hover .woqod-service-icon-img {
+  transform: scale(1.05);
+}

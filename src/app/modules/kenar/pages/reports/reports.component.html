@@ -1,0 +1,66 @@
+<div class="woqod-reports-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header woqod-page-header-kenar">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">Reports</h1>
+            <p class="woqod-page-subtitle">Generate and download various reports</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Reports Grid -->
+    <div class="row g-3 g-lg-4">
+      <div class="col-12 col-md-6 col-lg-4" *ngFor="let report of reports; let i = index">
+        <div class="woqod-modern-card h-100">
+          <div class="woqod-card-body text-center">
+            <div class="woqod-report-icon-wrapper mb-3">
+              <div class="woqod-report-icon" [attr.data-index]="i % 6">
+                {{ getReportIcon(report.reportType) }}
+              </div>
+            </div>
+            <h5 class="woqod-report-title mb-3">{{ report.reportName }}</h5>
+            <p class="woqod-report-description mb-3">
+              {{ report.description }}
+            </p>
+            <div class="mb-4">
+              <div class="small text-muted mb-2"><strong>Available Filters:</strong></div>
+              <div class="d-flex flex-wrap gap-2 justify-content-center">
+                <span
+                  *ngFor="let filter of report.availableFilters"
+                  class="woqod-badge woqod-badge-secondary"
+                >
+                  {{ filter }}
+                </span>
+              </div>
+            </div>
+            <button class="woqod-btn woqod-btn-primary w-100" (click)="downloadReport(report)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7 10L12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Download Report
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="reports.length === 0" class="woqod-empty-state">
+      <div class="woqod-empty-icon">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 2V8H20M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3 class="woqod-empty-title">No Reports Available</h3>
+      <p class="woqod-empty-text">There are currently no reports available to download.</p>
+    </div>
+  </div>
+</div>

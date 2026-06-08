@@ -1,0 +1,108 @@
+<div class="woqod-news-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header woqod-page-header-news">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <button class="woqod-back-btn" (click)="goBack()" type="button">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back to Home
+          </button>
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">News & Announcements</h1>
+            <p class="woqod-page-subtitle">Stay informed with the latest updates, developments, and insights from WOQOD</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="woqod-loading-container">
+    <div class="woqod-spinner-large"></div>
+    <p class="woqod-loading-message">Loading latest news...</p>
+  </div>
+
+  <!-- News Grid -->
+  <div *ngIf="!isLoading && newsList.length > 0" class="woqod-news-content">
+    <div class="container">
+      <div class="row g-3 g-lg-4">
+        <div *ngFor="let news of newsList; let i = index" [class]="i === 0 ? 'col-12' : 'col-lg-6 col-md-6 col-12'">
+          <article class="woqod-news-card-modern" [class.woqod-news-featured]="i === 0" (click)="openNewsDetails(news)">
+            <div class="woqod-news-image-wrapper">
+              <div class="woqod-news-image" [attr.data-news-index]="i"></div>
+              <div class="woqod-news-image-overlay"></div>
+              <div class="woqod-news-badge woqod-news-badge-new" *ngIf="i < 2">New</div>
+            </div>
+            <div class="woqod-news-body">
+              <div class="woqod-news-meta">
+                <span class="woqod-news-date-badge">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1.75" y="2.91666" width="10.5" height="9.33333" rx="1.16667" stroke="currentColor" stroke-width="1.16667"/>
+                    <path d="M9.33333 1.75V4.08333M4.66667 1.75V4.08333M1.75 6.41666H12.25" stroke="currentColor" stroke-width="1.16667" stroke-linecap="round"/>
+                  </svg>
+                  {{ formatDate(news.publishDate) }}
+                </span>
+              </div>
+              <h3 class="woqod-news-headline">{{ news.title }}</h3>
+              <p class="woqod-news-excerpt">{{ news.description }}</p>
+              <div class="woqod-news-footer">
+                <span class="woqod-news-read-more">
+                  Read Full Article
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+            <div class="woqod-news-hover-effect"></div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && newsList.length === 0" class="woqod-empty-state">
+    <div class="woqod-empty-icon">
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 20H5C3.89543 20 3 19.1046 3 18V6C3 4.89543 3.89543 4 5 4H19C20.1046 4 21 4.89543 21 6V18C21 19.1046 20.1046 20 19 20Z" stroke="currentColor" stroke-width="2"/>
+        <path d="M3 8H21M8 12H16M8 16H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h3 class="woqod-empty-title">No News Available</h3>
+    <p class="woqod-empty-text">There are currently no announcements or news to display. Check back soon!</p>
+  </div>
+</div>
+
+<!-- News Details Modal - Premium -->
+<div class="woqod-modal-overlay" *ngIf="showDetailsModal && selectedNews" (click)="closeDetailsModal()">
+  <div class="woqod-modal woqod-modal-article" (click)="$event.stopPropagation()">
+    <button class="woqod-modal-close" (click)="closeDetailsModal()" type="button">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div class="woqod-article-hero" [style.background-image]="'url(' + selectedNews.imageUrl + ')'">
+      <div class="woqod-article-hero-overlay"></div>
+      <div class="woqod-article-hero-content">
+        <span class="woqod-article-badge">News Article</span>
+        <h2 class="woqod-article-title">{{ selectedNews.title }}</h2>
+        <div class="woqod-article-date">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="3.33334" width="12" height="10.6667" rx="1.33333" stroke="currentColor" stroke-width="1.33333"/>
+            <path d="M10.6667 2V4.66667M5.33333 2V4.66667M2 7.33334H14" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round"/>
+          </svg>
+          {{ formatDate(selectedNews.publishDate) }}
+        </div>
+      </div>
+    </div>
+
+    <div class="woqod-article-body">
+      <p class="woqod-article-text">{{ selectedNews.details }}</p>
+    </div>
+  </div>
+</div>

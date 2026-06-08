@@ -1,0 +1,118 @@
+<div class="csp-content">
+  <app-breadcrumb pageTitle="Checker Approval" [trail]="[{ label: 'Home', link: '/' }, { label: 'Checker Approval' }]"></app-breadcrumb>
+
+  <header class="csp-page-heading">
+    <div>
+      <h2 class="csp-page-heading__title">Checker Approval Queue</h2>
+      <p class="csp-page-heading__sub">Internal staff page · review maker-approved requests and write to ERP</p>
+    </div>
+  </header>
+
+  <div *ngIf="toastMessage" class="csp-alert csp-alert--success" role="status">
+    <span aria-hidden="true">✓</span><span>{{ toastMessage }}</span>
+  </div>
+
+  <div style="display: grid; grid-template-columns: minmax(280px, 1fr) 2fr; gap: 24px;">
+    <section class="csp-card" style="margin-top: 0;">
+      <header class="csp-card__header">
+        <div>
+          <h3 class="csp-card__title">Awaiting Checker ({{ queue.length }})</h3>
+          <p class="csp-card__sub">Maker-approved requests pending final sign-off</p>
+        </div>
+      </header>
+      <div class="csp-card__body" style="padding: 0;">
+        <div *ngIf="queue.length === 0" class="csp-empty-block" style="margin: 16px;">No requests in the checker queue.</div>
+        <ul style="list-style: none; margin: 0; padding: 0;">
+          <li *ngFor="let r of queue"
+              (click)="select(r)"
+              [style.background]="selected?.requestId === r.requestId ? 'rgba(0,154,51,0.06)' : ''"
+              [style.borderLeft]="selected?.requestId === r.requestId ? '4px solid #009a33' : '4px solid transparent'"
+              style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; cursor: pointer;">
+            <div style="font-family: ui-monospace, monospace; font-size: 12px; color: #62748e;">{{ r.requestId }}</div>
+            <div style="font-weight: 600; color: #020618; margin-top: 2px;">{{ r.requestType }}</div>
+            <div style="font-size: 12px; color: #62748e; margin-top: 4px;">
+              <app-status-badge [status]="r.status"></app-status-badge>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section *ngIf="selected; else pickPrompt" class="csp-card" style="margin-top: 0;">
+      <header class="csp-card__header">
+        <div>
+          <h3 class="csp-card__title">{{ selected.requestType }} <span class="csp-badge csp-badge--info">{{ selected.requestId }}</span></h3>
+          <p class="csp-card__sub">Submitted {{ formatDateTime(selected.submittedAt) }} by {{ selected.submittedBy }}</p>
+        </div>
+      </header>
+      <div class="csp-card__body">
+        <div *ngIf="makerEntry(selected) as me" class="csp-info-banner">
+          <span aria-hidden="true">👤</span>
+          <span>
+            <strong>Maker recommendation:</strong> {{ me.action }} — by {{ me.user }} at {{ formatDateTime(me.timestamp) }}.
+            <span *ngIf="me.remarks">"{{ me.remarks }}"</span>
+          </span>
+        </div>
+
+        <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: #020618; margin: 16px 0 8px;">Profile changes</h4>
+        <app-diff-table [diff]="selected.profileChanges"></app-diff-table>
+
+        <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: #020618; margin: 16px 0 8px;">Documents submitted</h4>
+        <div *ngIf="documentKeys(selected).length; else noDocs" class="csp-doc-review-list">
+          <div *ngFor="let code of documentKeys(selected)" class="csp-doc-review">
+            <span class="csp-doc-review__icon" aria-hidden="true">📄</span>
+            <div class="csp-doc-review__body">
+              <p class="csp-doc-review__name">{{ code }}</p>
+              <p class="csp-doc-review__meta">{{ selected.documents[code].fileName }}</p>
+            </div>
+          </div>
+        </div>
+        <ng-template #noDocs><p class="csp-empty-block">No documents in this request.</p></ng-template>
+
+        <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: #020618; margin: 16px 0 8px;">Approval / Audit Trail</h4>
+        <ul class="csp-timeline" aria-label="Approval trail">
+          <li *ngFor="let s of selected.approvalTrail" class="csp-timeline__step">
+            <span class="csp-timeline__dot" aria-hidden="true"></span>
+            <div class="csp-timeline__head">
+              <span class="csp-timeline__stage">{{ s.stage }}</span>
+              <span class="csp-timeline__date">{{ formatDateTime(s.timestamp) }}</span>
+            </div>
+            <p class="csp-timeline__action">{{ s.action }} <span style="color:#62748e;">— by {{ s.user }}</span></p>
+            <p *ngIf="s.remarks" class="csp-timeline__remarks">"{{ s.remarks }}"</p>
+          </li>
+        </ul>
+
+        <div class="csp-form-row" style="margin-top: 24px;">
+          <div class="csp-form-group" [class.csp-form-group--invalid]="remarksError">
+            <label class="csp-form-group__label" for="checker-remarks">
+              Decision Remarks <span class="csp-form-group__label-required">*</span>
+            </label>
+            <textarea
+              id="checker-remarks"
+              class="csp-form-group__textarea"
+              [(ngModel)]="remarks"
+              (ngModelChange)="remarksError = false"
+              placeholder="Required — record the reason for your decision (audit trail)…"
+            ></textarea>
+            <span class="csp-form-group__error" style="display:block" *ngIf="remarksError">Remarks are required for every decision.</span>
+          </div>
+        </div>
+
+        <div class="csp-form-actions" style="margin-top: 16px;">
+          <span class="csp-form-actions__status">Approval will simulate ERP write.</span>
+          <div class="csp-form-actions__group">
+            <button type="button" class="csp-btn csp-btn--ghost-error" (click)="reject()">Reject</button>
+            <button type="button" class="csp-btn csp-btn--success" (click)="approveAndUpdateErp()">✓ Approve &amp; Update ERP</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <ng-template #pickPrompt>
+      <section class="csp-empty-state" style="align-self: start;">
+        <p class="csp-empty-state__title">Select a request</p>
+        <p class="csp-empty-state__sub">Choose an item from the queue on the left to view the maker recommendation and finalize.</p>
+      </section>
+    </ng-template>
+  </div>
+</div>

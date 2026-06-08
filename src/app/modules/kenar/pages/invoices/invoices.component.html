@@ -1,0 +1,190 @@
+<div class="woqod-invoices-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header woqod-page-header-kenar">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">Rent Invoices</h1>
+            <p class="woqod-page-subtitle">View and manage your rent invoices</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Filters -->
+    <div class="woqod-modern-card mb-4">
+      <div class="woqod-card-body">
+        <div class="row g-3">
+          <div class="col-12 col-md-3">
+            <label class="form-label">Shop</label>
+            <select class="form-select" [(ngModel)]="filterShop" (change)="onFilterChange()">
+              <option value="">All Shops</option>
+              <option *ngFor="let shop of shops" [value]="shop.shopCode">
+                {{ shop.shopCode }} - {{ shop.stationName }}
+              </option>
+            </select>
+          </div>
+          <div class="col-12 col-md-2">
+            <label class="form-label">Month</label>
+            <select class="form-select" [(ngModel)]="filterMonth" (change)="onFilterChange()">
+              <option value="">All Months</option>
+              <option *ngFor="let month of months" [value]="month.value">
+                {{ month.label }}
+              </option>
+            </select>
+          </div>
+          <div class="col-12 col-md-2">
+            <label class="form-label">Year</label>
+            <select class="form-select" [(ngModel)]="filterYear" (change)="onFilterChange()">
+              <option value="">All Years</option>
+              <option *ngFor="let year of years" [value]="year">
+                {{ year }}
+              </option>
+            </select>
+          </div>
+          <div class="col-12 col-md-3">
+            <label class="form-label">Status</label>
+            <select class="form-select" [(ngModel)]="filterStatus" (change)="onFilterChange()">
+              <option value="">All Statuses</option>
+              <option value="Paid">Paid</option>
+              <option value="Partially Paid">Partially Paid</option>
+              <option value="Pending">Pending</option>
+              <option value="Overdue">Overdue</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-2">
+            <label class="form-label">&nbsp;</label>
+            <button class="woqod-btn woqod-btn-secondary w-100" (click)="clearFilters()">
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoices Table -->
+    <div class="woqod-modern-card">
+      <div class="woqod-card-header">
+        <h3 class="woqod-card-title">Invoices ({{ filteredInvoices.length }})</h3>
+      </div>
+      <div class="woqod-card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Shop Code</th>
+                <th>Billing Period</th>
+                <th>Rent Amount</th>
+                <th>Paid Amount</th>
+                <th>Outstanding Amount</th>
+                <th>Due Date</th>
+                <th>Payment Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let invoice of filteredInvoices" class="csp-bf-invrow" (click)="viewInvoice(invoice)">
+                <td><button type="button" class="csp-link-strong">{{ invoice.invoiceNumber }}</button></td>
+                <td>{{ invoice.shopCode }}</td>
+                <td>{{ invoice.billingPeriod }}</td>
+                <td>QAR {{ invoice.rentAmount | number:'1.0-0' }}</td>
+                <td>QAR {{ invoice.paidAmount | number:'1.0-0' }}</td>
+                <td><strong>QAR {{ invoice.outstandingAmount | number:'1.0-0' }}</strong></td>
+                <td>{{ invoice.dueDate | date:'dd MMM yyyy' }}</td>
+                <td>
+                  <span class="woqod-badge" [ngClass]="getStatusClass(invoice.paymentStatus)">
+                    {{ invoice.paymentStatus }}
+                  </span>
+                </td>
+                <td (click)="$event.stopPropagation()">
+                  <div class="csp-action-buttons">
+                    <button class="csp-icon-button" type="button" title="View details" (click)="viewInvoice(invoice)">👁️</button>
+                    <button class="csp-icon-button" type="button" title="Download CSV" (click)="downloadInvoice(invoice)">⬇️</button>
+                    <button class="csp-icon-button" type="button" title="Print" (click)="printInvoice(invoice)">🖨️</button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="filteredInvoices.length === 0">
+                <td colspan="9" class="text-center text-muted py-4">
+                  No invoices found
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== INVOICE DETAIL MODAL ===================== -->
+  <div class="csp-modal-overlay" *ngIf="selectedInvoice" (click)="closeInvoice()">
+    <div class="csp-modal csp-modal--large" role="dialog" aria-modal="true" aria-label="Invoice details"
+         appFocusTrap (escape)="closeInvoice()" (click)="$event.stopPropagation()">
+      <div class="csp-modal-header">
+        <div>
+          <h3 class="csp-modal-title">
+            Invoice {{ selectedInvoice.invoiceNumber }}
+            <span class="csp-bf-tag">🏪 Kenar</span>
+            <span class="woqod-badge" [ngClass]="getStatusClass(selectedInvoice.paymentStatus)">{{ selectedInvoice.paymentStatus }}</span>
+          </h3>
+          <p class="csp-modal-sub">{{ shopName(selectedInvoice.shopCode) }} · {{ selectedInvoice.billingPeriod }}</p>
+        </div>
+        <button class="csp-icon-button" type="button" (click)="closeInvoice()" aria-label="Close">✕</button>
+      </div>
+
+      <div class="csp-modal-body">
+        <div class="csp-bf-inv-grid">
+          <div><span class="csp-bf-inv-grid__label">Shop</span><span class="csp-bf-inv-grid__value">{{ shopName(selectedInvoice.shopCode) }}</span></div>
+          <div><span class="csp-bf-inv-grid__label">Contract Ref</span><span class="csp-bf-inv-grid__value">{{ selectedInvoice.contractReference }}</span></div>
+          <div><span class="csp-bf-inv-grid__label">Billing Period</span><span class="csp-bf-inv-grid__value">{{ selectedInvoice.billingPeriod }}</span></div>
+          <div><span class="csp-bf-inv-grid__label">Issue Date</span><span class="csp-bf-inv-grid__value">{{ selectedInvoice.issueDate | date:'dd MMM yyyy' }}</span></div>
+          <div><span class="csp-bf-inv-grid__label">Due Date</span><span class="csp-bf-inv-grid__value">{{ selectedInvoice.dueDate | date:'dd MMM yyyy' }}</span></div>
+          <div><span class="csp-bf-inv-grid__label">Status</span><span class="csp-bf-inv-grid__value">{{ selectedInvoice.paymentStatus }}</span></div>
+        </div>
+
+        <div class="csp-modal__section">
+          <h4 class="csp-modal__section-title">Related Payments / Transactions</h4>
+          <div class="csp-table-container">
+            <table class="csp-settings-table">
+              <thead>
+                <tr><th>Receipt</th><th>Date</th><th>Mode</th><th>Amount</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let p of relatedPayments(selectedInvoice)">
+                  <td><strong>{{ p.receiptNumber }}</strong></td>
+                  <td>{{ p.paymentDate | date:'dd MMM yyyy' }}</td>
+                  <td>{{ p.paymentMode }}</td>
+                  <td>QAR {{ p.amountPaid | number:'1.0-0' }}</td>
+                  <td><span class="woqod-badge woqod-badge-success">{{ p.paymentStatus }}</span></td>
+                </tr>
+                <tr *ngIf="relatedPayments(selectedInvoice).length === 0">
+                  <td colspan="5" class="text-center text-muted">No payments recorded yet</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="csp-bf-inv-totals">
+          <div class="csp-bf-inv-totals__row"><span>Rent Amount</span><span>QAR {{ selectedInvoice.rentAmount | number:'1.0-0' }}</span></div>
+          <div class="csp-bf-inv-totals__row"><span>Paid</span><span>QAR {{ selectedInvoice.paidAmount | number:'1.0-0' }}</span></div>
+          <div class="csp-bf-inv-totals__row csp-bf-inv-totals__row--grand"><span>Outstanding</span><span>QAR {{ selectedInvoice.outstandingAmount | number:'1.0-0' }}</span></div>
+        </div>
+
+        <p class="csp-modal-message" style="margin-top:16px;font-size:12px;">
+          System-generated by WOQOD Total Control · Kenar. For queries call <strong>16007</strong> or email <strong>customercare&#64;woqod.com.qa</strong>.
+        </p>
+      </div>
+
+      <div class="csp-modal-footer">
+        <button class="csp-button csp-button--secondary" type="button" (click)="downloadInvoice(selectedInvoice)">⬇️ Download CSV</button>
+        <button class="csp-button csp-button--secondary" type="button" (click)="printInvoice(selectedInvoice)">🖨️ Print</button>
+        <button class="csp-button csp-button--primary" type="button" (click)="closeInvoice()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

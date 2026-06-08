@@ -1,0 +1,98 @@
+<div class="woqod-shops-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header woqod-page-header-kenar">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">My Shops</h1>
+            <p class="woqod-page-subtitle">View and manage your rental shops</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Filters -->
+    <div class="woqod-modern-card mb-4">
+      <div class="woqod-card-body">
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Search by shop code, station name, location, or type..."
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange()"
+            />
+          </div>
+          <div class="col-12 col-md-4">
+            <select class="form-select" [(ngModel)]="filterStatus" (change)="onFilterChange()">
+              <option value="">All Statuses</option>
+              <option value="Active">Active</option>
+              <option value="Expiring Soon">Expiring Soon</option>
+              <option value="Expired">Expired</option>
+              <option value="Terminated">Terminated</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-2">
+            <button class="woqod-btn woqod-btn-secondary w-100" (click)="clearFilters()">
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shops Table -->
+    <div class="woqod-modern-card">
+      <div class="woqod-card-header">
+        <h3 class="woqod-card-title">Shops ({{ filteredShops.length }})</h3>
+      </div>
+      <div class="woqod-card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Shop Code</th>
+                <th>Station Name</th>
+                <th>Location</th>
+                <th>Shop Type</th>
+                <th>Rent Amount</th>
+                <th>Contract Status</th>
+                <th>Operational Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let shop of filteredShops">
+                <td><strong>{{ shop.shopCode }}</strong></td>
+                <td>{{ shop.stationName }}</td>
+                <td>{{ shop.location }}</td>
+                <td>{{ shop.shopType }}</td>
+                <td><strong>QAR {{ shop.rentAmount | number:'1.0-0' }}</strong></td>
+                <td>
+                  <span class="woqod-badge" [ngClass]="getContractStatusClass(shop.contractStatus)">
+                    {{ shop.contractStatus }}
+                  </span>
+                </td>
+                <td>{{ shop.operationalStatus }}</td>
+                <td>
+                  <button class="woqod-btn woqod-btn-secondary woqod-btn-small" (click)="viewShopDetails(shop)">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="filteredShops.length === 0">
+                <td colspan="8" class="text-center text-muted py-4">
+                  No shops found matching your criteria
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

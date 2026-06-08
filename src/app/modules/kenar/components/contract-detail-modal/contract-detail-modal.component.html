@@ -1,0 +1,105 @@
+<div class="csp-modal-backdrop" *ngIf="open" (click)="closed.emit()" aria-hidden="true"></div>
+
+<div
+  class="csp-modal"
+  [class.csp-modal--open]="open"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="contract ? 'Contract details ' + contract.contractNumber : 'Contract details'"
+  *ngIf="open && contract"
+>
+  <!-- Header -->
+  <div class="csp-modal__head">
+    <div>
+      <h3 class="csp-modal__title">{{ contract.contractNumber }}</h3>
+      <p class="csp-modal__sub">{{ contract.shopName }}</p>
+    </div>
+    <button type="button" class="csp-btn-icon" aria-label="Close" (click)="closed.emit()">✕</button>
+  </div>
+
+  <!-- Body -->
+  <div class="csp-modal__body">
+
+    <!-- Status Section -->
+    <div class="csp-modal__section">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="csp-badge" [ngClass]="statusBadgeClass()">{{ contract.contractStatus }}</span>
+        <span *ngIf="contract.renewalStatus" class="csp-badge csp-badge--info">Renewal: {{ contract.renewalStatus }}</span>
+      </div>
+    </div>
+
+    <!-- Contract Overview -->
+    <div class="csp-modal__section">
+      <h4 class="csp-card__title" style="font-size:14px; font-weight:600; margin-bottom:12px;">Contract Overview</h4>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Shop Code</p>
+          <p style="font-size:14px; color:#020618;">{{ contract.shopCode }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Station Name</p>
+          <p style="font-size:14px; color:#020618;">{{ contract.stationName }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Start Date</p>
+          <p style="font-size:14px; color:#020618;">{{ formatDate(contract.startDate) }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">End Date</p>
+          <p style="font-size:14px; color:#020618;">{{ formatDate(contract.endDate) }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Contract Duration</p>
+          <p style="font-size:14px; color:#020618;">{{ calculateContractDuration() }}</p>
+        </div>
+        <div class="col-md-6" *ngIf="contract.daysUntilExpiry !== undefined">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Days Until Expiry</p>
+          <p style="font-size:14px; color:#020618; font-weight:600;"
+             [style.color]="contract.daysUntilExpiry < 90 ? '#e7000b' : '#020618'">
+            {{ contract.daysUntilExpiry }} days
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Financial Terms -->
+    <div class="csp-modal__section">
+      <h4 class="csp-card__title" style="font-size:14px; font-weight:600; margin-bottom:12px;">Financial Terms</h4>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Total Rent Value</p>
+          <p style="font-size:14px; color:#020618; font-weight:600;">{{ formatCurrency(contract.rentValue) }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Security Deposit</p>
+          <p style="font-size:14px; color:#020618;">{{ formatCurrency(contract.securityDeposit) }}</p>
+        </div>
+        <div class="col-12">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Payment Terms</p>
+          <p style="font-size:14px; color:#020618;">{{ contract.paymentTerms }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contract Terms (Placeholder) -->
+    <div class="csp-modal__section">
+      <h4 class="csp-card__title" style="font-size:14px; font-weight:600; margin-bottom:12px;">Key Contract Terms</h4>
+      <ul style="font-size:13px; color:#45556c; margin:0; padding-left:20px;">
+        <li>Rent payment due on the 1st of each month</li>
+        <li>Utilities billed separately based on actual consumption</li>
+        <li>Tenant responsible for shop maintenance and repairs</li>
+        <li>3 months notice required for contract termination</li>
+        <li>Security deposit refundable upon contract completion</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="csp-modal__footer">
+    <button type="button" class="csp-btn csp-btn--secondary" (click)="closed.emit()">Close</button>
+    <button type="button" class="csp-btn csp-btn--primary" (click)="downloadContract()">
+      📄 Download Contract
+    </button>
+  </div>
+</div>

@@ -1,0 +1,138 @@
+<div class="csp-settings-section-container">
+  <h2 class="csp-section-title">System Preferences</h2>
+  <p class="csp-section-subtitle">Customize your portal experience</p>
+
+  <!-- Language Preference Card -->
+  <div class="csp-card">
+    <div class="csp-card-header">
+      <h3 class="csp-card-title">Language & Direction</h3>
+    </div>
+    <div class="csp-card-body">
+      <div class="csp-form-group">
+        <label class="csp-form-label">Interface Language</label>
+        <div class="csp-radio-group">
+          <label class="csp-radio">
+            <input
+              type="radio"
+              class="csp-radio__input"
+              name="language"
+              [value]="'en'"
+              [checked]="preferences.language === 'en'"
+              (change)="updateLanguage('en')"
+            />
+            <span class="csp-radio__label">English (LTR)</span>
+          </label>
+          <label class="csp-radio">
+            <input
+              type="radio"
+              class="csp-radio__input"
+              name="language"
+              [value]="'ar'"
+              [checked]="preferences.language === 'ar'"
+              (change)="updateLanguage('ar')"
+            />
+            <span class="csp-radio__label">العربية (RTL)</span>
+          </label>
+        </div>
+        <p class="csp-form-help">Change the interface language and text direction</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date Format Card -->
+  <div class="csp-card">
+    <div class="csp-card-header">
+      <h3 class="csp-card-title">Date & Time Format</h3>
+    </div>
+    <div class="csp-card-body">
+      <div class="csp-form-group">
+        <label class="csp-form-label">Date Format</label>
+        <div class="csp-radio-group">
+          <label class="csp-radio">
+            <input
+              type="radio"
+              class="csp-radio__input"
+              name="dateFormat"
+              [value]="'DD/MM/YYYY'"
+              [checked]="preferences.dateFormat === 'DD/MM/YYYY'"
+              (change)="updateDateFormat('DD/MM/YYYY')"
+            />
+            <span class="csp-radio__label">DD/MM/YYYY (e.g., 22/05/2026)</span>
+          </label>
+          <label class="csp-radio">
+            <input
+              type="radio"
+              class="csp-radio__input"
+              name="dateFormat"
+              [value]="'MM/DD/YYYY'"
+              [checked]="preferences.dateFormat === 'MM/DD/YYYY'"
+              (change)="updateDateFormat('MM/DD/YYYY')"
+            />
+            <span class="csp-radio__label">MM/DD/YYYY (e.g., 05/22/2026)</span>
+          </label>
+          <label class="csp-radio">
+            <input
+              type="radio"
+              class="csp-radio__input"
+              name="dateFormat"
+              [value]="'YYYY-MM-DD'"
+              [checked]="preferences.dateFormat === 'YYYY-MM-DD'"
+              (change)="updateDateFormat('YYYY-MM-DD')"
+            />
+            <span class="csp-radio__label">YYYY-MM-DD (e.g., 2026-05-22)</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard View Card -->
+  <div class="csp-card">
+    <div class="csp-card-header">
+      <h3 class="csp-card-title">Default Dashboard View</h3>
+    </div>
+    <div class="csp-card-body">
+      <div class="csp-form-group">
+        <label class="csp-form-label">Default Line of Business View</label>
+        <select
+          class="csp-form-input"
+          [value]="preferences.defaultDashboardView"
+          (change)="updateDashboardView($any($event.target).value)"
+        >
+          <option value="all">All Lines of Business</option>
+          <option value="Fuel">Fuel</option>
+          <option value="APC">APC (Aviation Petroleum)</option>
+          <option value="Bulk Fuel">Bulk Fuel</option>
+        </select>
+        <p class="csp-form-help">Choose which LOB data to display by default when you log in</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview Section -->
+  <div class="csp-card">
+    <div class="csp-card-header">
+      <h3 class="csp-card-title">Current Settings Summary</h3>
+    </div>
+    <div class="csp-card-body">
+      <div class="csp-info-grid">
+        <div class="csp-info-row">
+          <span class="csp-info-row__label">Language</span>
+          <span class="csp-info-row__value">{{ preferences.language === 'en' ? 'English' : 'العربية' }}</span>
+        </div>
+        <div class="csp-info-row">
+          <span class="csp-info-row__label">Text Direction</span>
+          <span class="csp-info-row__value">{{ preferences.language === 'en' ? 'Left-to-Right' : 'Right-to-Left' }}</span>
+        </div>
+        <div class="csp-info-row">
+          <span class="csp-info-row__label">Date Format</span>
+          <span class="csp-info-row__value">{{ preferences.dateFormat }}</span>
+        </div>
+        <div class="csp-info-row">
+          <span class="csp-info-row__label">Default Dashboard</span>
+          <span class="csp-info-row__value">{{ preferences.defaultDashboardView === 'all' ? 'All LOBs' : preferences.defaultDashboardView }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

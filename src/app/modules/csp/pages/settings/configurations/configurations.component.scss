@@ -1,0 +1,118 @@
+:host {
+  display: block;
+}
+
+// Section header with a primary action on the right
+.csp-section-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+// Open API endpoint chip
+.csp-cfg-endpoint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+
+  code {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #020618;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 4px 8px;
+    word-break: break-all;
+  }
+}
+
+.csp-cfg-api-label {
+  display: inline-flex;
+}
+
+// --- Modal: approval levels editor ---
+.csp-cfg-levels {
+  margin-top: 8px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+}
+
+.csp-cfg-levels-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.csp-cfg-level-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  margin-bottom: 12px;
+
+  .csp-step-number {
+    flex: 0 0 auto;
+    margin-top: 26px;
+  }
+}
+
+.csp-cfg-level-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  flex: 1 1 auto;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.csp-cfg-level-remove {
+  flex: 0 0 auto;
+  margin-top: 26px;
+  color: #e7000b;
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+// --- Modal: Open API block ---
+.csp-cfg-api-block {
+  margin-top: 8px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+}
+
+.csp-cfg-api-hint {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+// Small + danger button variants (scoped, csp- prefixed)
+.csp-button--sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.csp-button--danger {
+  background: #e7000b;
+  border-color: #e7000b;
+  color: #ffffff;
+
+  &:hover {
+    background: #c50009;
+    border-color: #c50009;
+  }
+}

@@ -1,0 +1,184 @@
+<div class="woqod-dashboard-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header woqod-page-header-kenar">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">Sales Data</h1>
+            <p class="woqod-page-subtitle">View and confirm your daily and monthly sales data</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Filters Card -->
+    <div class="woqod-modern-card mb-4">
+      <div class="woqod-card-header">
+        <h3 class="woqod-card-title">Filter Sales Data</h3>
+      </div>
+      <div class="woqod-card-body">
+        <div class="row g-3">
+          <div class="col-12 col-md-6 col-lg-3">
+            <label for="filterStartDate" class="form-label">Start Date</label>
+            <input
+              type="date"
+              id="filterStartDate"
+              class="form-control"
+              [(ngModel)]="filterStartDate"
+              (change)="onFilterChange()"
+            />
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-3">
+            <label for="filterEndDate" class="form-label">End Date</label>
+            <input
+              type="date"
+              id="filterEndDate"
+              class="form-control"
+              [(ngModel)]="filterEndDate"
+              (change)="onFilterChange()"
+            />
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-3">
+            <label for="filterShop" class="form-label">Shop</label>
+            <select
+              id="filterShop"
+              class="form-select"
+              [(ngModel)]="filterShop"
+              (change)="onFilterChange()"
+            >
+              <option value="">All Shops</option>
+              <option *ngFor="let shop of shops" [value]="shop.shopCode">
+                {{ shop.shopCode }} - {{ shop.stationName }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-3">
+            <label for="filterStatus" class="form-label">Status</label>
+            <select
+              id="filterStatus"
+              class="form-select"
+              [(ngModel)]="filterStatus"
+              (change)="onFilterChange()"
+            >
+              <option value="">All Statuses</option>
+              <option value="Received">Received</option>
+              <option value="Under Processing">Under Processing</option>
+              <option value="Processed Successfully">Processed Successfully</option>
+              <option value="Validation Failed">Validation Failed</option>
+              <option value="Pending Tenant Confirmation">Pending Tenant Confirmation</option>
+              <option value="Confirmed by Tenant">Confirmed by Tenant</option>
+              <option value="Disputed by Tenant">Disputed by Tenant</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+
+          <div class="col-12">
+            <button type="button" class="woqod-btn woqod-btn-secondary" (click)="clearFilters()">
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales Data Table -->
+    <div class="woqod-modern-card">
+      <div class="woqod-card-header">
+        <h3 class="woqod-card-title">Sales Records ({{ filteredSales.length }})</h3>
+      </div>
+      <div class="woqod-card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Sales Date</th>
+                <th>Shop</th>
+                <th>Station</th>
+                <th>Sales Amount</th>
+                <th>Transactions</th>
+                <th>Payment Methods</th>
+                <th>Data Source</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let sale of filteredSales">
+                <td><strong>{{ sale.salesDate | date:'dd MMM yyyy' }}</strong></td>
+                <td>{{ sale.shopCode }}<br><small class="text-muted">{{ sale.shopName }}</small></td>
+                <td>{{ sale.stationName }}</td>
+                <td><strong>QAR {{ sale.totalSalesAmount | number:'1.0-0' }}</strong></td>
+                <td>{{ sale.transactionCount | number }}</td>
+                <td>
+                  <small>
+                    Cash: {{ sale.paymentMethodBreakdown.cash | number:'1.0-0' }}<br>
+                    Card: {{ sale.paymentMethodBreakdown.card | number:'1.0-0' }}<br>
+                    Wallet: {{ sale.paymentMethodBreakdown.digitalWallet | number:'1.0-0' }}
+                  </small>
+                </td>
+                <td>
+                  <span class="woqod-badge woqod-badge-info">
+                    {{ getDataSourceIcon(sale.dataSource) }} {{ sale.dataSource }}
+                  </span>
+                </td>
+                <td>
+                  <span class="woqod-badge" [ngClass]="getStatusClass(sale.processingStatus)">
+                    {{ sale.processingStatus }}
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button
+                      *ngIf="sale.processingStatus === 'Pending Tenant Confirmation'"
+                      type="button"
+                      class="btn btn-sm btn-success"
+                      (click)="confirmSales(sale.salesId)"
+                      title="Confirm Sales Data"
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-warning"
+                      (click)="disputeSales(sale.salesId)"
+                      title="Dispute Sales Data"
+                    >
+                      Dispute
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-primary"
+                      (click)="downloadSalesRecord(sale.salesId)"
+                      title="Download Record"
+                    >
+                      Download
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="filteredSales.length === 0">
+                <td colspan="9">
+                  <div class="woqod-empty-state">
+                    <div class="woqod-empty-icon">
+                      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 11L12 14L22 4M21 12V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                    <p class="woqod-empty-title">No Sales Data Found</p>
+                    <p class="woqod-empty-text">No sales records match the selected filters</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

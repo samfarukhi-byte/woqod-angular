@@ -1,0 +1,216 @@
+<div class="woqod-tender-details-wrapper">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="woqod-loading-container">
+    <div class="woqod-spinner-large"></div>
+    <p class="woqod-loading-message">Loading tender details...</p>
+  </div>
+
+  <!-- Tender Details Content -->
+  <div *ngIf="!isLoading && tender" class="woqod-tender-details-content">
+
+    <!-- Header Section -->
+    <div class="woqod-tender-details-header">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <button class="woqod-back-btn" (click)="goBack()" type="button">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Back to Tenders
+            </button>
+
+            <div class="woqod-tender-details-header-content">
+              <div class="woqod-tender-badge-large">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M14 2V8H20M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+
+              <span class="woqod-tender-ref-badge">{{ tender.tenderReferenceNo }}</span>
+
+              <h1 class="woqod-tender-details-title">{{ tender.tenderTitle }}</h1>
+
+              <div class="woqod-tender-status-badge woqod-status-active">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="5" cy="5" r="5" fill="currentColor"/>
+                </svg>
+                Active Tender
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Meta Information -->
+    <div class="woqod-tender-details-meta">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-3 col-md-6 col-12">
+            <div class="woqod-meta-card">
+              <div class="woqod-meta-card-icon woqod-meta-icon-red">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="woqod-meta-card-content">
+                <div class="woqod-meta-card-label">Closing Date</div>
+                <div class="woqod-meta-card-value">{{ formatDate(tender.closingDate) }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6 col-12">
+            <div class="woqod-meta-card">
+              <div class="woqod-meta-card-icon woqod-meta-icon-green">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                  <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="woqod-meta-card-content">
+                <div class="woqod-meta-card-label">Status</div>
+                <div class="woqod-meta-card-value">Active</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6 col-12">
+            <div class="woqod-meta-card">
+              <div class="woqod-meta-card-icon woqod-meta-icon-blue">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M14 2V8H20" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </div>
+              <div class="woqod-meta-card-content">
+                <div class="woqod-meta-card-label">Reference Number</div>
+                <div class="woqod-meta-card-value">{{ tender.tenderReferenceNo }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6 col-12">
+            <div class="woqod-meta-card">
+              <div class="woqod-meta-card-icon woqod-meta-icon-purple">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 16V8C20.9996 7.64927 20.9071 7.30481 20.7315 7.00116C20.556 6.69751 20.3037 6.44536 20 6.27L13 2.27C12.696 2.09446 12.3511 2.00205 12 2.00205C11.6489 2.00205 11.304 2.09446 11 2.27L4 6.27C3.69626 6.44536 3.44398 6.69751 3.26846 7.00116C3.09294 7.30481 3.00036 7.64927 3 8V16C3.00036 16.3507 3.09294 16.6952 3.26846 16.9988C3.44398 17.3025 3.69626 17.5546 4 17.73L11 21.73C11.304 21.9055 11.6489 21.9979 12 21.9979C12.3511 21.9979 12.696 21.9055 13 21.73L20 17.73C20.3037 17.5546 20.556 17.3025 20.7315 16.9988C20.9071 16.6952 20.9996 16.3507 21 16Z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M3.27002 6.96L12 12.01L20.73 6.96M12 22.08V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="woqod-meta-card-content">
+                <div class="woqod-meta-card-label">Category</div>
+                <div class="woqod-meta-card-value">Procurement</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="woqod-tender-details-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-12">
+            <!-- Description Section -->
+            <div class="woqod-details-section">
+              <h2 class="woqod-details-section-title">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17.5 2.5H2.5V17.5H17.5V2.5Z" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M5.83334 6.66667H14.1667M5.83334 10H14.1667M5.83334 13.3333H10.8333" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                Tender Overview
+              </h2>
+              <p class="woqod-details-description">{{ tender.description }}</p>
+            </div>
+
+            <!-- Full Details Section -->
+            <div class="woqod-details-section">
+              <h2 class="woqod-details-section-title">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11.6667 1.66667H5.00001C4.55798 1.66667 4.13406 1.84226 3.82149 2.15482C3.50893 2.46738 3.33334 2.89131 3.33334 3.33334V16.6667C3.33334 17.1087 3.50893 17.5326 3.82149 17.8452C4.13406 18.1577 4.55798 18.3333 5.00001 18.3333H15C15.442 18.3333 15.866 18.1577 16.1785 17.8452C16.4911 17.5326 16.6667 17.1087 16.6667 16.6667V6.66667L11.6667 1.66667Z" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M11.6667 1.66667V6.66667H16.6667M13.3333 10.8333H6.66667M13.3333 14.1667H6.66667M8.33334 7.5H6.66667" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                Complete Tender Details
+              </h2>
+              <div class="woqod-details-text-container">
+                <pre class="woqod-details-text">{{ tender.details }}</pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="col-lg-4 col-12">
+            <!-- Download Section -->
+            <div class="woqod-sidebar-card woqod-sidebar-download" *ngIf="tender.tenderUrl">
+              <div class="woqod-sidebar-card-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M7 10L12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3 class="woqod-sidebar-card-title">Download Tender Document</h3>
+              <p class="woqod-sidebar-card-text">Download the official tender document with complete specifications and requirements.</p>
+              <button class="woqod-btn woqod-btn-primary woqod-btn-block" (click)="downloadDocument()" type="button">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                  <path d="M17.5 12.5V15.8333C17.5 16.2754 17.3244 16.6993 17.0118 17.0118C16.6993 17.3244 16.2754 17.5 15.8333 17.5H4.16667C3.72464 17.5 3.30072 17.3244 2.98816 17.0118C2.67559 16.6993 2.5 16.2754 2.5 15.8333V12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M5.83334 8.33334L10 12.5L14.1667 8.33334M10 12.5V2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Download PDF
+              </button>
+            </div>
+
+            <!-- Quick Info Section -->
+            <div class="woqod-sidebar-card">
+              <h3 class="woqod-sidebar-card-title">Important Information</h3>
+              <div class="woqod-sidebar-info-list">
+                <div class="woqod-sidebar-info-item">
+                  <div class="woqod-sidebar-info-label">Tender Type</div>
+                  <div class="woqod-sidebar-info-value">Open Tender</div>
+                </div>
+                <div class="woqod-sidebar-info-item">
+                  <div class="woqod-sidebar-info-label">Published Date</div>
+                  <div class="woqod-sidebar-info-value">{{ formatDate(tender.createdAt) }}</div>
+                </div>
+                <div class="woqod-sidebar-info-item">
+                  <div class="woqod-sidebar-info-label">Closing Date</div>
+                  <div class="woqod-sidebar-info-value woqod-text-red">{{ formatDate(tender.closingDate) }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="woqod-sidebar-card woqod-sidebar-contact">
+              <div class="woqod-sidebar-card-icon-small">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3 class="woqod-sidebar-card-title">Need Help?</h3>
+              <p class="woqod-sidebar-card-text">Contact our procurement team for any questions or clarifications regarding this tender.</p>
+              <div class="woqod-sidebar-contact-info">
+                <div class="woqod-contact-item">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14.6667 11.28V13.28C14.6675 13.4657 14.6294 13.6494 14.555 13.8195C14.4807 13.9897 14.3716 14.1424 14.2348 14.2679C14.0979 14.3934 13.9364 14.489 13.7605 14.5485C13.5847 14.6079 13.3983 14.63 13.2133 14.6133C11.1619 14.3904 9.19137 13.6894 7.46 12.5667C5.84919 11.5431 4.48353 10.1774 3.46 8.56665C2.33334 6.82745 1.6322 4.84731 1.41333 2.78665C1.39667 2.60229 1.41862 2.41649 1.4777 2.24107C1.53679 2.06564 1.63175 1.90444 1.75655 1.76773C1.88134 1.63102 2.03324 1.52179 2.20256 1.44702C2.37189 1.37225 2.55493 1.33359 2.74 1.33332H4.74C5.06357 1.33013 5.37723 1.4447 5.62248 1.65568C5.86773 1.86666 6.02803 2.15963 6.07333 2.47998C6.15774 3.12003 6.31427 3.748 6.54 4.34998C6.62974 4.59618 6.64908 4.86243 6.59591 5.11967C6.54274 5.37691 6.41928 5.61334 6.24 5.79998L5.39333 6.64665C6.34239 8.31352 7.68647 9.6576 9.35333 10.6067L10.2 9.75998C10.3867 9.5807 10.6231 9.45724 10.8803 9.40407C11.1376 9.3509 11.4038 9.37024 11.65 9.45998C12.252 9.68571 12.88 9.84224 13.52 9.92665C13.8439 9.97234 14.1396 10.1355 14.3511 10.385C14.5625 10.6345 14.6748 10.953 14.6667 11.28Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>+974 4013 0000</span>
+                </div>
+                <div class="woqod-contact-item">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.66666 2.66666H13.3333C14.0667 2.66666 14.6667 3.26666 14.6667 4V12C14.6667 12.7333 14.0667 13.3333 13.3333 13.3333H2.66666C1.93332 13.3333 1.33332 12.7333 1.33332 12V4C1.33332 3.26666 1.93332 2.66666 2.66666 2.66666Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14.6667 4L8 8.66667L1.33334 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>procurement@woqod.com.qa</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

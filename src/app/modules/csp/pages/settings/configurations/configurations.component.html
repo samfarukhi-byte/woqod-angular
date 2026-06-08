@@ -1,0 +1,292 @@
+<div class="csp-settings-section-container">
+  <div class="csp-section-header-row">
+    <div>
+      <h2 class="csp-section-title">Configurations</h2>
+      <p class="csp-section-subtitle">
+        Define dynamic approval flows that requests must pass through internally before they are sent to WOQOD
+      </p>
+    </div>
+    <button class="csp-button csp-button--primary" type="button" (click)="openAddModal()">
+      ➕ New Configuration
+    </button>
+  </div>
+
+  <!-- Info Banner -->
+  <div class="csp-info-banner">
+    <span class="csp-info-icon">ℹ️</span>
+    <div>
+      <strong>How it works:</strong> Choose what kind of request needs internal approval (invoice verification,
+      document edit/update, profile change, or any custom request). Add an approver for each level — the request
+      flows level by level and only after the final approval is it submitted to WOQOD. Enable
+      <strong>Push to Open API</strong> to expose the approved result on an endpoint your systems can call to
+      retrieve the information.
+    </div>
+  </div>
+
+  <!-- Configurations Grid -->
+  <div class="csp-approval-flows-grid">
+    <div class="csp-card csp-flow-card" *ngFor="let config of configurations">
+      <div class="csp-card-header">
+        <div class="csp-card-header-left">
+          <span class="csp-card-icon">{{ getTypeIcon(config.approvalType) }}</span>
+          <div>
+            <h3 class="csp-card-title">{{ config.name }}</h3>
+            <span class="csp-badge csp-badge--info">{{ getTypeLabel(config.approvalType) }}</span>
+          </div>
+        </div>
+        <label class="csp-toggle">
+          <input
+            type="checkbox"
+            class="csp-toggle__input"
+            [checked]="config.enabled"
+            (change)="toggleEnabled(config)"
+          />
+          <span class="csp-toggle__switch"></span>
+          <span class="csp-toggle__label">{{ config.enabled ? 'Enabled' : 'Disabled' }}</span>
+        </label>
+      </div>
+
+      <div class="csp-card-body">
+        <p class="csp-flow-description" *ngIf="config.description">{{ config.description }}</p>
+
+        <!-- Approval Chain -->
+        <div class="csp-approval-steps">
+          <h4 class="csp-subsection-title">Approval Chain ({{ config.approvers.length }} level{{ config.approvers.length === 1 ? '' : 's' }})</h4>
+          <div class="csp-approval-step" *ngFor="let approver of config.approvers; let i = index">
+            <div class="csp-step-number">{{ i + 1 }}</div>
+            <div class="csp-step-details">
+              <div class="csp-step-role">
+                <strong>{{ approver.title }}</strong>
+              </div>
+              <div class="csp-step-conditions">
+                {{ approver.userName || 'Unassigned' }}
+                <span *ngIf="approver.userEmail"> · {{ approver.userEmail }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Open API target -->
+        <div class="csp-flow-settings">
+          <div class="csp-setting-row">
+            <span class="csp-cfg-api-label">
+              <span class="csp-badge" [ngClass]="config.pushToOpenApi ? 'csp-badge--approved' : 'csp-badge--info'">
+                {{ config.pushToOpenApi ? '🔌 Pushes to Open API' : 'Open API off' }}
+              </span>
+            </span>
+          </div>
+          <div class="csp-cfg-endpoint" *ngIf="config.pushToOpenApi && config.apiEndpointPath">
+            <span class="csp-badge csp-badge--info">GET</span>
+            <code>{{ config.apiEndpointPath }}</code>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="csp-flow-actions">
+          <button class="csp-button csp-button--secondary" type="button" (click)="openEditModal(config)">
+            ⚙️ Edit
+          </button>
+          <button class="csp-button csp-button--danger" type="button" (click)="requestDelete(config)">
+            🗑️ Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="csp-empty-state" *ngIf="configurations.length === 0">
+    <h3 class="csp-empty-state__title">No Configurations Yet</h3>
+    <p class="csp-empty-state__sub">Create your first approval flow configuration to get started</p>
+    <button class="csp-button csp-button--primary" type="button" (click)="openAddModal()">
+      ➕ New Configuration
+    </button>
+  </div>
+</div>
+
+<!-- Create / Edit Modal -->
+<div class="csp-modal-overlay" *ngIf="showModal && editing" (click)="closeModal()">
+  <div class="csp-modal csp-modal--large" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">{{ isNew ? '➕ New Configuration' : '⚙️ Edit Configuration' }}</h3>
+      <button class="csp-icon-button" (click)="closeModal()" type="button">✕</button>
+    </div>
+
+    <div class="csp-modal-body">
+      <form>
+        <div class="csp-form-row">
+          <div class="csp-form-group">
+            <label class="csp-form-label">Configuration Name <span class="csp-required">*</span></label>
+            <input
+              type="text"
+              class="csp-form-input"
+              [class.csp-form-input--invalid]="isNameInvalid()"
+              [(ngModel)]="editing.name"
+              name="configName"
+              placeholder="e.g. Invoice Verification — Finance"
+              (blur)="saveFormTouched = true"
+            />
+            <span class="csp-field-error" *ngIf="isNameInvalid()">Name must be at least 3 characters</span>
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-label">Approval Type <span class="csp-required">*</span></label>
+            <select
+              class="csp-form-input"
+              [(ngModel)]="editing.approvalType"
+              name="approvalType"
+              (ngModelChange)="onApprovalTypeChange()"
+            >
+              <option *ngFor="let t of approvalTypes" [value]="t.value">{{ t.icon }} {{ t.label }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="csp-form-group">
+          <label class="csp-form-label">Description</label>
+          <textarea
+            class="csp-form-input"
+            [(ngModel)]="editing.description"
+            name="description"
+            rows="2"
+            placeholder="What does this approval flow cover?"
+          ></textarea>
+        </div>
+
+        <!-- Approval levels -->
+        <div class="csp-cfg-levels">
+          <div class="csp-cfg-levels-header">
+            <h4 class="csp-subsection-title">Approval Levels</h4>
+            <button class="csp-button csp-button--secondary csp-button--sm" type="button" (click)="addApprover()">
+              ➕ Add Level
+            </button>
+          </div>
+
+          <div class="csp-cfg-level-row" *ngFor="let approver of editing.approvers; let i = index; trackBy: trackByLevelId">
+            <div class="csp-step-number">{{ i + 1 }}</div>
+            <div class="csp-cfg-level-fields">
+              <div class="csp-form-group">
+                <label class="csp-form-label">Level Title <span class="csp-required">*</span></label>
+                <input
+                  type="text"
+                  class="csp-form-input"
+                  [class.csp-form-input--invalid]="isApproverTitleInvalid(approver)"
+                  [(ngModel)]="approver.title"
+                  [name]="'levelTitle' + i"
+                  placeholder="e.g. Finance Manager"
+                  (blur)="saveFormTouched = true"
+                />
+                <span class="csp-field-error" *ngIf="isApproverTitleInvalid(approver)">Required (min 2 characters)</span>
+              </div>
+              <div class="csp-form-group">
+                <label class="csp-form-label">Approver <span class="csp-required">*</span></label>
+                <select
+                  class="csp-form-input"
+                  [class.csp-form-input--invalid]="isApproverUserInvalid(approver)"
+                  [ngModel]="approver.userId"
+                  [name]="'levelUser' + i"
+                  (ngModelChange)="onApproverUserChange(approver, $event)"
+                >
+                  <option value="">Select a user…</option>
+                  <option *ngFor="let u of users" [value]="u.userId">{{ u.fullName }} ({{ u.role }})</option>
+                </select>
+                <span class="csp-field-error" *ngIf="isApproverUserInvalid(approver)">An approver must be selected</span>
+              </div>
+            </div>
+            <button
+              class="csp-icon-button csp-cfg-level-remove"
+              type="button"
+              title="Remove level"
+              (click)="removeApprover(approver.levelId)"
+              [disabled]="editing.approvers.length === 1"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <!-- Open API integration -->
+        <div class="csp-cfg-api-block">
+          <label class="csp-toggle">
+            <input
+              type="checkbox"
+              class="csp-toggle__input"
+              [(ngModel)]="editing.pushToOpenApi"
+              name="pushToOpenApi"
+            />
+            <span class="csp-toggle__switch"></span>
+            <span class="csp-toggle__label">Push approved result to the Open API interface</span>
+          </label>
+          <p class="csp-text-muted csp-cfg-api-hint">
+            When enabled, once the final level approves, the result is published to an endpoint your systems can
+            call to retrieve the information.
+          </p>
+          <div class="csp-cfg-endpoint" *ngIf="editing.pushToOpenApi">
+            <span class="csp-badge csp-badge--info">GET</span>
+            <code>{{ buildEndpointPath(editing.approvalType) }}</code>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--secondary" (click)="closeModal()" type="button">Cancel</button>
+      <button class="csp-button csp-button--primary" (click)="saveConfig()" type="button">
+        {{ isNew ? 'Create Configuration' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete Modal -->
+<div *ngIf="showConfirmDelete" class="csp-modal-overlay" (click)="cancelDelete()">
+  <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">⚠️ Delete Configuration</h3>
+      <button class="csp-icon-button" (click)="cancelDelete()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <p class="csp-modal-message">
+        Delete configuration <strong>{{ configToDelete?.name }}</strong>? This cannot be undone.
+      </p>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--secondary" (click)="cancelDelete()" type="button">Cancel</button>
+      <button class="csp-button csp-button--danger" (click)="confirmDelete()" type="button">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Validation Error Modal -->
+<div *ngIf="showValidationModal" class="csp-modal-overlay" (click)="closeValidationModal()">
+  <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">⚠️ Validation Errors</h3>
+      <button class="csp-icon-button" (click)="closeValidationModal()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <p class="csp-modal-message csp-modal-message--spaced">Please fix the following errors:</p>
+      <ul class="csp-validation-list">
+        <li *ngFor="let error of validationErrors">{{ error }}</li>
+      </ul>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--primary" (click)="closeValidationModal()" type="button">OK, Got It</button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div *ngIf="showSuccessModal" class="csp-modal-overlay" (click)="closeSuccessModal()">
+  <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">✓ Success</h3>
+      <button class="csp-icon-button" (click)="closeSuccessModal()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <p class="csp-modal-message">{{ successMessage }}</p>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--primary" (click)="closeSuccessModal()" type="button">OK</button>
+    </div>
+  </div>
+</div>

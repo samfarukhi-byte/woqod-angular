@@ -1,0 +1,39 @@
+<!-- Floating launcher — click the mascot to open the assistant -->
+<button class="woqod-chat-fab" type="button" (click)="toggle()" [class.woqod-chat-fab--open]="open"
+        aria-label="Open WOQOD Assistant">
+  <img *ngIf="!open" src="assets/images/chatbot-mascot.png" alt="WOQOD Assistant" class="woqod-chat-fab__mascot" />
+  <span *ngIf="open" class="woqod-chat-fab__close">✕</span>
+</button>
+
+<!-- Chat panel -->
+<div class="woqod-chat" *ngIf="open" role="dialog" aria-modal="true" aria-label="WOQOD Assistant"
+     appFocusTrap (escape)="close()">
+  <header class="woqod-chat__head">
+    <div class="woqod-chat__head-id">
+      <span class="woqod-chat__avatar">🤖</span>
+      <div>
+        <div class="woqod-chat__title">WOQOD Assistant</div>
+        <div class="woqod-chat__status"><span class="woqod-chat__dot"></span> Online · AI-powered</div>
+      </div>
+    </div>
+    <button class="woqod-chat__close" type="button" (click)="close()" aria-label="Close">✕</button>
+  </header>
+
+  <div class="woqod-chat__body">
+    <div *ngFor="let m of messages" class="woqod-chat__msg" [ngClass]="'woqod-chat__msg--' + m.from">
+      <div class="woqod-chat__bubble" [innerHTML]="format(m.text)"></div>
+      <div class="woqod-chat__actions" *ngIf="m.actions?.length">
+        <button class="woqod-chat__chip" type="button" *ngFor="let a of m.actions" (click)="act(a)">{{ a.label }}</button>
+      </div>
+    </div>
+
+    <div class="woqod-chat__msg woqod-chat__msg--bot" *ngIf="typing">
+      <div class="woqod-chat__bubble woqod-chat__typing"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
+  <form class="woqod-chat__input" (ngSubmit)="send()">
+    <input type="text" [(ngModel)]="draft" name="chatDraft" placeholder="Type your question…" autocomplete="off" />
+    <button type="submit" class="woqod-chat__send" [disabled]="!draft.trim()" aria-label="Send">➤</button>
+  </form>
+</div>

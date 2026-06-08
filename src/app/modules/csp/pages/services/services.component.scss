@@ -1,0 +1,57 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* SERVICE PHOTO — covers the gradient/emoji header; falls back to emoji if it fails to load */
+::ng-deep .woqod-service-icon-wrapper {
+  overflow: hidden;
+}
+
+::ng-deep .woqod-service-icon-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 3;
+  transition: transform 0.4s ease;
+}
+
+::ng-deep .woqod-service-card-premium:hover .woqod-service-icon-img {
+  transform: scale(1.05);
+}
+
+/* SERVICE CARD GRADIENT BACKGROUNDS */
+::ng-deep .woqod-service-card-premium:nth-child(1) .woqod-service-icon-wrapper {
+  background: linear-gradient(135deg, #ef4444, #f87171) !important;
+}
+
+::ng-deep .woqod-service-card-premium:nth-child(2) .woqod-service-icon-wrapper {
+  background: linear-gradient(135deg, #6366f1, #a78bfa) !important;
+}
+
+::ng-deep .woqod-service-card-premium:nth-child(3) .woqod-service-icon-wrapper {
+  background: linear-gradient(135deg, #0ea5e9, #38bdf8) !important;
+}
+
+::ng-deep .woqod-service-card-premium:nth-child(4) .woqod-service-icon-wrapper {
+  background: linear-gradient(135deg, #10b981, #34d399) !important;
+}
+
+::ng-deep .woqod-service-card-premium:nth-child(5) .woqod-service-icon-wrapper {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24) !important;
+}
+
+::ng-deep .woqod-service-card-premium:nth-child(6) .woqod-service-icon-wrapper {
+  background: linear-gradient(135deg, #ec4899, #f472b6) !important;
+}
+
+::ng-deep .woqod-service-card-premium:nth-child(7) .woqod-service-icon-wrapper {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa) !important;
+}
+
+::ng-deep .woqod-service-card-premium:nth-child(8) .woqod-service-icon-wrapper {
+  background: linear-gradient(135deg, #14b8a6, #2dd4bf) !important;
+}

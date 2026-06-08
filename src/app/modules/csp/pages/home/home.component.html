@@ -1,0 +1,227 @@
+<div class="woqod-home-wrapper">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="woqod-loading-overlay">
+    <div class="woqod-spinner"></div>
+    <p class="woqod-loading-text">Loading your dashboard...</p>
+  </div>
+
+  <!-- Home Content -->
+  <div *ngIf="!isLoading" class="woqod-home-content">
+
+    <!-- Hero Banner Carousel -->
+    <section class="woqod-hero-section" *ngIf="banners.length > 0">
+      <div class="woqod-hero-carousel">
+        <div class="woqod-hero-slides">
+          <div
+            *ngFor="let banner of banners; let i = index"
+            class="woqod-hero-slide"
+            [class.active]="i === currentSlideIndex"
+            [class.prev]="i === (currentSlideIndex - 1 + banners.length) % banners.length"
+            [class.next]="i === (currentSlideIndex + 1) % banners.length"
+          >
+            <div class="woqod-hero-background" [attr.data-banner-index]="i"></div>
+            <div class="woqod-hero-gradient" *ngIf="i !== 0"></div>
+            <div class="container">
+              <div class="row align-items-center" style="min-height: 500px;">
+                <div class="col-lg-7" *ngIf="i !== 0">
+                  <div class="woqod-hero-content">
+                    <div class="woqod-hero-badge">Welcome to WOQOD Total Control</div>
+                    <h1 class="woqod-hero-title animate-slide-up">{{ banner.title }}</h1>
+                    <p class="woqod-hero-subtitle animate-slide-up delay-1">{{ banner.subtitle }}</p>
+                    <div class="woqod-hero-actions animate-slide-up delay-2">
+                      <button
+                        *ngIf="banner.redirectUrl"
+                        class="woqod-btn woqod-btn-primary woqod-btn-lg"
+                        (click)="onBannerClick(banner)"
+                        type="button"
+                      >
+                        Learn More
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 8px;">
+                          <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Arrows -->
+        <button
+          class="woqod-hero-nav woqod-hero-nav-prev"
+          (click)="previousSlide()"
+          *ngIf="banners.length > 1"
+          type="button"
+          aria-label="Previous slide"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button
+          class="woqod-hero-nav woqod-hero-nav-next"
+          (click)="nextSlide()"
+          *ngIf="banners.length > 1"
+          type="button"
+          aria-label="Next slide"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <!-- Slide Indicators -->
+        <div class="woqod-hero-indicators" *ngIf="banners.length > 1">
+          <button
+            *ngFor="let banner of banners; let i = index"
+            class="woqod-hero-indicator"
+            [class.active]="i === currentSlideIndex"
+            (click)="goToSlide(i)"
+            type="button"
+            [attr.aria-label]="'Go to slide ' + (i + 1)"
+          ></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Stats Section -->
+    <section class="woqod-stats-section">
+      <div class="container">
+        <div class="row g-3 g-lg-4">
+          <div class="col-lg-4 col-md-4 col-12">
+            <div class="woqod-stat-card">
+              <div class="woqod-stat-icon woqod-stat-icon-green">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 7H4C2.89543 7 2 7.89543 2 9V19C2 20.1046 2.89543 21 4 21H20C21.1046 21 22 20.1046 22 19V9C22 7.89543 21.1046 7 20 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M16 21V5C16 4.46957 15.7893 3.96086 15.4142 3.58579C15.0391 3.21071 14.5304 3 14 3H10C9.46957 3 8.96086 3.21071 8.58579 3.58579C8.21071 3.96086 8 4.46957 8 5V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="woqod-stat-content">
+                <h3 class="woqod-stat-value">8</h3>
+                <p class="woqod-stat-label">Active Services</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-4 col-12">
+            <div class="woqod-stat-card">
+              <div class="woqod-stat-icon woqod-stat-icon-blue">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="woqod-stat-content">
+                <h3 class="woqod-stat-value">24/7</h3>
+                <p class="woqod-stat-label">Support Available</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-4 col-12">
+            <div class="woqod-stat-card">
+              <div class="woqod-stat-icon woqod-stat-icon-orange">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="woqod-stat-content">
+                <h3 class="woqod-stat-value">Qatar's #1</h3>
+                <p class="woqod-stat-label">Fuel Provider</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Access Section -->
+    <section class="woqod-quick-access-section">
+      <div class="container">
+        <div class="woqod-section-header text-center mb-4 mb-lg-5">
+          <h2 class="woqod-section-title">Quick Access</h2>
+          <p class="woqod-section-description">Explore our services and stay updated with the latest news</p>
+        </div>
+
+        <div class="row g-3 g-lg-4">
+          <div
+            *ngFor="let section of sections"
+            class="col-lg-4 col-md-6 col-12"
+          >
+            <div
+              class="woqod-access-card"
+              (click)="onSectionClick(section)"
+              role="button"
+              tabindex="0"
+            >
+              <div class="woqod-access-card-inner">
+                <div class="woqod-access-icon-wrapper">
+                  <div class="woqod-access-icon">{{ getSectionIcon(section.code) }}</div>
+                  <div class="woqod-access-icon-bg"></div>
+                </div>
+                <div class="woqod-access-content">
+                  <h3 class="woqod-access-title">{{ section.title }}</h3>
+                  <p class="woqod-access-description">{{ section.description }}</p>
+                </div>
+                <div class="woqod-access-footer">
+                  <span class="woqod-access-link">
+                    Explore
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                </div>
+              </div>
+              <div class="woqod-access-card-glow"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Highlight Section -->
+    <section class="woqod-features-section">
+      <div class="container">
+        <div class="row align-items-center g-4 g-lg-5">
+          <div class="col-lg-6 col-12 mb-3 mb-lg-0">
+            <div class="woqod-features-image">
+              <div class="woqod-features-shape"></div>
+              <img src="assets/images/whitelogo.png" alt="WOQOD" class="img-fluid">
+            </div>
+          </div>
+          <div class="col-lg-6 col-12">
+            <div class="woqod-features-content">
+              <h2 class="woqod-features-title">Why Choose WOQOD Total Control?</h2>
+              <p class="woqod-features-subtitle">Your complete fuel management solution</p>
+              <ul class="woqod-features-list">
+                <li class="woqod-feature-item">
+                  <div class="woqod-feature-icon">✓</div>
+                  <div class="woqod-feature-text">
+                    <h4>Real-time Monitoring</h4>
+                    <p>Track your fuel consumption and fleet activity in real-time</p>
+                  </div>
+                </li>
+                <li class="woqod-feature-item">
+                  <div class="woqod-feature-icon">✓</div>
+                  <div class="woqod-feature-text">
+                    <h4>Secure Transactions</h4>
+                    <p>Bank-grade security for all your transactions and data</p>
+                  </div>
+                </li>
+                <li class="woqod-feature-item">
+                  <div class="woqod-feature-icon">✓</div>
+                  <div class="woqod-feature-text">
+                    <h4>24/7 Support</h4>
+                    <p>Our dedicated team is always here to help you</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

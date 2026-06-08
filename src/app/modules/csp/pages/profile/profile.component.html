@@ -1,0 +1,162 @@
+<div class="csp-content">
+  <app-breadcrumb pageTitle="My Profile" [trail]="[{ label: 'Home', link: '/' }, { label: 'My Profile' }]"></app-breadcrumb>
+
+  <section class="csp-profile-banner">
+    <div class="csp-profile-banner__avatar" aria-hidden="true">{{ initial(customer.customerName) }}</div>
+    <div class="csp-profile-banner__body">
+      <h2 class="csp-profile-banner__title">{{ customer.customerName }}</h2>
+      <div class="csp-profile-banner__meta">
+        <span>Customer Code: <strong>{{ customer.customerCode }}</strong></span>
+        <span>·</span>
+        <span>{{ customer.customerType }}</span>
+        <span>·</span>
+        <app-status-badge [status]="customer.status" icon="●"></app-status-badge>
+      </div>
+    </div>
+    <div class="csp-page-heading__actions">
+      <a routerLink="/csp/edit-profile" class="csp-btn csp-btn--primary">✎ Edit Profile</a>
+      <a routerLink="/" class="csp-btn csp-btn--secondary">← Dashboard</a>
+    </div>
+  </section>
+
+  <section class="csp-card">
+    <header class="csp-card__header">
+      <div>
+        <h3 class="csp-card__title">Basic Information</h3>
+        <p class="csp-card__sub">Identity &amp; status</p>
+      </div>
+    </header>
+    <div class="csp-card__body">
+      <div class="csp-info-row"><span class="csp-info-row__label">Customer Code</span><span class="csp-info-row__value">{{ customer.customerCode }}</span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Customer Name</span><span class="csp-info-row__value">{{ customer.customerName }}</span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Customer Type</span><span class="csp-info-row__value">{{ customer.customerType }}</span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Status</span><span class="csp-info-row__value"><app-status-badge [status]="customer.status" icon="●"></app-status-badge></span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Member Since</span><span class="csp-info-row__value">{{ formatDate(customer.createdDate) }}</span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Party Number</span><span class="csp-info-row__value">{{ customer.partyNumber || '—' }}</span></div>
+    </div>
+  </section>
+
+  <section class="csp-card">
+    <header class="csp-card__header">
+      <div>
+        <h3 class="csp-card__title">Business Registration</h3>
+        <p class="csp-card__sub">CR, classification, account type</p>
+      </div>
+    </header>
+    <div class="csp-card__body">
+      <div class="csp-info-row"><span class="csp-info-row__label">Registry ID (CR)</span><span class="csp-info-row__value">{{ customer.registryId || '—' }}</span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Classification</span><span class="csp-info-row__value">{{ customer.businessClassification || '—' }}</span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Sub-Classification</span><span class="csp-info-row__value">{{ customer.businessSubClassification || '—' }}</span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Account Type</span><span class="csp-info-row__value">{{ customer.accountType || '—' }}</span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Description</span><span class="csp-info-row__value">{{ customer.accountDescription || '—' }}</span></div>
+    </div>
+  </section>
+
+  <section class="csp-card">
+    <header class="csp-card__header">
+      <div>
+        <h3 class="csp-card__title">Contact Information</h3>
+        <p class="csp-card__sub">Primary contact for this account</p>
+      </div>
+    </header>
+    <div class="csp-card__body">
+      <div class="csp-info-row"><span class="csp-info-row__label">Contact Person</span><span class="csp-info-row__value">{{ fullContactName() }}</span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Job Title</span><span class="csp-info-row__value">{{ customer.primaryContact.jobTitle || '—' }}</span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Email</span><span class="csp-info-row__value"><a [href]="'mailto:' + customer.primaryContact.email">{{ customer.primaryContact.email }}</a></span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Phone</span><span class="csp-info-row__value"><a [href]="telHref(customer.primaryContact.phone)">{{ customer.primaryContact.phone }}</a></span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Extension</span><span class="csp-info-row__value">{{ customer.primaryContact.phoneExtension || '—' }}</span></div>
+    </div>
+  </section>
+
+  <section class="csp-card">
+    <header class="csp-card__header">
+      <div>
+        <h3 class="csp-card__title">Location Details</h3>
+        <p class="csp-card__sub">Registered &amp; billing addresses</p>
+      </div>
+    </header>
+    <div class="csp-card__body">
+      <div class="csp-address-grid">
+        <div class="csp-address-block">
+          <p class="csp-address-block__label">Registered Address</p>
+          <p class="csp-address-block__body" [innerHTML]="addressLines(customer.registeredAddress)"></p>
+        </div>
+        <div class="csp-address-block">
+          <p class="csp-address-block__label">Billing Address</p>
+          <p class="csp-address-block__body" [innerHTML]="addressLines(customer.billingAddress)"></p>
+          <p *ngIf="billingSameAsRegistered" class="csp-address-block__same">(Same as registered address)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="csp-card">
+    <header class="csp-card__header">
+      <div>
+        <h3 class="csp-card__title">Services &amp; Line of Business</h3>
+        <p class="csp-card__sub">{{ customer.servicesEnabled.length }} enabled</p>
+      </div>
+    </header>
+    <div class="csp-card__body">
+      <div class="csp-service-grid">
+        <div class="csp-service-chip" *ngFor="let s of customer.servicesEnabled">
+          <span class="csp-service-chip__icon" aria-hidden="true">{{ serviceIcon(s) }}</span>
+          <span>{{ s }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="csp-card">
+    <header class="csp-card__header">
+      <div>
+        <h3 class="csp-card__title">Payment &amp; Credit</h3>
+        <p class="csp-card__sub">Terms, method, and limit</p>
+      </div>
+    </header>
+    <div class="csp-card__body">
+      <div class="csp-info-row"><span class="csp-info-row__label">Payment Terms</span><span class="csp-info-row__value">{{ customer.paymentTerms || '—' }}</span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Payment Method</span><span class="csp-info-row__value">{{ customer.paymentMethod || '—' }}</span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Account Model</span><span class="csp-info-row__value">{{ customer.accountModel || '—' }}</span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Credit Limit</span><span class="csp-info-row__value">{{ customer.creditLimit ? formatCurrency(customer.creditLimit, customer.currency) : '—' }}</span></div>
+    </div>
+  </section>
+
+  <section class="csp-card">
+    <header class="csp-card__header">
+      <h3 class="csp-card__title">Documents on File</h3>
+      <a routerLink="/csp/documents" class="csp-btn csp-btn--secondary csp-btn--small">Manage Documents →</a>
+    </header>
+    <div class="csp-card__body">
+      <div class="csp-document-list">
+        <div *ngFor="let d of documents" class="csp-document-row" [ngClass]="documentRowClass(d.status)">
+          <div>
+            <span class="csp-document-row__name">{{ docTypeLabel(d.docType) }}</span>
+            <span class="csp-document-row__meta">
+              v{{ d.version }}<ng-container *ngIf="d.expiryDate"> · Expires {{ formatDate(d.expiryDate) }}</ng-container>
+              · Uploaded {{ formatDate(d.uploadedDate) }}
+            </span>
+          </div>
+          <span class="csp-badge" [ngClass]="documentBadgeClass(d.status)">
+            {{ documentBadgeIcon(d.status) }} {{ d.status }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="csp-card">
+    <header class="csp-card__header">
+      <h3 class="csp-card__title">Approval Status</h3>
+    </header>
+    <div class="csp-card__body">
+      <div class="csp-info-row"><span class="csp-info-row__label">Last Approved</span><span class="csp-info-row__value">{{ formatDate(customer.lastApprovedDate) }}</span></div>
+      <div class="csp-info-row"><span class="csp-info-row__label">Pending Changes</span><span class="csp-info-row__value">{{ pendingChangesText }}</span></div>
+    </div>
+  </section>
+
+  <div class="csp-actions-row">
+    <a routerLink="/csp/edit-profile" class="csp-btn csp-btn--primary">✎ Edit Profile</a>
+    <a routerLink="/" class="csp-btn csp-btn--secondary">← Back to Dashboard</a>
+  </div>
+</div>

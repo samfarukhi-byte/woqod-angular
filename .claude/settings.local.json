@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\ayana\\\\Downloads\\\\CSP LATEST\\\\CSP_FIXED\\\\woqod-angular\\\\src\\\\app\" -Recurse -Directory | Where-Object { $_.Name -eq \"services\" } | Select-Object FullName)",
+      "PowerShell(ng serve *)",
+      "PowerShell(ng build *)",
+      "PowerShell(New-Item *)",
+      "PowerShell(\\(Get-Content \"src\\\\assets\\\\css\\\\woqod-styles.css\" | Measure-Object -Line\\).Lines)",
+      "PowerShell(Get-Content *)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(Test-NetConnection *)",
+      "PowerShell(Get-NetTCPConnection *)",
+      "PowerShell($count = \\(Get-ChildItem -Path \"src/app/modules/kenar\" -Recurse -File\\).Count; Write-Output \"Total files: $count\")",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(Start-Process \"http://localhost:4200/kenar/dashboard\")",
+      "PowerShell(cd 'C:\\\\Users\\\\ayana\\\\Downloads\\\\CSP LATEST\\\\CSP_FIXED\\\\woqod-angular'; \\(Get-Content 'src/app/core/services/kenar.service.ts' | Measure-Object -Line\\).Lines)",
+      "PowerShell(Stop-Process *)",
+      "PowerShell(Start-Process \"http://localhost:4200\")"
+    ]
+  }
+}

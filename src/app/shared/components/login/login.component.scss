@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+// OTP step — scoped to the auth card
+.woqod-auth__otp-hint {
+  background: #f8fafc;
+  border: 1px dashed #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #45556c;
+  text-align: center;
+
+  strong {
+    color: #009a33;
+    letter-spacing: 3px;
+    font-size: 18px;
+    margin-left: 6px;
+  }
+}
+
+.woqod-auth__otp-input {
+  letter-spacing: 8px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.woqod-auth__otp-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.woqod-auth__link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: #009a33;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

@@ -1,0 +1,5 @@
+/* All shell styling is provided by the global WOQOD stylesheet (assets/css/woqod-styles.css)
+   imported in src/styles.scss. This file exists as a per-component scope but intentionally
+   adds nothing — the .dashboard.versionthree shell, .sidebar, .main-header, etc. classes
+   are all matched globally so RTL rules and Bootstrap interactions stay consistent. */
+:host { display: block; min-height: 100vh; }

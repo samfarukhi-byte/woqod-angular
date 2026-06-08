@@ -1,0 +1,92 @@
+<div class="woqod-notifications-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header woqod-page-header-kenar">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="woqod-header-content">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+              <div>
+                <h1 class="woqod-page-title mb-2">Notifications</h1>
+                <p class="woqod-page-subtitle mb-0">Stay updated with important alerts and messages</p>
+              </div>
+              <button
+                class="woqod-btn woqod-btn-secondary"
+                (click)="markAllAsRead()"
+                [disabled]="unreadCount === 0"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Mark All as Read ({{ unreadCount }})
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Notifications List -->
+    <div class="woqod-modern-card">
+      <div class="woqod-card-header">
+        <h3 class="woqod-card-title">All Notifications ({{ notifications.length }})</h3>
+      </div>
+      <div class="woqod-card-body p-0">
+        <div class="woqod-notification-list-full" *ngIf="notifications.length > 0">
+          <div
+            *ngFor="let notification of notifications"
+            class="woqod-notification-item-full"
+            [class.woqod-notification-unread]="!notification.isRead"
+            [ngClass]="getPriorityClass(notification.priority)"
+            (click)="markAsRead(notification)"
+          >
+            <div class="woqod-notification-icon-wrapper-full">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 6.65685 16.3431 8 18 8Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M6 15L2 19V21H22V19L14 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="woqod-notification-content-full">
+              <div class="d-flex justify-content-between align-items-start mb-1">
+                <div class="woqod-notification-title-full">
+                  {{ notification.title }}
+                  <span *ngIf="!notification.isRead" class="woqod-badge woqod-badge-primary ms-2">
+                    New
+                  </span>
+                </div>
+                <div class="woqod-notification-time-full">
+                  {{ notification.createdDate | date:'dd MMM yyyy, HH:mm' }}
+                </div>
+              </div>
+              <div class="woqod-notification-message-full">
+                {{ notification.message }}
+              </div>
+              <div class="woqod-notification-meta-full mt-2">
+                <span class="woqod-badge woqod-badge-sm"
+                      [class.woqod-badge-secondary]="notification.priority === 'Low'"
+                      [class.woqod-badge-warning]="notification.priority === 'Medium'"
+                      [class.woqod-badge-danger]="notification.priority === 'High'">
+                  {{ notification.priority }} Priority
+                </span>
+                <span class="ms-2 text-muted small">{{ notification.type }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="notifications.length === 0" class="woqod-empty-state">
+          <div class="woqod-empty-icon">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 6.65685 16.3431 8 18 8Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M6 15L2 19V21H22V19L14 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="woqod-empty-title">No Notifications</h3>
+          <p class="woqod-empty-text">You don't have any notifications at the moment. Check back later for updates.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

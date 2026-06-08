@@ -1,0 +1,134 @@
+<div class="csp-settings-section-container">
+  <h2 class="csp-section-title">Security & Compliance</h2>
+  <p class="csp-section-subtitle">Manage security settings and view compliance logs</p>
+
+  <!-- Password Policy Card -->
+  <div class="csp-card">
+    <div class="csp-card-header">
+      <h3 class="csp-card-title">Password Policy</h3>
+      <span class="csp-badge csp-badge--info">Read-only</span>
+    </div>
+    <div class="csp-card-body">
+      <div class="csp-info-grid">
+        <div class="csp-info-row">
+          <span class="csp-info-row__label">Minimum Length</span>
+          <span class="csp-info-row__value">{{ passwordPolicy.minLength }} characters</span>
+        </div>
+        <div class="csp-info-row">
+          <span class="csp-info-row__label">Requirements</span>
+          <span class="csp-info-row__value">
+            <span *ngIf="passwordPolicy.requireUppercase">Uppercase, </span>
+            <span *ngIf="passwordPolicy.requireLowercase">Lowercase, </span>
+            <span *ngIf="passwordPolicy.requireNumbers">Numbers, </span>
+            <span *ngIf="passwordPolicy.requireSpecialChars">Special Chars</span>
+          </span>
+        </div>
+        <div class="csp-info-row">
+          <span class="csp-info-row__label">Password Expiry</span>
+          <span class="csp-info-row__value">{{ passwordPolicy.expiryDays }} days</span>
+        </div>
+        <div class="csp-info-row">
+          <span class="csp-info-row__label">Password History</span>
+          <span class="csp-info-row__value">Last {{ passwordPolicy.historyCount }} passwords cannot be reused</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two-Factor Authentication Card -->
+  <!-- Hidden: Two-Factor Authentication section
+  <div class="csp-card">
+    <div class="csp-card-header">
+      <h3 class="csp-card-title">Two-Factor Authentication</h3>
+    </div>
+    <div class="csp-card-body">
+      <div class="csp-form-group">
+        <label class="csp-toggle">
+          <input
+            type="checkbox"
+            class="csp-toggle__input"
+            [checked]="twoFactorEnabled"
+            (change)="toggleTwoFactor($any($event.target).checked)"
+          />
+          <span class="csp-toggle__switch"></span>
+          <span class="csp-toggle__label">Enable Two-Factor Authentication</span>
+        </label>
+        <p class="csp-form-help">Require additional verification code during login for enhanced security</p>
+      </div>
+    </div>
+  </div>
+  -->
+
+  <!-- Login History Section -->
+  <h3 class="csp-section-title" style="margin-top: 48px;">Login History</h3>
+  <p class="csp-section-subtitle">Recent login attempts for all users</p>
+
+  <div class="csp-card">
+    <div class="csp-table-container">
+      <table class="csp-settings-table">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>User</th>
+            <th>IP Address</th>
+            <th>Device</th>
+            <th>Location</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entry of loginHistory">
+            <td>{{ formatDateTime(entry.timestamp) }}</td>
+            <td>{{ entry.user }}</td>
+            <td>{{ entry.ipAddress }}</td>
+            <td>{{ entry.device }}</td>
+            <td>{{ entry.location || '—' }}</td>
+            <td>
+              <span class="csp-badge" [ngClass]="loginStatusBadgeClass(entry.status)">
+                {{ entry.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Audit Log Section -->
+  <div class="csp-section-header">
+    <div>
+      <h3 class="csp-section-title">Audit Log</h3>
+      <p class="csp-section-subtitle">Complete activity trail for compliance</p>
+    </div>
+    <button class="csp-button csp-button--secondary" (click)="exportAuditLog()" type="button">
+      📥 Export CSV
+    </button>
+  </div>
+
+  <div class="csp-card">
+    <div class="csp-table-container">
+      <table class="csp-settings-table">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Module</th>
+            <th>Details</th>
+            <th>IP Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entry of auditLog">
+            <td>{{ formatDateTime(entry.timestamp) }}</td>
+            <td>{{ entry.user }}</td>
+            <td>{{ entry.action }}</td>
+            <td>{{ entry.module }}</td>
+            <td>{{ entry.details }}</td>
+            <td>{{ entry.ipAddress }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

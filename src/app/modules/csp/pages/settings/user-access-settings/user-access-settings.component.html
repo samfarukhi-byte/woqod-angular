@@ -1,0 +1,700 @@
+<div class="csp-settings-section-container">
+  <div class="csp-section-header">
+    <div>
+      <h2 class="csp-section-title">User & Access Management</h2>
+      <p class="csp-section-subtitle">Comprehensive user management with role-based access control</p>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="csp-tabs">
+    <button
+      class="csp-tab"
+      [class.csp-tab--active]="activeTab === 'overview'"
+      (click)="setActiveTab('overview')"
+      type="button"
+    >
+      📊 Overview
+    </button>
+    <button
+      class="csp-tab"
+      [class.csp-tab--active]="activeTab === 'users'"
+      (click)="setActiveTab('users')"
+      type="button"
+    >
+      👥 Users ({{ totalUsers }})
+    </button>
+    <button
+      class="csp-tab"
+      [class.csp-tab--active]="activeTab === 'roles'"
+      (click)="setActiveTab('roles')"
+      type="button"
+    >
+      🔐 Roles & Permissions
+    </button>
+    <button
+      class="csp-tab"
+      [class.csp-tab--active]="activeTab === 'lob-assignment'"
+      (click)="setActiveTab('lob-assignment')"
+      type="button"
+    >
+      🏢 LOB Assignment
+    </button>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="csp-tab-content">
+
+    <!-- OVERVIEW TAB -->
+    <div *ngIf="activeTab === 'overview'" class="csp-overview-section">
+      <div class="csp-subhead">
+        <h3 class="csp-section-title">User Statistics</h3>
+        <p class="csp-section-subtitle">A snapshot of your organisation's users, activity and contacts</p>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="csp-stats-grid">
+        <div class="csp-stat-card">
+          <div class="csp-stat-icon csp-stat-icon--primary">👥</div>
+          <div class="csp-stat-content">
+            <div class="csp-stat-value">{{ totalUsers }}</div>
+            <div class="csp-stat-label">Total Users</div>
+          </div>
+        </div>
+
+        <div class="csp-stat-card">
+          <div class="csp-stat-icon csp-stat-icon--success">✓</div>
+          <div class="csp-stat-content">
+            <div class="csp-stat-value">{{ activeUsers }}</div>
+            <div class="csp-stat-label">Active Users</div>
+          </div>
+        </div>
+
+        <div class="csp-stat-card">
+          <div class="csp-stat-icon csp-stat-icon--neutral">✕</div>
+          <div class="csp-stat-content">
+            <div class="csp-stat-value">{{ inactiveUsers }}</div>
+            <div class="csp-stat-label">Inactive Users</div>
+          </div>
+        </div>
+
+        <div class="csp-stat-card">
+          <div class="csp-stat-icon csp-stat-icon--info">🏢</div>
+          <div class="csp-stat-content">
+            <div class="csp-stat-value">{{ lobContacts.length }}</div>
+            <div class="csp-stat-label">LOB Contacts</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users by Role -->
+      <div class="csp-subhead csp-subhead--spaced">
+        <h3 class="csp-section-title">Users by Role</h3>
+        <p class="csp-section-subtitle">How your {{ totalUsers }} users are distributed across access roles</p>
+      </div>
+      <div class="csp-roles-breakdown">
+        <div class="csp-role-breakdown-card" *ngFor="let roleDef of roleDefinitions">
+          <div class="csp-role-breakdown-header">
+            <div>
+              <h4 class="csp-role-breakdown-title">{{ roleDef.role }}</h4>
+              <p class="csp-role-breakdown-desc">{{ roleDef.description }}</p>
+            </div>
+            <div class="csp-role-breakdown-count">{{ usersByRole[roleDef.role] }}</div>
+          </div>
+          <div class="csp-role-breakdown-body">
+            <div class="csp-user-list" *ngIf="usersByRole[roleDef.role] > 0; else noUsers">
+              <div class="csp-user-list-item" *ngFor="let user of getUsersByRole(roleDef.role)">
+                <div class="csp-user-avatar">{{ user.fullName.charAt(0) }}</div>
+                <div class="csp-user-info">
+                  <div class="csp-user-name">{{ user.fullName }}</div>
+                  <div class="csp-user-meta">
+                    <span class="csp-user-email">{{ user.email }}</span>
+                    <span class="csp-user-phone" *ngIf="user.phone">{{ user.phone }}</span>
+                  </div>
+                </div>
+                <span class="csp-badge" [ngClass]="statusBadgeClass(user.status)">
+                  {{ user.status }}
+                </span>
+              </div>
+            </div>
+            <ng-template #noUsers>
+              <p class="csp-empty-message">No users assigned to this role</p>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS TAB -->
+    <div *ngIf="activeTab === 'users'" class="csp-users-section">
+      <div class="csp-section-header">
+        <div>
+          <h3 class="csp-section-title">All Users</h3>
+          <p class="csp-section-subtitle">{{ totalUsers }} total, {{ activeUsers }} active, {{ inactiveUsers }} inactive</p>
+        </div>
+        <button class="csp-button csp-button--primary csp-button--icon" (click)="openAddUserModal()" type="button">
+          <span class="csp-button-icon">+</span>
+          <span>Add User</span>
+        </button>
+      </div>
+
+      <!-- Toolbar: search + filters -->
+      <div class="csp-toolbar">
+        <div class="csp-toolbar__search">
+          <span class="csp-toolbar__search-icon" aria-hidden="true">🔍</span>
+          <input
+            type="search"
+            class="csp-form-input csp-toolbar__search-input"
+            placeholder="Search by name, email or phone…"
+            [(ngModel)]="searchTerm"
+            name="userSearch"
+            aria-label="Search users"
+          />
+        </div>
+        <select class="csp-form-input csp-toolbar__select" [(ngModel)]="filterRole" name="filterRole" aria-label="Filter by role">
+          <option value="">All Roles</option>
+          <option *ngFor="let role of availableRoles" [value]="role">{{ role }}</option>
+        </select>
+        <select class="csp-form-input csp-toolbar__select" [(ngModel)]="filterStatus" name="filterStatus" aria-label="Filter by status">
+          <option value="">All Statuses</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+        <button
+          class="csp-button csp-button--secondary csp-button--small"
+          type="button"
+          (click)="clearUserFilters()"
+          [disabled]="!isUserFilterActive"
+        >
+          Clear
+        </button>
+        <span class="csp-toolbar__count">
+          Showing <strong>{{ filteredUsers.length }}</strong> of {{ totalUsers }}
+        </span>
+      </div>
+
+      <div class="csp-card">
+        <div class="csp-table-container">
+          <table class="csp-settings-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>LOB Access</th>
+                <th>Status</th>
+                <th>Last Login</th>
+                <th class="csp-col-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of filteredUsers">
+                <td>
+                  <div class="csp-user-cell">
+                    <div class="csp-user-avatar">{{ user.fullName.charAt(0) }}</div>
+                    <div class="csp-user-info">
+                      <div class="csp-user-name">{{ user.fullName }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.phone || '—' }}</td>
+                <td><span class="csp-role-badge" [ngClass]="roleBadgeClass(user.role)">{{ user.role }}</span></td>
+                <td>{{ getLOBsText(user.lobAssignments) }}</td>
+                <td>
+                  <span class="csp-badge" [ngClass]="statusBadgeClass(user.status)">
+                    {{ user.status }}
+                  </span>
+                </td>
+                <td>{{ formatDate(user.lastLogin) }}</td>
+                <td class="csp-col-actions">
+                  <div class="csp-action-buttons">
+                    <button
+                      class="csp-icon-button"
+                      (click)="openEditUserModal(user)"
+                      type="button"
+                      title="Edit user"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      *ngIf="user.status === 'Active'"
+                      class="csp-icon-button"
+                      (click)="deactivateUser(user)"
+                      type="button"
+                      title="Deactivate user"
+                    >
+                      🔒
+                    </button>
+                    <button
+                      *ngIf="user.status === 'Inactive'"
+                      class="csp-icon-button"
+                      (click)="activateUser(user)"
+                      type="button"
+                      title="Activate user"
+                    >
+                      🔓
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Empty state row -->
+              <tr *ngIf="filteredUsers.length === 0">
+                <td colspan="8">
+                  <div class="csp-table-empty">
+                    <div class="csp-table-empty__icon">🔍</div>
+                    <p class="csp-table-empty__title">No users found</p>
+                    <p class="csp-table-empty__sub">
+                      {{ isUserFilterActive ? 'Try adjusting your search or filters.' : 'Add your first user to get started.' }}
+                    </p>
+                    <button
+                      *ngIf="isUserFilterActive"
+                      class="csp-button csp-button--secondary csp-button--small"
+                      type="button"
+                      (click)="clearUserFilters()"
+                    >
+                      Clear filters
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROLES & PERMISSIONS TAB -->
+    <div *ngIf="activeTab === 'roles'" class="csp-roles-section">
+      <div class="csp-subhead">
+        <h3 class="csp-section-title">Role Definitions &amp; Permissions</h3>
+        <p class="csp-section-subtitle">
+          Predefined roles with specific permissions. Assign users to these roles to control their access.
+        </p>
+      </div>
+
+      <div class="csp-roles-grid">
+        <div class="csp-role-card" *ngFor="let roleDef of roleDefinitions">
+          <div class="csp-role-card-header">
+            <div>
+              <h4 class="csp-role-card-title">
+                <span class="csp-role-badge" [ngClass]="roleBadgeClass(roleDef.role)">{{ roleDef.role }}</span>
+              </h4>
+              <p class="csp-role-card-subtitle">{{ usersByRole[roleDef.role] }} user(s) assigned</p>
+            </div>
+          </div>
+          <div class="csp-role-card-body">
+            <p class="csp-role-description">{{ roleDef.description }}</p>
+
+            <h5 class="csp-permissions-title">Permissions:</h5>
+            <div class="csp-permissions-list">
+              <div class="csp-permission-item" *ngFor="let permission of roleDef.permissions">
+                <span class="csp-permission-check">✓</span>
+                <span class="csp-permission-label">{{ permission }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOB ASSIGNMENT TAB -->
+    <div *ngIf="activeTab === 'lob-assignment'" class="csp-lob-section">
+      <div class="csp-subhead">
+        <h3 class="csp-section-title">Line of Business User Assignments</h3>
+        <p class="csp-section-subtitle">
+          View and manage user access to each Line of Business
+        </p>
+      </div>
+
+      <div class="csp-lob-assignment-grid">
+        <div class="csp-lob-assignment-card" *ngFor="let lob of availableLOBs">
+          <div class="csp-lob-assignment-header">
+            <div class="csp-lob-assignment-title-wrapper">
+              <span class="csp-lob-assignment-icon">{{ getLOBIcon(lob) }}</span>
+              <div>
+                <h3 class="csp-lob-assignment-title">{{ lob }}</h3>
+                <span class="csp-lob-badge" [ngClass]="getLOBBadgeClass(lob)">{{ lob }}</span>
+              </div>
+            </div>
+            <div class="csp-lob-assignment-count">
+              <span class="csp-count-badge">{{ getUsersByLOB(lob).length }} users</span>
+            </div>
+          </div>
+
+          <div class="csp-lob-assignment-body">
+            <!-- Contact Persons Section -->
+            <div class="csp-lob-subsection">
+              <div class="csp-subsection-header">
+                <h4 class="csp-subsection-title">📞 Contact Persons</h4>
+                <button
+                  class="csp-icon-button csp-icon-button--small"
+                  (click)="openEditContactModal(getLOBContact(lob)!)"
+                  type="button"
+                  title="Edit contacts"
+                  *ngIf="getLOBContact(lob)"
+                >
+                  ✏️
+                </button>
+              </div>
+              <div class="csp-contact-persons-list" *ngIf="getLOBContact(lob) as contact">
+                <div class="csp-contact-person-item" *ngFor="let user of contact.users">
+                  <div class="csp-contact-person-info">
+                    <div class="csp-contact-person-name">{{ user.name }}</div>
+                    <div class="csp-contact-person-meta">
+                      <span class="csp-contact-person-email">{{ user.email }}</span>
+                      <span class="csp-contact-person-phone">{{ user.phone }}</span>
+                    </div>
+                  </div>
+                  <span class="csp-badge csp-badge--info">{{ user.role }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Assigned Users Section -->
+            <div class="csp-lob-subsection">
+              <h4 class="csp-subsection-title">👥 Users with Access</h4>
+              <div class="csp-assigned-users-list" *ngIf="getUsersByLOB(lob).length > 0; else noAssignedUsers">
+                <div class="csp-assigned-user-item" *ngFor="let user of getUsersByLOB(lob)">
+                  <div class="csp-user-avatar">{{ user.fullName.charAt(0) }}</div>
+                  <div class="csp-assigned-user-info">
+                    <div class="csp-assigned-user-name">{{ user.fullName }}</div>
+                    <div class="csp-assigned-user-details">
+                      <span class="csp-assigned-user-email">📧 {{ user.email }}</span>
+                      <span class="csp-assigned-user-phone" *ngIf="user.phone">📞 {{ user.phone }}</span>
+                    </div>
+                  </div>
+                  <div class="csp-assigned-user-badges">
+                    <span class="csp-badge csp-badge--primary">{{ user.role }}</span>
+                    <span class="csp-badge" [ngClass]="statusBadgeClass(user.status)">{{ user.status }}</span>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noAssignedUsers>
+                <p class="csp-empty-message">No users assigned to this LOB</p>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- User Form Modal -->
+<div class="csp-modal-overlay" *ngIf="showUserModal" (click)="closeUserModal()">
+  <div class="csp-modal" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">{{ isNewUser ? 'Add New User' : 'Edit User' }}</h3>
+      <button class="csp-icon-button" (click)="closeUserModal()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <form *ngIf="editingUser">
+        <div class="csp-form-group">
+          <label class="csp-form-label">Full Name <span class="csp-required">*</span></label>
+          <input
+            type="text"
+            class="csp-form-input"
+            [class.csp-form-input--invalid]="isUserNameInvalid()"
+            [(ngModel)]="editingUser.fullName"
+            name="fullName"
+            required
+            minlength="2"
+            placeholder="Enter full name (minimum 2 characters)"
+            (blur)="saveFormTouched = true"
+          />
+          <span class="csp-field-error" *ngIf="isUserNameInvalid()">
+            Full name must be at least 2 characters
+          </span>
+        </div>
+
+        <div class="csp-form-group">
+          <label class="csp-form-label">Email <span class="csp-required">*</span></label>
+          <input
+            type="email"
+            class="csp-form-input"
+            [class.csp-form-input--invalid]="isUserEmailInvalid()"
+            [(ngModel)]="editingUser.email"
+            name="email"
+            required
+            placeholder="user@example.com"
+            (blur)="saveFormTouched = true"
+          />
+          <span class="csp-field-error" *ngIf="isUserEmailInvalid()">
+            Please enter a valid email address
+          </span>
+        </div>
+
+        <div class="csp-form-group">
+          <label class="csp-form-label">Phone Number</label>
+          <input
+            type="tel"
+            class="csp-form-input"
+            [class.csp-form-input--invalid]="isUserPhoneInvalid()"
+            [(ngModel)]="editingUser.phone"
+            name="phone"
+            placeholder="+974-XXXX-XXXX"
+            (blur)="saveFormTouched = true"
+          />
+          <span class="csp-field-error" *ngIf="isUserPhoneInvalid()">
+            Please enter a valid phone number
+          </span>
+        </div>
+
+        <div class="csp-form-group">
+          <label class="csp-form-label">Role</label>
+          <select class="csp-form-input" [(ngModel)]="editingUser.role" name="role">
+            <option *ngFor="let role of availableRoles" [value]="role">{{ role }}</option>
+          </select>
+        </div>
+
+        <div class="csp-form-group">
+          <label class="csp-form-label">Status</label>
+          <select class="csp-form-input" [(ngModel)]="editingUser.status" name="status">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div class="csp-form-group">
+          <label class="csp-form-label">Line of Business Access</label>
+          <div class="csp-checkbox-group">
+            <label class="csp-checkbox" *ngFor="let lob of availableLOBs">
+              <input
+                type="checkbox"
+                [checked]="hasLOBAccess(lob)"
+                (change)="updateLOBAccess(lob, $any($event.target).checked)"
+              />
+              {{ lob }}
+            </label>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--secondary" (click)="closeUserModal()" type="button">
+        Cancel
+      </button>
+      <button class="csp-button csp-button--primary" (click)="saveUser()" type="button">
+        {{ isNewUser ? 'Add User' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- LOB Contact Edit Modal -->
+<div class="csp-modal-overlay" *ngIf="showLOBContactModal" (click)="closeLOBContactModal()">
+  <div class="csp-modal" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">Edit LOB Contact</h3>
+      <button class="csp-icon-button" (click)="closeLOBContactModal()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <form *ngIf="editingContact">
+        <div class="csp-form-group">
+          <label class="csp-form-label">Line of Business</label>
+          <input
+            type="text"
+            class="csp-form-input"
+            [value]="editingContact.lob"
+            disabled
+          />
+        </div>
+
+        <div class="csp-form-group">
+          <label class="csp-form-label">Department</label>
+          <input
+            type="text"
+            class="csp-form-input"
+            [(ngModel)]="editingContact.department"
+            name="department"
+          />
+        </div>
+
+        <!-- Current Users List -->
+        <div class="csp-form-group">
+          <label class="csp-form-label">Assigned Users</label>
+          <div class="csp-lob-users-list">
+            <div *ngFor="let user of editingContact.users" class="csp-lob-user-card">
+              <div class="csp-lob-user-info">
+                <strong>{{ user.name }}</strong>
+                <span class="csp-lob-user-details">{{ user.email }} | {{ user.phone }}</span>
+              </div>
+              <div class="csp-lob-user-actions">
+                <select
+                  class="csp-form-input csp-form-input--small"
+                  [value]="user.role"
+                  (change)="updateContactUserRole(user.userId, $any($event.target).value)"
+                >
+                  <option *ngFor="let role of availableRoles" [value]="role">{{ role }}</option>
+                </select>
+                <button
+                  class="csp-icon-button"
+                  (click)="removeContactUser(user.userId)"
+                  type="button"
+                  title="Remove user"
+                >
+                  🗑️
+                </button>
+              </div>
+            </div>
+
+            <div *ngIf="editingContact.users.length === 0" class="csp-empty-state">
+              <p>No users assigned yet. Add a user below.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add New User Form -->
+        <div class="csp-add-user-section">
+          <h4 class="csp-subsection-title">Add New User</h4>
+
+          <div class="csp-form-row">
+            <div class="csp-form-group">
+              <label class="csp-form-label">Name <span class="csp-required">*</span></label>
+              <input
+                type="text"
+                class="csp-form-input"
+                [class.csp-form-input--invalid]="isNewUserNameInvalid()"
+                [(ngModel)]="newContactUser.name"
+                name="newUserName"
+                placeholder="Full name (minimum 2 characters)"
+                (blur)="addUserFormTouched = true"
+              />
+              <span class="csp-field-error" *ngIf="isNewUserNameInvalid()">
+                Name must be at least 2 characters
+              </span>
+            </div>
+            <div class="csp-form-group">
+              <label class="csp-form-label">Role <span class="csp-required">*</span></label>
+              <select
+                class="csp-form-input"
+                [(ngModel)]="newContactUser.role"
+                name="newUserRole"
+              >
+                <option *ngFor="let role of availableRoles" [value]="role">{{ role }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="csp-form-row">
+            <div class="csp-form-group">
+              <label class="csp-form-label">Email <span class="csp-required">*</span></label>
+              <input
+                type="email"
+                class="csp-form-input"
+                [class.csp-form-input--invalid]="isNewUserEmailInvalid()"
+                [(ngModel)]="newContactUser.email"
+                name="newUserEmail"
+                placeholder="user@example.com"
+                (blur)="addUserFormTouched = true"
+              />
+              <span class="csp-field-error" *ngIf="isNewUserEmailInvalid()">
+                Please enter a valid email address
+              </span>
+            </div>
+            <div class="csp-form-group">
+              <label class="csp-form-label">Phone <span class="csp-required">*</span></label>
+              <input
+                type="tel"
+                class="csp-form-input"
+                [class.csp-form-input--invalid]="isNewUserPhoneInvalid()"
+                [(ngModel)]="newContactUser.phone"
+                name="newUserPhone"
+                placeholder="+974-XXXX-XXXX"
+                (blur)="addUserFormTouched = true"
+              />
+              <span class="csp-field-error" *ngIf="isNewUserPhoneInvalid()">
+                Please enter a valid phone number
+              </span>
+            </div>
+          </div>
+
+          <button
+            class="csp-button csp-button--secondary"
+            (click)="addContactUser()"
+            type="button"
+            [disabled]="!newContactUser.name || !newContactUser.email || !newContactUser.phone"
+          >
+            ➕ Add User
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--secondary" (click)="closeLOBContactModal()" type="button">
+        Cancel
+      </button>
+      <button class="csp-button csp-button--primary" (click)="saveLOBContact()" type="button">
+        Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Deactivate Modal -->
+<div *ngIf="showConfirmDeactivate" class="csp-modal-overlay" (click)="cancelDeactivate()">
+  <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">⚠️ Confirm Deactivate User</h3>
+      <button class="csp-icon-button" (click)="cancelDeactivate()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <p class="csp-modal-message">
+        Deactivate user <strong>{{ userToDeactivate?.fullName }}</strong>? They will lose access to the system.
+      </p>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--secondary" (click)="cancelDeactivate()" type="button">
+        Cancel
+      </button>
+      <button class="csp-button csp-button--primary" (click)="confirmDeactivate()" type="button">
+        Deactivate
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Validation Error Modal -->
+<div *ngIf="showValidationModal" class="csp-modal-overlay" (click)="closeValidationModal()">
+  <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">⚠️ Validation Errors</h3>
+      <button class="csp-icon-button" (click)="closeValidationModal()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <p class="csp-modal-message csp-modal-message--spaced">
+        Please fix the following errors:
+      </p>
+      <ul class="csp-validation-list">
+        <li *ngFor="let error of validationErrors">{{ error }}</li>
+      </ul>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--primary" (click)="closeValidationModal()" type="button">
+        OK, Got It
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div *ngIf="showSuccessModal" class="csp-modal-overlay" (click)="closeSuccessModal()">
+  <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">✓ Success</h3>
+      <button class="csp-icon-button" (click)="closeSuccessModal()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <p class="csp-modal-message">{{ successMessage }}</p>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--primary" (click)="closeSuccessModal()" type="button">
+        OK
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,131 @@
+<div class="csp-modal-backdrop" *ngIf="open" (click)="cancel()" aria-hidden="true"></div>
+
+<div
+  class="csp-modal"
+  [class.csp-modal--open]="open"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Submit new request"
+  *ngIf="open"
+>
+  <!-- Header -->
+  <div class="csp-modal__head">
+    <div>
+      <h3 class="csp-modal__title">Submit New Request</h3>
+      <p class="csp-modal__sub">Fill in the details below to submit your request</p>
+    </div>
+    <button type="button" class="csp-btn-icon" aria-label="Close" (click)="cancel()">✕</button>
+  </div>
+
+  <!-- Body -->
+  <div class="csp-modal__body">
+    <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
+
+      <!-- Request Type -->
+      <div class="csp-form-group" [class.csp-form-group--invalid]="hasError('requestType')">
+        <label class="csp-form-group__label" for="requestType">
+          Request Type <span class="csp-form-group__label-required">*</span>
+        </label>
+        <select
+          id="requestType"
+          class="csp-form-group__select"
+          formControlName="requestType"
+        >
+          <option value="">Select request type</option>
+          <option *ngFor="let type of requestTypes" [value]="type">{{ type }}</option>
+        </select>
+        <p class="csp-form-group__error" *ngIf="hasError('requestType')">
+          {{ getFieldError('requestType') }}
+        </p>
+      </div>
+
+      <!-- Related Shop -->
+      <div class="csp-form-group">
+        <label class="csp-form-group__label" for="relatedShop">Related Shop (Optional)</label>
+        <select
+          id="relatedShop"
+          class="csp-form-group__select"
+          formControlName="relatedShop"
+        >
+          <option value="">None / General</option>
+          <option *ngFor="let shop of shops" [value]="shop.shopCode">
+            {{ shop.shopCode }} - {{ shop.stationName }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Subject -->
+      <div class="csp-form-group" [class.csp-form-group--invalid]="hasError('subject')">
+        <label class="csp-form-group__label" for="subject">
+          Subject <span class="csp-form-group__label-required">*</span>
+        </label>
+        <input
+          id="subject"
+          type="text"
+          class="csp-form-group__input"
+          formControlName="subject"
+          placeholder="Brief summary of your request"
+        />
+        <p class="csp-form-group__error" *ngIf="hasError('subject')">
+          {{ getFieldError('subject') }}
+        </p>
+      </div>
+
+      <!-- Description -->
+      <div class="csp-form-group" [class.csp-form-group--invalid]="hasError('description')">
+        <label class="csp-form-group__label" for="description">
+          Description <span class="csp-form-group__label-required">*</span>
+        </label>
+        <textarea
+          id="description"
+          class="csp-form-group__textarea"
+          formControlName="description"
+          placeholder="Provide detailed information about your request"
+          rows="5"
+        ></textarea>
+        <p class="csp-form-group__error" *ngIf="hasError('description')">
+          {{ getFieldError('description') }}
+        </p>
+      </div>
+
+      <!-- Priority -->
+      <div class="csp-form-group" [class.csp-form-group--invalid]="hasError('priority')">
+        <label class="csp-form-group__label" for="priority">
+          Priority <span class="csp-form-group__label-required">*</span>
+        </label>
+        <select
+          id="priority"
+          class="csp-form-group__select"
+          formControlName="priority"
+        >
+          <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
+        </select>
+        <p class="csp-form-group__error" *ngIf="hasError('priority')">
+          {{ getFieldError('priority') }}
+        </p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <div class="csp-modal__footer">
+    <button
+      type="button"
+      class="csp-btn csp-btn--secondary"
+      (click)="cancel()"
+      [disabled]="isSubmitting"
+    >
+      Cancel
+    </button>
+    <button
+      type="button"
+      class="csp-btn csp-btn--primary"
+      (click)="onSubmit()"
+      [disabled]="isSubmitting || requestForm.invalid"
+    >
+      <span *ngIf="!isSubmitting">Submit Request</span>
+      <span *ngIf="isSubmitting">Submitting...</span>
+    </button>
+  </div>
+</div>

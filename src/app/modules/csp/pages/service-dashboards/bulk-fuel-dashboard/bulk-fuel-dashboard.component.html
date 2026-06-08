@@ -1,0 +1,111 @@
+<div class="woqod-bulkfuel-wrapper">
+  <!-- Page header -->
+  <div class="woqod-page-header woqod-page-header-tenders">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <button class="woqod-back-btn" routerLink="/csp/home" type="button">
+            ← Back to Home
+          </button>
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">Bulk Fuel</h1>
+            <p class="woqod-page-subtitle">Reliable bulk fuel supply for businesses across Qatar</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- "Avail Bulk Fuel Supply" entry card -->
+    <button class="csp-bf-avail" type="button" (click)="availSupply()" [class.csp-bf-avail--open]="showDetails">
+      <span class="csp-bf-avail__icon">🛢️</span>
+      <span class="csp-bf-avail__text">
+        <span class="csp-bf-avail__title">Avail Bulk Fuel Supply</span>
+        <span class="csp-bf-avail__sub">View product range, prerequisites and apply for a new contract</span>
+      </span>
+      <span class="csp-bf-avail__arrow">→</span>
+    </button>
+
+    <!-- Details panel (revealed on click) -->
+    <section id="bf-details" class="csp-bf-details" *ngIf="showDetails">
+      <!-- Visual banner ("image of bulk fuel section") -->
+      <div class="csp-bf-hero">
+        <div class="csp-bf-hero__pattern"></div>
+        <div class="csp-bf-hero__content">
+          <span class="csp-bf-hero__badge">EURO 5 COMPLIANT</span>
+          <h2 class="csp-bf-hero__title">🚛 Bulk Fuel Supply</h2>
+          <p class="csp-bf-hero__text">
+            Bulk fuels are stored at strategically located distribution depots in
+            <strong>Abu Hamour</strong> and <strong>Ras Laffan</strong>, covering Qatar’s entire region.
+            All fuels meet or exceed international standards and specifications, including Euro 5.
+          </p>
+        </div>
+        <div class="csp-bf-hero__depots">
+          <div class="csp-bf-depot">
+            <span class="csp-bf-depot__icon">📍</span>
+            <div>
+              <div class="csp-bf-depot__name">Abu Hamour Depot</div>
+              <div class="csp-bf-depot__meta">Central distribution</div>
+            </div>
+          </div>
+          <div class="csp-bf-depot">
+            <span class="csp-bf-depot__icon">📍</span>
+            <div>
+              <div class="csp-bf-depot__name">Ras Laffan Depot</div>
+              <div class="csp-bf-depot__meta">Northern distribution</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product range -->
+      <div class="csp-bf-section-head">
+        <h3 class="csp-bf-section-title">Bulk Fuels Product Range</h3>
+        <p class="csp-bf-section-sub">Four products available for bulk supply, all meeting international specifications</p>
+      </div>
+
+      <div class="csp-bf-product-grid">
+        <article class="csp-bf-product" [ngClass]="product.accent" *ngFor="let product of products">
+          <div class="csp-bf-product__head">
+            <span class="csp-bf-product__icon">{{ product.icon }}</span>
+            <div>
+              <h4 class="csp-bf-product__name">{{ product.name }}</h4>
+              <p class="csp-bf-product__spec">{{ product.spec }}</p>
+            </div>
+          </div>
+          <p class="csp-bf-product__desc">{{ product.description }}</p>
+        </article>
+      </div>
+
+      <!-- Call to action -->
+      <div class="csp-bf-cta">
+        <div class="csp-bf-cta__text">
+          <h3 class="csp-bf-cta__title">Ready to start a bulk fuel contract?</h3>
+          <p class="csp-bf-cta__sub">
+            Register your requirement and a reference number will be generated for your application.
+            Our Sales &amp; Marketing team will guide you through the approval process.
+          </p>
+        </div>
+        <button class="csp-btn csp-btn--primary csp-btn--large" type="button" (click)="register()">
+          📝 Register for Bulk Fuel
+        </button>
+      </div>
+
+      <!-- Action hub -->
+      <div class="csp-bf-section-head">
+        <h3 class="csp-bf-section-title">Bulk Fuel Services</h3>
+        <p class="csp-bf-section-sub">Everything you can do with your bulk fuel account</p>
+      </div>
+      <div class="csp-bf-action-grid">
+        <button class="csp-bf-action" [ngClass]="action.accent" type="button"
+                *ngFor="let action of actions" (click)="go(action.route)">
+          <span class="csp-bf-action__icon">{{ action.icon }}</span>
+          <span class="csp-bf-action__title">{{ action.title }}</span>
+          <span class="csp-bf-action__desc">{{ action.desc }}</span>
+          <span class="csp-bf-action__cta">Open →</span>
+        </button>
+      </div>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,140 @@
+<div class="woqod-bulkfuel-wrapper">
+  <div class="woqod-page-header woqod-page-header-tenders">
+    <div class="container">
+      <div class="row"><div class="col-12">
+        <button class="woqod-back-btn" type="button" (click)="backToBulkFuel()">← Back to Bulk Fuel</button>
+        <div class="woqod-header-content">
+          <h1 class="woqod-page-title">Terminate Bulk Fuel Contract</h1>
+          <p class="woqod-page-subtitle">Request termination of an active contract</p>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="container csp-bf-form-wrap">
+
+    <!-- Success -->
+    <div class="csp-bf-success" *ngIf="showSuccess">
+      <div class="csp-bf-success__check">✓</div>
+      <h2 class="csp-bf-success__title">Termination Request Submitted</h2>
+      <p class="csp-bf-success__sub">Your request to terminate contract <strong>{{ selected?.contractNo }}</strong> has been received and will be reviewed by the WOQOD team.</p>
+      <div class="csp-bf-ticket">
+        <div class="csp-bf-ticket__row">
+          <span class="csp-bf-ticket__label">Reference Number</span>
+          <span class="csp-bf-ticket__value">{{ referenceNumber }}</span>
+        </div>
+        <div class="csp-bf-barcode" aria-hidden="true">
+          <span class="csp-bf-barcode__bar" *ngFor="let w of barcodeBars" [style.width.px]="w"></span>
+        </div>
+        <div class="csp-bf-barcode__text">{{ referenceNumber }}</div>
+      </div>
+      <div class="csp-actions-row">
+        <button class="csp-btn csp-btn--secondary" type="button" (click)="backToBulkFuel()">Back to Bulk Fuel</button>
+        <button class="csp-btn csp-btn--primary" type="button" (click)="goToTracking()">Track My Requests →</button>
+      </div>
+    </div>
+
+    <ng-container *ngIf="!showSuccess">
+      <!-- Step 1: select active contract (only when none chosen) -->
+      <ng-container *ngIf="!selected">
+        <div class="csp-bf-section-head">
+          <h3 class="csp-bf-section-title">Select Active Contract</h3>
+          <p class="csp-bf-section-sub">Choose the active contract you wish to terminate</p>
+        </div>
+
+        <div class="csp-empty-state" *ngIf="contracts.length === 0">
+          <p class="csp-empty-state__title">No active contracts</p>
+          <p class="csp-empty-state__sub">You don't have any active bulk fuel contracts to terminate.</p>
+        </div>
+
+        <div class="csp-bf-contract-grid">
+          <button class="csp-bf-contract" type="button" *ngFor="let c of contracts" (click)="select(c)">
+            <div class="csp-bf-contract__top">
+              <span class="csp-bf-contract__no">{{ c.contractNo }}</span>
+              <span class="csp-badge csp-badge--approved">{{ c.status }}</span>
+            </div>
+            <div class="csp-bf-contract__product">{{ c.product }}</div>
+            <div class="csp-bf-contract__meta">📍 {{ c.site }}</div>
+            <div class="csp-bf-contract__meta">⛽ {{ c.minVolume | number }}–{{ c.maxVolume | number }} L/month · {{ c.tanks.length }} tank(s)</div>
+            <div class="csp-bf-contract__meta">📅 {{ c.startDate }} → {{ c.endDate }}</div>
+          </button>
+        </div>
+      </ng-container>
+
+      <!-- Step 2: master–detail (summary aside + form) -->
+      <div class="csp-bf-detail" *ngIf="selected">
+        <aside class="csp-bf-detail__aside">
+          <div class="csp-bf-summary">
+            <div class="csp-bf-summary__head">
+              <div class="csp-bf-summary__no">{{ selected.contractNo }}</div>
+              <div class="csp-bf-summary__product">{{ selected.product }}</div>
+            </div>
+            <div class="csp-bf-summary__body">
+              <div class="csp-bf-summary__row"><span>Status</span><span><span class="csp-badge csp-badge--approved">{{ selected.status }}</span></span></div>
+              <div class="csp-bf-summary__row"><span>Site</span><span>{{ selected.site }}</span></div>
+              <div class="csp-bf-summary__row"><span>Volume</span><span>{{ selected.minVolume | number }}–{{ selected.maxVolume | number }} L/mo</span></div>
+              <div class="csp-bf-summary__row"><span>Approved Qty</span><span>{{ selected.approvedQuantity | number }} L/yr</span></div>
+              <div class="csp-bf-summary__row"><span>Credit Limit</span><span>QAR {{ selected.creditLimit | number }}</span></div>
+              <div class="csp-bf-summary__row"><span>Tanks</span><span>{{ selected.tanks.length }}</span></div>
+              <div class="csp-bf-summary__row"><span>Period</span><span>{{ selected.startDate }} → {{ selected.endDate }}</span></div>
+            </div>
+            <div class="csp-bf-summary__foot">
+              <button type="button" class="csp-btn csp-btn--secondary csp-btn--small" (click)="clearSelection()">← Change contract</button>
+            </div>
+          </div>
+        </aside>
+
+        <div class="csp-bf-detail__main">
+          <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+            <fieldset class="csp-form-section csp-form-section--editable">
+              <legend class="csp-form-section__legend">
+                <span>Termination Details</span>
+                <span class="csp-form-section__legend-aside csp-form-section__legend-aside--editable">{{ selected.contractNo }}</span>
+              </legend>
+              <div class="csp-form-section__body">
+                <div class="csp-form-row csp-form-row--2-col">
+                  <div class="csp-form-group" [class.csp-form-group--invalid]="invalid('reason')">
+                    <label class="csp-form-group__label">Reason for Termination <span class="csp-form-group__label-required">*</span></label>
+                    <select class="csp-form-group__select" formControlName="reason">
+                      <option value="">Select a reason…</option>
+                      <option *ngFor="let r of reasons" [value]="r">{{ r }}</option>
+                    </select>
+                    <span class="csp-form-group__error">Please select a reason.</span>
+                  </div>
+                  <div class="csp-form-group" [class.csp-form-group--invalid]="invalid('effectiveDate')">
+                    <label class="csp-form-group__label">Requested Effective Date <span class="csp-form-group__label-required">*</span></label>
+                    <input type="date" class="csp-form-group__input" formControlName="effectiveDate" />
+                    <span class="csp-form-group__error">Please choose an effective date.</span>
+                  </div>
+                </div>
+                <div class="csp-form-row">
+                  <div class="csp-form-group">
+                    <label class="csp-form-group__label">Additional Remarks</label>
+                    <textarea class="csp-form-group__textarea" formControlName="remarks" rows="3"
+                      placeholder="Any additional information for the WOQOD team"></textarea>
+                  </div>
+                </div>
+                <label class="csp-checkbox">
+                  <input type="checkbox" class="csp-checkbox__input" formControlName="settleOutstanding" />
+                  <span>I acknowledge that any outstanding invoices and tank-return obligations must be settled before termination is finalised.</span>
+                </label>
+                <label class="csp-checkbox" [class.csp-form-group--invalid]="invalid('declaration')" style="margin-top:12px;">
+                  <input type="checkbox" class="csp-checkbox__input" formControlName="declaration" />
+                  <span>I confirm this termination request is accurate and authorised. <span class="csp-form-group__label-required">*</span></span>
+                </label>
+                <span class="csp-field-error" *ngIf="invalid('declaration')">You must confirm to submit.</span>
+              </div>
+            </fieldset>
+
+            <div class="csp-form-actions">
+              <div class="csp-form-actions__group"></div>
+              <div class="csp-form-actions__group">
+                <button type="submit" class="csp-btn csp-btn--primary">Submit Termination Request →</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

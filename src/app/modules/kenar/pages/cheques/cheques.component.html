@@ -1,0 +1,104 @@
+<div class="woqod-cheques-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header woqod-page-header-kenar">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">Cheque Status</h1>
+            <p class="woqod-page-subtitle">View and manage your submitted cheques</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Bounced Cheques Alert (if any) -->
+    <div class="alert alert-danger mb-4" *ngIf="hasBouncedCheques()">
+      <div class="d-flex align-items-center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
+          <path d="M10.29 3.86L1.82 18C1.64537 18.3024 1.55296 18.6453 1.55199 18.9945C1.55101 19.3437 1.64151 19.6871 1.81445 19.9905C1.98738 20.2939 2.23673 20.5467 2.53771 20.7239C2.83868 20.901 3.18086 20.9962 3.53 21H20.47C20.8191 20.9962 21.1613 20.901 21.4623 20.7239C21.7633 20.5467 22.0126 20.2939 22.1856 19.9905C22.3585 19.6871 22.449 19.3437 22.448 18.9945C22.447 18.6453 22.3546 18.3024 22.18 18L13.71 3.86C13.5317 3.56611 13.2807 3.32312 12.9812 3.15448C12.6817 2.98585 12.3437 2.89725 12 2.89725C11.6563 2.89725 11.3183 2.98585 11.0188 3.15448C10.7193 3.32312 10.4683 3.56611 10.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 9V13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <strong>Attention Required!</strong> You have bounced cheques that require immediate action. Please replace or contact support.
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="woqod-modern-card mb-4">
+      <div class="woqod-card-body">
+        <div class="row g-3">
+          <div class="col-12 col-md-4">
+            <select class="form-select" [(ngModel)]="filterStatus" (change)="onFilterChange()">
+              <option value="">All Statuses</option>
+              <option value="Submitted">Submitted</option>
+              <option value="Pending Deposit">Pending Deposit</option>
+              <option value="Deposited">Deposited</option>
+              <option value="Cleared">Cleared</option>
+              <option value="Bounced">Bounced</option>
+              <option value="Replacement Required">Replacement Required</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-2">
+            <button class="woqod-btn woqod-btn-secondary w-100" (click)="clearFilters()">
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cheques Table -->
+    <div class="woqod-modern-card">
+      <div class="woqod-card-header">
+        <h3 class="woqod-card-title">Cheques ({{ filteredCheques.length }})</h3>
+      </div>
+      <div class="woqod-card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Cheque #</th>
+                <th>Bank</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Shop</th>
+                <th>Contract</th>
+                <th>Status</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let cheque of filteredCheques" [class.table-danger]="isBounced(cheque)">
+                <td>
+                  <strong>{{ cheque.chequeNumber }}</strong>
+                  <span *ngIf="isBounced(cheque)" class="ms-2 text-danger">⚠️</span>
+                </td>
+                <td>{{ cheque.bankName }}</td>
+                <td>{{ cheque.chequeDate | date:'dd MMM yyyy' }}</td>
+                <td><strong>QAR {{ cheque.amount | number:'1.0-0' }}</strong></td>
+                <td>{{ cheque.shopCode }}</td>
+                <td>{{ cheque.contractReference }}</td>
+                <td>
+                  <span class="woqod-badge" [ngClass]="getStatusClass(cheque.status)">
+                    {{ cheque.status }}
+                  </span>
+                </td>
+                <td>{{ cheque.remarks || '-' }}</td>
+              </tr>
+              <tr *ngIf="filteredCheques.length === 0">
+                <td colspan="8" class="text-center text-muted py-4">
+                  No cheques found
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+/* WOQOD design system — sidebar, header, brand palette, CSP component styles */
+@import 'assets/css/woqod-styles.css';
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}

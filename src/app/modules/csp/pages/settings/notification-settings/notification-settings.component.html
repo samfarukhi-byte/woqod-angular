@@ -1,0 +1,139 @@
+<div class="csp-settings-section-container">
+  <h2 class="csp-section-title">Notifications</h2>
+  <p class="csp-section-subtitle">Configure push notifications and alerts you want to receive</p>
+
+  <!-- Push Notifications -->
+  <div class="csp-card">
+    <div class="csp-card-header">
+      <h3 class="csp-card-title">Push Notifications & Alerts</h3>
+    </div>
+    <div class="csp-card-body">
+      <div class="csp-form-group">
+        <label class="csp-toggle">
+          <input
+            type="checkbox"
+            class="csp-toggle__input"
+            [checked]="preferences.alertTypes.fuel_prices"
+            (change)="toggleAlertType('fuel_prices', $any($event.target).checked)"
+          />
+          <span class="csp-toggle__switch"></span>
+          <span class="csp-toggle__label">Fuel Price Changes</span>
+        </label>
+        <p class="csp-form-help">Get notified when fuel prices are updated</p>
+      </div>
+
+      <div class="csp-form-group">
+        <label class="csp-toggle">
+          <input
+            type="checkbox"
+            class="csp-toggle__input"
+            [checked]="preferences.alertTypes.station_downtime"
+            (change)="toggleAlertType('station_downtime', $any($event.target).checked)"
+          />
+          <span class="csp-toggle__switch"></span>
+          <span class="csp-toggle__label">Station Downtimes</span>
+        </label>
+        <p class="csp-form-help">Alerts when fuel stations are temporarily unavailable</p>
+      </div>
+
+      <div class="csp-form-group">
+        <label class="csp-toggle">
+          <input
+            type="checkbox"
+            class="csp-toggle__input"
+            [checked]="preferences.alertTypes.system_downtime"
+            (change)="toggleAlertType('system_downtime', $any($event.target).checked)"
+          />
+          <span class="csp-toggle__switch"></span>
+          <span class="csp-toggle__label">WOQOD System Downtime</span>
+        </label>
+        <p class="csp-form-help">System maintenance and planned downtime notifications</p>
+      </div>
+
+      <div class="csp-form-group">
+        <label class="csp-toggle">
+          <input
+            type="checkbox"
+            class="csp-toggle__input"
+            [checked]="preferences.alertTypes.announcements"
+            (change)="toggleAlertType('announcements', $any($event.target).checked)"
+          />
+          <span class="csp-toggle__switch"></span>
+          <span class="csp-toggle__label">Email Announcements</span>
+        </label>
+        <p class="csp-form-help">Important announcements and updates from WOQOD</p>
+      </div>
+
+      <div class="csp-form-group">
+        <label class="csp-toggle">
+          <input
+            type="checkbox"
+            class="csp-toggle__input"
+            [checked]="preferences.alertTypes.monthly_invoices"
+            (change)="toggleAlertType('monthly_invoices', $any($event.target).checked)"
+          />
+          <span class="csp-toggle__switch"></span>
+          <span class="csp-toggle__label">Monthly Invoices Ready</span>
+        </label>
+        <p class="csp-form-help">Notification when your monthly invoices are ready for review</p>
+      </div>
+
+      <div class="csp-form-group">
+        <label class="csp-toggle">
+          <input
+            type="checkbox"
+            class="csp-toggle__input"
+            [checked]="preferences.alertTypes.payment_due"
+            (change)="toggleAlertType('payment_due', $any($event.target).checked)"
+          />
+          <span class="csp-toggle__switch"></span>
+          <span class="csp-toggle__label">Payment Due Reminders</span>
+        </label>
+        <p class="csp-form-help">Reminders when payments are due</p>
+      </div>
+
+      <div class="csp-form-group">
+        <label class="csp-toggle">
+          <input
+            type="checkbox"
+            class="csp-toggle__input"
+            [checked]="preferences.alertTypes.request_status"
+            (change)="toggleAlertType('request_status', $any($event.target).checked)"
+          />
+          <span class="csp-toggle__switch"></span>
+          <span class="csp-toggle__label">Request Status Updates</span>
+        </label>
+        <p class="csp-form-help">Updates when your submitted requests change status</p>
+      </div>
+
+      <div class="csp-form-group">
+        <label class="csp-toggle">
+          <input
+            type="checkbox"
+            class="csp-toggle__input"
+            [checked]="preferences.alertTypes.promotions"
+            (change)="toggleAlertType('promotions', $any($event.target).checked)"
+          />
+          <span class="csp-toggle__switch"></span>
+          <span class="csp-toggle__label">Promotions & Special Offers</span>
+        </label>
+        <p class="csp-form-help">Promotional campaigns and special offers</p>
+      </div>
+
+      <div class="csp-form-group">
+        <label class="csp-toggle">
+          <input
+            type="checkbox"
+            class="csp-toggle__input"
+            [checked]="preferences.alertTypes.account_activity"
+            (change)="toggleAlertType('account_activity', $any($event.target).checked)"
+          />
+          <span class="csp-toggle__switch"></span>
+          <span class="csp-toggle__label">Account Activity Alerts</span>
+        </label>
+        <p class="csp-form-help">Security alerts and important account changes</p>
+      </div>
+    </div>
+  </div>
+
+</div>

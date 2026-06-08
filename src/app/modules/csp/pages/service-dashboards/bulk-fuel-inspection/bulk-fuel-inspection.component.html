@@ -1,0 +1,99 @@
+<div class="woqod-bulkfuel-wrapper">
+  <div class="woqod-page-header woqod-page-header-tenders">
+    <div class="container">
+      <div class="row"><div class="col-12">
+        <button class="woqod-back-btn" type="button" (click)="backToBulkFuel()">← Back to Bulk Fuel</button>
+        <div class="woqod-header-content">
+          <h1 class="woqod-page-title">Periodic Inspection</h1>
+          <p class="woqod-page-subtitle">Scheduled inspection of your tanks for active contracts</p>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="container csp-bf-form-wrap">
+    <div class="csp-info-banner">
+      <span>📅</span>
+      <div>
+        Periodic inspections are scheduled quarterly. You have been notified by email — the schedule below shows
+        the site, tank, date and time. You can <strong>acknowledge</strong> or <strong>reply</strong> to each entry.
+      </div>
+    </div>
+
+    <div class="csp-stats-grid" style="margin-bottom:20px;">
+      <div class="csp-stat-card">
+        <div class="csp-stat-icon csp-stat-icon--info">🔍</div>
+        <div class="csp-stat-content"><div class="csp-stat-value">{{ inspections.length }}</div><div class="csp-stat-label">Total Scheduled</div></div>
+      </div>
+      <div class="csp-stat-card">
+        <div class="csp-stat-icon csp-stat-icon--warning">⏳</div>
+        <div class="csp-stat-content"><div class="csp-stat-value">{{ upcoming }}</div><div class="csp-stat-label">Upcoming / Due</div></div>
+      </div>
+    </div>
+
+    <div class="csp-card">
+      <div class="csp-table-container">
+        <table class="csp-settings-table">
+          <thead>
+            <tr><th>Contract</th><th>Site Location</th><th>Tank No</th><th>Capacity</th><th>Date</th><th>Time</th><th>Inspector</th><th>Status</th><th class="csp-col-actions">Actions</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let i of inspections">
+              <td>{{ i.contractNo }}</td>
+              <td>📍 {{ i.site }}</td>
+              <td><strong>{{ i.tankNo }}</strong></td>
+              <td>{{ i.capacity | number }} L</td>
+              <td>{{ i.date }}</td>
+              <td>{{ i.time }}</td>
+              <td>{{ i.inspector }}</td>
+              <td>
+                <span class="csp-badge" [ngClass]="statusClass(i.status)">{{ i.status }}</span>
+                <span class="csp-badge csp-badge--approved" *ngIf="isAcknowledged(i)" style="margin-left:6px;">Acknowledged</span>
+              </td>
+              <td class="csp-col-actions">
+                <div class="csp-action-buttons">
+                  <button class="csp-icon-button" type="button" title="Acknowledge"
+                          *ngIf="i.status !== 'Completed' && !isAcknowledged(i)" (click)="acknowledge(i)">✓</button>
+                  <button class="csp-icon-button" type="button" title="Reply" (click)="openReply(i)">💬</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reply modal -->
+  <div class="csp-modal-overlay" *ngIf="showReply" (click)="closeReply()">
+    <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+      <div class="csp-modal-header">
+        <h3 class="csp-modal-title">Reply — {{ replyTarget?.tankNo }}</h3>
+        <button class="csp-icon-button" type="button" (click)="closeReply()">✕</button>
+      </div>
+      <div class="csp-modal-body">
+        <p class="csp-modal-message csp-modal-message--spaced">
+          Inspection on <strong>{{ replyTarget?.date }}</strong> at <strong>{{ replyTarget?.time }}</strong> ·
+          {{ replyTarget?.site }}
+        </p>
+        <div class="csp-form-group">
+          <label class="csp-form-group__label">Your Comment</label>
+          <textarea class="csp-form-group__textarea" rows="4" [(ngModel)]="replyComment"
+            placeholder="Add a comment or request a re-schedule…"></textarea>
+        </div>
+      </div>
+      <div class="csp-modal-footer">
+        <button class="csp-button csp-button--secondary" type="button" (click)="closeReply()">Cancel</button>
+        <button class="csp-button csp-button--primary" type="button" (click)="sendReply()" [disabled]="!replyComment.trim()">Send Reply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="csp-submit-success" *ngIf="toast">
+    <div class="csp-submit-success__content">
+      <span class="csp-submit-success__icon">✓</span>
+      <div class="csp-submit-success__text"><p class="csp-submit-success__title">{{ toast }}</p></div>
+    </div>
+  </div>
+</div>

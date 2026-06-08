@@ -1,0 +1,169 @@
+<div class="csp-content">
+  <app-breadcrumb pageTitle="Documents" [trail]="[{ label: 'Home', link: '/' }, { label: 'Documents' }]"></app-breadcrumb>
+
+  <header class="csp-page-heading">
+    <div>
+      <h2 class="csp-page-heading__title">Documents</h2>
+      <p class="csp-page-heading__sub">Upload required documents for <strong>{{ customer.customerName }}</strong>.</p>
+      <p class="csp-flow-strip" aria-label="Submission flow">
+        <span class="csp-flow-strip__step csp-flow-strip__step--done">✓ Edit Profile</span>
+        <span class="csp-flow-strip__sep" aria-hidden="true">›</span>
+        <span class="csp-flow-strip__step csp-flow-strip__step--current">● Documents</span>
+        <span class="csp-flow-strip__sep" aria-hidden="true">›</span>
+        <span class="csp-flow-strip__step">Review &amp; Submit</span>
+      </p>
+    </div>
+    <div class="csp-page-heading__actions">
+      <a routerLink="/csp/edit-profile" class="csp-btn csp-btn--secondary">← Back to Edit</a>
+      <a routerLink="/csp/review-changes" class="csp-btn csp-btn--primary">Next → Review</a>
+    </div>
+  </header>
+
+  <p class="csp-info-banner" role="note">
+    <span aria-hidden="true">ℹ</span>
+    <span>Files staged here are kept locally until you submit on the next step. Accepted formats and size limits are shown per document.</span>
+  </p>
+
+  <ng-template #docCardTpl let-t="t" let-ex="ex">
+    <article class="csp-doc-card" [ngClass]="cardClass(t, ex)">
+      <header class="csp-doc-card__head">
+        <div class="csp-doc-card__title-block">
+          <h4 class="csp-doc-card__title">
+            {{ t.name }}
+            <span *ngIf="t.required" class="csp-tag csp-tag--required">Required</span>
+            <span *ngIf="!t.required" class="csp-tag csp-tag--optional">Optional</span>
+          </h4>
+          <p class="csp-doc-card__desc">{{ t.description }}</p>
+        </div>
+      </header>
+      <div class="csp-doc-card__body">
+        <div *ngIf="ex" class="csp-doc-current">
+          <div class="csp-doc-current__file">
+            <span class="csp-doc-current__icon" aria-hidden="true">📄</span>
+            <div>
+              <div class="csp-doc-current__name">
+                {{ ex.fileName }}<span class="csp-version-badge">v{{ ex.version }}</span>
+              </div>
+              <div class="csp-doc-current__meta">
+                {{ formatBytes(ex.fileSize) }} · Uploaded {{ formatDate(ex.uploadedDate) }}<ng-container *ngIf="ex.expiryDate"> · Expires {{ formatDate(ex.expiryDate) }}</ng-container>
+              </div>
+            </div>
+          </div>
+          <div class="csp-doc-current__status">
+            <span class="csp-badge" [ngClass]="badgeClass(ex.status)">{{ badgeIcon(ex.status) }} {{ ex.status }}</span>
+          </div>
+        </div>
+        <div *ngIf="!ex" class="csp-doc-current csp-doc-current--empty">
+          {{ t.required ? 'No document on file yet — upload required.' : 'No document on file. Optional.' }}
+        </div>
+
+        <div *ngIf="stagedFor(t.code) as sf" class="csp-staged-file">
+          <div>
+            <div class="csp-staged-file__name">📥 {{ sf.fileName }}
+              <span class="csp-badge csp-badge--info" style="margin-left:6px;">Staged</span>
+            </div>
+            <div class="csp-staged-file__meta">{{ formatBytes(sf.fileSize) }} · staged {{ formatDate(sf.uploadedAt) }}</div>
+          </div>
+          <button type="button" class="csp-btn csp-btn--ghost-error" (click)="unstage(t.code)">Remove</button>
+        </div>
+
+        <label
+          class="csp-drop-zone"
+          [class.csp-drop-zone--drag-over]="dragOver[t.code]"
+          [class.csp-drop-zone--invalid]="!!errors[t.code]"
+          (dragover)="onDragOver(t.code, $event)"
+          (dragleave)="onDragLeave(t.code)"
+          (drop)="onDrop(t.code, $event)"
+        >
+          <span class="csp-drop-zone__icon" aria-hidden="true">↑</span>
+          <span class="csp-drop-zone__text">Drop a new file here, or <span class="csp-drop-zone__text-cta">browse</span></span>
+          <span class="csp-drop-zone__sub">{{ acceptDisplay(t) }} · max {{ t.maxSizeMB }} MB</span>
+          <span class="csp-drop-zone__error" role="alert">{{ errors[t.code] }}</span>
+          <input type="file" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;" [accept]="acceptList(t)" (change)="onFilePicked(t.code, $event)">
+        </label>
+
+        <div *ngIf="ex" class="csp-doc-actions">
+          <button type="button" class="csp-btn csp-btn--secondary csp-btn--small" (click)="alertNotImplemented('view', t.code)">View</button>
+          <button type="button" class="csp-btn csp-btn--secondary csp-btn--small" (click)="alertNotImplemented('history', t.code, ex.version)">History (v{{ ex.version }})</button>
+        </div>
+      </div>
+    </article>
+  </ng-template>
+
+  <section class="csp-docs-group">
+    <div class="csp-docs-group__head">
+      <h3 class="csp-docs-group__title">
+        <span class="csp-tag csp-tag--required">Required</span> Required Documents
+      </h3>
+      <p class="csp-docs-group__sub" aria-live="polite" [innerHTML]="requiredSummary"></p>
+    </div>
+    <div class="csp-doc-list">
+      <ng-container *ngFor="let t of requiredTypes()">
+        <ng-container *ngTemplateOutlet="docCardTpl; context: { t: t, ex: existingFor(t.code) }"></ng-container>
+      </ng-container>
+    </div>
+  </section>
+
+  <section class="csp-docs-group">
+    <div class="csp-docs-group__head">
+      <h3 class="csp-docs-group__title">
+        <span class="csp-tag csp-tag--optional">Optional</span> Optional Documents
+      </h3>
+    </div>
+    <div class="csp-doc-list">
+      <ng-container *ngFor="let t of optionalTypes()">
+        <ng-container *ngTemplateOutlet="docCardTpl; context: { t: t, ex: existingFor(t.code) }"></ng-container>
+      </ng-container>
+    </div>
+  </section>
+
+  <div class="csp-form-actions">
+    <span class="csp-form-actions__status" aria-live="polite" [innerHTML]="footerStatus"></span>
+    <div class="csp-form-actions__group">
+      <a routerLink="/csp/edit-profile" class="csp-btn csp-btn--secondary">← Back</a>
+      <button type="button" class="csp-btn csp-btn--secondary" (click)="clearAllStaged()">Clear staged</button>
+      <a routerLink="/csp/review-changes" class="csp-btn csp-btn--primary">Next → Review</a>
+    </div>
+  </div>
+
+  <!-- Confirm Clear All Modal -->
+  <div *ngIf="showConfirmClear" class="csp-modal-overlay" (click)="cancelClearAll()">
+    <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+      <div class="csp-modal-header">
+        <h3 class="csp-modal-title">⚠️ Confirm Clear All</h3>
+        <button class="csp-icon-button" (click)="cancelClearAll()" type="button">✕</button>
+      </div>
+      <div class="csp-modal-body">
+        <p style="color: #45556c; font-size: 14px;">
+          Remove all staged files? This does not affect documents already on file.
+        </p>
+      </div>
+      <div class="csp-modal-footer">
+        <button class="csp-button csp-button--secondary" (click)="cancelClearAll()" type="button">
+          Cancel
+        </button>
+        <button class="csp-button csp-button--primary" (click)="confirmClearAll()" type="button">
+          Clear All
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Modal -->
+  <div *ngIf="showAlertModal" class="csp-modal-overlay" (click)="closeAlertModal()">
+    <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+      <div class="csp-modal-header">
+        <h3 class="csp-modal-title">ℹ️ Information</h3>
+        <button class="csp-icon-button" (click)="closeAlertModal()" type="button">✕</button>
+      </div>
+      <div class="csp-modal-body">
+        <p style="color: #45556c; font-size: 14px;">{{ alertMessage }}</p>
+      </div>
+      <div class="csp-modal-footer">
+        <button class="csp-button csp-button--primary" (click)="closeAlertModal()" type="button">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

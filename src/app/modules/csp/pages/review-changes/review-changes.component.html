@@ -1,0 +1,133 @@
+<div class="csp-content">
+  <app-breadcrumb pageTitle="Review &amp; Submit" [trail]="[{ label: 'Home', link: '/' }, { label: 'Review Changes' }]"></app-breadcrumb>
+
+  <header class="csp-page-heading">
+    <div>
+      <h2 class="csp-page-heading__title">Review &amp; Submit</h2>
+      <p class="csp-page-heading__sub">
+        Confirm staged changes for <strong>{{ customer.customerName }}</strong> before sending through Maker-Checker approval.
+      </p>
+      <p class="csp-flow-strip" aria-label="Submission flow">
+        <span class="csp-flow-strip__step csp-flow-strip__step--done">✓ Edit Profile</span>
+        <span class="csp-flow-strip__sep" aria-hidden="true">›</span>
+        <span class="csp-flow-strip__step csp-flow-strip__step--done">✓ Documents</span>
+        <span class="csp-flow-strip__sep" aria-hidden="true">›</span>
+        <span class="csp-flow-strip__step csp-flow-strip__step--current">● Review &amp; Submit</span>
+      </p>
+    </div>
+    <div class="csp-page-heading__actions">
+      <a routerLink="/csp/documents" class="csp-btn csp-btn--secondary">← Back to Documents</a>
+      <button type="submit" form="submission-form" class="csp-btn csp-btn--success">✓ Submit for Approval</button>
+    </div>
+  </header>
+
+  <section class="csp-card">
+    <header class="csp-card__header">
+      <div>
+        <h3 class="csp-card__title">Profile Changes</h3>
+        <p class="csp-card__sub">{{ fieldCount === 0 ? 'No changes staged' : (fieldCount + ' field' + (fieldCount === 1 ? '' : 's') + ' changed') }}</p>
+      </div>
+      <a routerLink="/csp/edit-profile" class="csp-link-secondary">← Edit These Changes</a>
+    </header>
+    <div class="csp-card__body">
+      <app-diff-table [diff]="diff"></app-diff-table>
+      <div *ngIf="!diff || fieldCount === 0" class="csp-empty-block">
+        No profile changes staged.
+        <a routerLink="/csp/edit-profile" class="csp-link-secondary">Edit profile</a>.
+      </div>
+    </div>
+  </section>
+
+  <section class="csp-card">
+    <header class="csp-card__header">
+      <div>
+        <h3 class="csp-card__title">Documents to Submit</h3>
+        <p class="csp-card__sub">{{ docCount === 0 ? 'No new documents staged' : (docCount + ' document' + (docCount === 1 ? '' : 's') + ' staged') }}</p>
+      </div>
+      <a routerLink="/csp/documents" class="csp-link-secondary">← Edit Documents</a>
+    </header>
+    <div class="csp-card__body">
+      <div *ngIf="docCount === 0" class="csp-empty-block">
+        No new documents staged. <a routerLink="/csp/documents" class="csp-link-secondary">Manage documents</a>.
+      </div>
+      <div *ngIf="docCount > 0" class="csp-doc-review-list">
+        <div *ngFor="let d of docList" class="csp-doc-review">
+          <span class="csp-doc-review__icon" aria-hidden="true">📄</span>
+          <div class="csp-doc-review__body">
+            <p class="csp-doc-review__name">
+              {{ d.label }}
+              <span class="csp-badge csp-badge--info" style="margin-left:6px;">NEW</span>
+            </p>
+            <p class="csp-doc-review__meta">
+              {{ d.fileName }} · {{ formatBytes(d.fileSize) }} · staged {{ formatDate(d.uploadedAt) }}
+            </p>
+          </div>
+          <span class="csp-badge csp-badge--approved">✓ Ready to upload</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="csp-card">
+    <header class="csp-card__header">
+      <h3 class="csp-card__title">Submission Details</h3>
+      <p class="csp-card__sub">Provide context for the reviewer</p>
+    </header>
+    <div class="csp-card__body">
+      <form id="submission-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="csp-form-row csp-form-row--2-col">
+          <div class="csp-form-group" [class.csp-form-group--invalid]="isInvalid('reason')">
+            <label class="csp-form-group__label" for="reason">
+              <span class="csp-form-group__label-required" aria-hidden="true">*</span>Reason for Submission
+            </label>
+            <select class="csp-form-group__select" id="reason" formControlName="reason" required>
+              <option value="">Select a reason…</option>
+              <option value="profile_update">Profile Update</option>
+              <option value="address_change">Address Change</option>
+              <option value="contact_update">Contact Update</option>
+              <option value="document_refresh">Document Refresh</option>
+              <option value="other">Other</option>
+            </select>
+            <span class="csp-form-group__error" role="alert">Reason is required</span>
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-group__label" for="request-type">Request Type</label>
+            <input class="csp-form-group__input csp-form-group__input--readonly" type="text" id="request-type" [value]="requestType" readonly>
+          </div>
+        </div>
+        <div class="csp-form-row">
+          <div class="csp-form-group">
+            <label class="csp-form-group__label" for="comments">Comments to Reviewer (optional)</label>
+            <textarea class="csp-form-group__textarea" id="comments" formControlName="comments" placeholder="Add any comments for the review team…"></textarea>
+          </div>
+        </div>
+        <div class="csp-form-row">
+          <div class="csp-form-group" [class.csp-form-group--invalid]="isInvalid('confirm')">
+            <label class="csp-checkbox">
+              <input type="checkbox" class="csp-checkbox__input" id="confirm-check" formControlName="confirm" required>
+              <span>I confirm that the above information is <strong>accurate and complete</strong>.</span>
+            </label>
+            <span class="csp-form-group__error" role="alert">You must confirm before submitting</span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <div *ngIf="showSuccess" class="csp-alert csp-alert--success" role="alert">
+    <span aria-hidden="true">✓</span>
+    <span><strong>Submitted.</strong> Request <span>{{ createdId }}</span> is in the Maker queue. Redirecting to Track Requests…</span>
+  </div>
+  <div *ngIf="showError" class="csp-alert csp-alert--error" role="alert">
+    <span aria-hidden="true">✗</span>
+    <span [innerHTML]="errorMessage"></span>
+  </div>
+
+  <div class="csp-form-actions">
+    <span class="csp-form-actions__status" aria-live="polite" [innerHTML]="footerStatus"></span>
+    <div class="csp-form-actions__group">
+      <a routerLink="/csp/documents" class="csp-btn csp-btn--secondary">← Back</a>
+      <button type="submit" form="submission-form" class="csp-btn csp-btn--success">✓ Submit for Approval</button>
+    </div>
+  </div>
+</div>

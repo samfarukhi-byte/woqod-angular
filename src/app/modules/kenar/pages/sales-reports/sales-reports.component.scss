@@ -1,0 +1,43 @@
+:host {
+  display: block;
+}
+
+.woqod-report-card {
+  height: 100%;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .woqod-card-body {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.woqod-report-icon {
+  color: #009a33;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background-color: #f0fdf4;
+  border-radius: 12px;
+  margin: 0 auto;
+}
+
+.woqod-report-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #020618;
+  margin-bottom: 0.5rem;
+}
+
+.woqod-report-description {
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  flex-grow: 1;
+}

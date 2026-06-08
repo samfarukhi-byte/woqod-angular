@@ -1,0 +1,402 @@
+<div class="csp-page-container">
+  <button class="csp-button csp-button--secondary csp-vch-back" type="button" (click)="back()">
+    ← Back to Retail
+  </button>
+
+  <div class="csp-page-heading">
+    <h1 class="csp-page-heading__title">🎟️ Voucher Management</h1>
+    <p class="csp-page-heading__sub">
+      Generate fuel vouchers against your available credit limit, assign them to drivers, and track utilization.
+      Each driver receives an SMS with a link and a dynamic QR code to redeem at the pump.
+    </p>
+  </div>
+
+  <!-- Credit limit summary -->
+  <div class="csp-stats-grid">
+    <div class="csp-stat-card">
+      <div class="csp-stat-icon csp-stat-icon--info">💳</div>
+      <div class="csp-stat-content">
+        <div class="csp-stat-value">{{ creditLimit | number }} <small>{{ currency }}</small></div>
+        <div class="csp-stat-label">Credit Limit</div>
+      </div>
+    </div>
+    <div class="csp-stat-card">
+      <div class="csp-stat-icon csp-stat-icon--success">✅</div>
+      <div class="csp-stat-content">
+        <div class="csp-stat-value">{{ utilizedCredit | number }} <small>{{ currency }}</small></div>
+        <div class="csp-stat-label">Utilized Credit</div>
+      </div>
+    </div>
+    <div class="csp-stat-card">
+      <div class="csp-stat-icon csp-stat-icon--primary">🟢</div>
+      <div class="csp-stat-content">
+        <div class="csp-stat-value">{{ availableCredit | number }} <small>{{ currency }}</small></div>
+        <div class="csp-stat-label">Available Credit</div>
+      </div>
+    </div>
+    <div class="csp-stat-card">
+      <div class="csp-stat-icon csp-stat-icon--warning">🎫</div>
+      <div class="csp-stat-content">
+        <div class="csp-stat-value">{{ activeVoucherValue | number }} <small>{{ currency }}</small></div>
+        <div class="csp-stat-label">Active Voucher Value <small>(not deducted)</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="csp-vch-progress" [attr.aria-label]="'Credit used ' + creditUsedPct + '%'">
+    <div class="csp-vch-progress__bar" [style.width.%]="creditUsedPct"></div>
+    <span class="csp-vch-progress__label">{{ creditUsedPct }}% of credit limit utilized</span>
+  </div>
+
+  <!-- Voucher statistics -->
+  <div class="csp-stats-grid">
+    <div class="csp-stat-card">
+      <div class="csp-stat-icon csp-stat-icon--info">🎟️</div>
+      <div class="csp-stat-content">
+        <div class="csp-stat-value">{{ totalVouchers }}</div>
+        <div class="csp-stat-label">Total Vouchers</div>
+      </div>
+    </div>
+    <div class="csp-stat-card">
+      <div class="csp-stat-icon csp-stat-icon--success">🟢</div>
+      <div class="csp-stat-content">
+        <div class="csp-stat-value">{{ countBy('Active') }}</div>
+        <div class="csp-stat-label">Active</div>
+      </div>
+    </div>
+    <div class="csp-stat-card">
+      <div class="csp-stat-icon csp-stat-icon--neutral">✔️</div>
+      <div class="csp-stat-content">
+        <div class="csp-stat-value">{{ countBy('Redeemed') }}</div>
+        <div class="csp-stat-label">Fully Redeemed</div>
+      </div>
+    </div>
+    <div class="csp-stat-card">
+      <div class="csp-stat-icon csp-stat-icon--warning">⌛</div>
+      <div class="csp-stat-content">
+        <div class="csp-stat-value">{{ countBy('Expired') }}</div>
+        <div class="csp-stat-label">Expired</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="csp-tabs">
+    <button class="csp-tab" [class.csp-tab--active]="activeTab === 'vouchers'" (click)="setTab('vouchers')" type="button">
+      Vouchers
+    </button>
+    <button class="csp-tab" [class.csp-tab--active]="activeTab === 'reports'" (click)="setTab('reports')" type="button">
+      Utilization Report
+    </button>
+  </div>
+
+  <div class="csp-tab-content">
+    <!-- ============ VOUCHERS TAB ============ -->
+    <ng-container *ngIf="activeTab === 'vouchers'">
+      <div class="csp-vch-toolbar">
+        <span class="csp-text-muted">{{ totalVouchers }} voucher(s)</span>
+        <button class="csp-button csp-button--primary" type="button" (click)="openCreateModal()">
+          ➕ Generate Voucher
+        </button>
+      </div>
+
+      <div class="csp-table-container">
+        <table class="csp-settings-table">
+          <thead>
+            <tr>
+              <th>Voucher</th>
+              <th>Driver</th>
+              <th>Amount</th>
+              <th>Utilized</th>
+              <th>Restrictions</th>
+              <th>Expiry</th>
+              <th>Status</th>
+              <th class="csp-col-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let v of vouchers; trackBy: trackByVoucherId">
+              <td>
+                <div class="csp-vch-code">{{ v.code }}</div>
+                <div class="csp-text-muted csp-vch-sub">{{ stationNames(v) }}</div>
+              </td>
+              <td>
+                <div>{{ v.driverName }}</div>
+                <div class="csp-text-muted csp-vch-sub">{{ v.driverPhone }}</div>
+                <div class="csp-text-muted csp-vch-sub" *ngIf="v.vehiclePlate">🚗 {{ v.vehiclePlate }}</div>
+              </td>
+              <td>{{ v.amount | number }} {{ currency }}</td>
+              <td>
+                <div>{{ redeemedTotal(v) | number }} / {{ v.amount | number }}</div>
+                <div class="csp-vch-mini-progress">
+                  <div class="csp-vch-mini-progress__bar" [style.width.%]="utilizationPct(v)"></div>
+                </div>
+                <div class="csp-text-muted csp-vch-sub">{{ utilizationPct(v) }}% used</div>
+              </td>
+              <td>
+                <div class="csp-text-muted csp-vch-sub">📅 {{ daysLabel(v) }}</div>
+                <div class="csp-text-muted csp-vch-sub" *ngIf="v.dailyLimit">Daily: {{ v.dailyLimit | number }}</div>
+                <div class="csp-text-muted csp-vch-sub" *ngIf="v.weeklyLimit">Weekly: {{ v.weeklyLimit | number }}</div>
+                <div class="csp-text-muted csp-vch-sub" *ngIf="v.monthlyLimit">Monthly: {{ v.monthlyLimit | number }}</div>
+              </td>
+              <td>
+                {{ v.expiryDate | date:'dd MMM yyyy' }}
+                <div class="csp-text-muted csp-vch-sub" *ngIf="isUsed(v)">Last used {{ v.redemptions[v.redemptions.length - 1].date | date:'dd MMM' }}</div>
+                <div class="csp-text-muted csp-vch-sub" *ngIf="!isUsed(v)">Not used yet</div>
+              </td>
+              <td>
+                <span class="csp-badge" [ngClass]="statusBadgeClass(v)">{{ effectiveStatus(v) }}</span>
+              </td>
+              <td class="csp-col-actions">
+                <div class="csp-action-buttons">
+                  <button class="csp-icon-button" type="button" title="View QR / SMS link" (click)="openQrModal(v)">📱</button>
+                  <button class="csp-icon-button" type="button" title="Simulate redemption" (click)="simulateUse(v)"
+                          [disabled]="effectiveStatus(v) !== 'Active'">⛽</button>
+                  <button class="csp-icon-button" type="button" title="Cancel voucher" (click)="requestCancel(v)"
+                          [disabled]="effectiveStatus(v) === 'Cancelled'">🗑️</button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="vouchers.length === 0">
+              <td colspan="8">
+                <div class="csp-table-empty">
+                  <div class="csp-table-empty__icon">🎟️</div>
+                  <p class="csp-table-empty__title">No vouchers yet</p>
+                  <p class="csp-table-empty__sub">Generate your first voucher to assign fuel credit to a driver</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
+
+    <!-- ============ REPORTS TAB ============ -->
+    <ng-container *ngIf="activeTab === 'reports'">
+      <div class="csp-vch-report-summary">
+        <div class="csp-card csp-vch-report-card">
+          <span class="csp-vch-report-card__label">Credit Limit</span>
+          <span class="csp-vch-report-card__value">{{ creditLimit | number }} {{ currency }}</span>
+        </div>
+        <div class="csp-card csp-vch-report-card">
+          <span class="csp-vch-report-card__label">Utilized Credit Limit</span>
+          <span class="csp-vch-report-card__value">{{ utilizedCredit | number }} {{ currency }}</span>
+        </div>
+        <div class="csp-card csp-vch-report-card">
+          <span class="csp-vch-report-card__label">Available Credit</span>
+          <span class="csp-vch-report-card__value">{{ availableCredit | number }} {{ currency }}</span>
+        </div>
+        <div class="csp-card csp-vch-report-card">
+          <span class="csp-vch-report-card__label">Active Voucher Value</span>
+          <span class="csp-vch-report-card__value">{{ activeVoucherValue | number }} {{ currency }}</span>
+        </div>
+      </div>
+
+      <div class="csp-table-container">
+        <table class="csp-settings-table">
+          <thead>
+            <tr>
+              <th>Voucher</th>
+              <th>Driver</th>
+              <th>Allocated</th>
+              <th>Redeemed</th>
+              <th>Remaining</th>
+              <th>Utilization</th>
+              <th>Redemptions</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let v of vouchers; trackBy: trackByVoucherId">
+              <td class="csp-vch-code">{{ v.code }}</td>
+              <td>{{ v.driverName }}</td>
+              <td>{{ v.amount | number }}</td>
+              <td>{{ redeemedTotal(v) | number }}</td>
+              <td>{{ remaining(v) | number }}</td>
+              <td>
+                <div class="csp-vch-mini-progress">
+                  <div class="csp-vch-mini-progress__bar" [style.width.%]="utilizationPct(v)"></div>
+                </div>
+                <div class="csp-text-muted csp-vch-sub">{{ utilizationPct(v) }}%</div>
+              </td>
+              <td>{{ v.redemptions.length }}</td>
+              <td><span class="csp-badge" [ngClass]="statusBadgeClass(v)">{{ effectiveStatus(v) }}</span></td>
+            </tr>
+            <tr *ngIf="vouchers.length === 0">
+              <td colspan="8">
+                <div class="csp-table-empty">
+                  <div class="csp-table-empty__icon">📊</div>
+                  <p class="csp-table-empty__title">No utilization to report</p>
+                  <p class="csp-table-empty__sub">Generate and redeem vouchers to see utilization here</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<!-- ============ GENERATE VOUCHER MODAL ============ -->
+<div class="csp-modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
+  <div class="csp-modal csp-modal--large" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">➕ Generate Voucher</h3>
+      <button class="csp-icon-button" (click)="closeCreateModal()" type="button">✕</button>
+    </div>
+
+    <div class="csp-modal-body">
+      <div class="csp-info-banner">
+        <span class="csp-info-icon">💳</span>
+        <div>
+          No credit is deducted when issuing a voucher. Each redemption is validated against your
+          available credit limit at the time of use. Available now:
+          <strong>{{ availableCredit | number }} {{ currency }}</strong>
+        </div>
+      </div>
+
+      <ul class="csp-validation-list csp-vch-errors" *ngIf="validationErrors.length">
+        <li *ngFor="let e of validationErrors">{{ e }}</li>
+      </ul>
+
+      <form>
+        <div class="csp-form-group">
+          <label class="csp-form-label">Vehicle <span class="csp-text-muted">(optional — auto-fills the assigned driver)</span></label>
+          <select class="csp-form-input" name="vehicleId" [ngModel]="draft.vehicleId"
+                  (ngModelChange)="onVehicleChange($event)">
+            <option value="">— No vehicle / enter driver manually —</option>
+            <option *ngFor="let veh of vehicles" [value]="veh.vehicleId">
+              {{ veh.plateNo }} · {{ veh.type }} — {{ veh.driverName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="csp-form-row">
+          <div class="csp-form-group">
+            <label class="csp-form-label">Driver Name <span class="csp-required">*</span></label>
+            <input class="csp-form-input" type="text" name="driverName" [(ngModel)]="draft.driverName"
+                   placeholder="e.g. Rakesh Kumar" />
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-label">Driver Phone (SMS) <span class="csp-required">*</span></label>
+            <input class="csp-form-input" type="tel" name="driverPhone" [(ngModel)]="draft.driverPhone"
+                   placeholder="+974-XXXX-XXXX" />
+          </div>
+        </div>
+
+        <div class="csp-form-row">
+          <div class="csp-form-group">
+            <label class="csp-form-label">Voucher Amount ({{ currency }}) <span class="csp-required">*</span></label>
+            <input class="csp-form-input" type="number" min="1" name="amount" [(ngModel)]="draft.amount"
+                   placeholder="e.g. 5000" />
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-label">Expiry Date <span class="csp-required">*</span></label>
+            <input class="csp-form-input" type="date" name="expiryDate" [(ngModel)]="draft.expiryDate" />
+          </div>
+        </div>
+
+        <!-- Station restriction -->
+        <div class="csp-form-group">
+          <label class="csp-form-label">Allowed Stations <span class="csp-text-muted">(none = any station)</span></label>
+          <div class="csp-vch-chip-group">
+            <button type="button" class="csp-vch-chip" *ngFor="let s of stations"
+                    [class.csp-vch-chip--on]="isStationSelected(s.code)" (click)="toggleStation(s.code)">
+              {{ s.name }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Day restriction -->
+        <div class="csp-form-group">
+          <label class="csp-form-label">Allowed Days <span class="csp-text-muted">(none = any day)</span></label>
+          <div class="csp-vch-chip-group">
+            <button type="button" class="csp-vch-chip" *ngFor="let d of weekDays"
+                    [class.csp-vch-chip--on]="isDaySelected(d)" (click)="toggleDay(d)">
+              {{ d }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Spend caps -->
+        <div class="csp-form-row csp-form-row--3-col">
+          <div class="csp-form-group">
+            <label class="csp-form-label">Daily Limit ({{ currency }})</label>
+            <input class="csp-form-input" type="number" min="0" name="dailyLimit" [(ngModel)]="draft.dailyLimit"
+                   placeholder="Optional" />
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-label">Weekly Limit ({{ currency }})</label>
+            <input class="csp-form-input" type="number" min="0" name="weeklyLimit" [(ngModel)]="draft.weeklyLimit"
+                   placeholder="Optional" />
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-label">Monthly Limit ({{ currency }})</label>
+            <input class="csp-form-input" type="number" min="0" name="monthlyLimit" [(ngModel)]="draft.monthlyLimit"
+                   placeholder="Optional" />
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--secondary" type="button" (click)="closeCreateModal()">Cancel</button>
+      <button class="csp-button csp-button--primary" type="button" (click)="createVoucher()">
+        Generate &amp; Send SMS
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ QR / SMS MODAL ============ -->
+<div class="csp-modal-overlay" *ngIf="showQrModal && qrVoucher" (click)="closeQrModal()">
+  <div class="csp-modal" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">📱 Voucher {{ qrVoucher.code }}</h3>
+      <button class="csp-icon-button" (click)="closeQrModal()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body csp-vch-qr-body">
+      <p class="csp-text-muted csp-vch-qr-intro">
+        Assigned to <strong>{{ qrVoucher.driverName }}</strong> · {{ qrVoucher.driverPhone }}.
+        The driver scans this dynamic QR (or taps the SMS link) to redeem at the pump.
+      </p>
+      <qrcode class="csp-vch-qr" [qrdata]="voucherLink(qrVoucher)" [width]="220" [margin]="2"
+              errorCorrectionLevel="M" elementType="img"
+              [alt]="'QR code for voucher ' + qrVoucher.code"></qrcode>
+      <div class="csp-vch-link">{{ voucherLink(qrVoucher) }}</div>
+
+      <div class="csp-vch-detail-grid">
+        <div><span class="csp-text-muted">Amount</span><strong>{{ qrVoucher.amount | number }} {{ currency }}</strong></div>
+        <div><span class="csp-text-muted">Expiry</span><strong>{{ qrVoucher.expiryDate | date:'dd MMM yyyy' }}</strong></div>
+        <div *ngIf="qrVoucher.vehiclePlate"><span class="csp-text-muted">Vehicle</span><strong>{{ qrVoucher.vehiclePlate }}</strong></div>
+        <div><span class="csp-text-muted">Stations</span><strong>{{ stationNames(qrVoucher) }}</strong></div>
+        <div><span class="csp-text-muted">Days</span><strong>{{ daysLabel(qrVoucher) }}</strong></div>
+      </div>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--secondary" type="button" (click)="closeQrModal()">Close</button>
+      <button class="csp-button csp-button--primary" type="button" (click)="resendSms(qrVoucher)">📨 Resend SMS</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CANCEL CONFIRM MODAL ============ -->
+<div class="csp-modal-overlay" *ngIf="showCancelModal" (click)="cancelCancel()">
+  <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">⚠️ Cancel Voucher</h3>
+      <button class="csp-icon-button" (click)="cancelCancel()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <p class="csp-modal-message">
+        Cancel voucher <strong>{{ voucherToCancel?.code }}</strong> for {{ voucherToCancel?.driverName }}?
+        It will no longer be redeemable at any station.
+      </p>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--secondary" type="button" (click)="cancelCancel()">Keep Voucher</button>
+      <button class="csp-button csp-button--danger" type="button" (click)="confirmCancel()">Cancel Voucher</button>
+    </div>
+  </div>
+</div>

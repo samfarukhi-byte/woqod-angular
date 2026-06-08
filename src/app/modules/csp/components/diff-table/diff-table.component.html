@@ -1,0 +1,26 @@
+<div *ngIf="diff && diff.changedFields && diff.changedFields.length > 0; else empty" class="csp-diff-scroller">
+  <table class="csp-diff-table" aria-label="Profile changes diff">
+    <thead>
+      <tr>
+        <th scope="col">Field</th>
+        <th scope="col">Before</th>
+        <th scope="col">After</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let key of diff.changedFields">
+        <td class="csp-diff-table__field">{{ fieldLabel(key) }}</td>
+        <td
+          class="csp-diff-table__old"
+          [class.csp-diff-table__old--empty]="!diff.oldValues[key]"
+        >
+          {{ diff.oldValues[key] || '— (not set)' }}
+        </td>
+        <td class="csp-diff-table__new">{{ diff.newValues[key] || '—' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<ng-template #empty>
+  <div class="csp-empty-block">No profile changes staged.</div>
+</ng-template>

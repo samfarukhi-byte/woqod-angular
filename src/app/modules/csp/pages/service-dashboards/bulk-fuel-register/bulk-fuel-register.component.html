@@ -1,0 +1,540 @@
+<div class="woqod-bulkfuel-wrapper">
+  <!-- Page header -->
+  <div class="woqod-page-header woqod-page-header-tenders">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <button class="woqod-back-btn" type="button" (click)="backToBulkFuel()">← Back to Bulk Fuel</button>
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">Bulk Fuel Contract Registration</h1>
+            <p class="woqod-page-subtitle">{{ scopeLabel }} — complete the steps below to apply</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container csp-bf-form-wrap">
+
+    <!-- ===================== SUCCESS / CONFIRMATION ===================== -->
+    <div class="csp-bf-success" *ngIf="showSuccess">
+      <div class="csp-bf-success__check">✓</div>
+      <h2 class="csp-bf-success__title">Application Submitted Successfully</h2>
+      <p class="csp-bf-success__sub">
+        Your bulk fuel contract application has been received. Please keep your reference number safe —
+        you will need it to track and continue your application.
+      </p>
+
+      <div class="csp-bf-ticket">
+        <div class="csp-bf-ticket__row">
+          <span class="csp-bf-ticket__label">Reference Number</span>
+          <span class="csp-bf-ticket__value">{{ referenceNumber }}</span>
+        </div>
+        <div class="csp-bf-barcode" aria-hidden="true">
+          <span class="csp-bf-barcode__bar" *ngFor="let w of barcodeBars" [style.width.px]="w"></span>
+        </div>
+        <div class="csp-bf-barcode__text">{{ referenceNumber }}</div>
+      </div>
+
+      <div class="csp-info-banner csp-bf-success__note">
+        <span>ℹ️</span>
+        <div>
+          This reference is <strong>valid until {{ validUntilLabel() }}</strong> (1 month). A reminder will be sent
+          every 15 days to continue your application. If not completed within the validity period, the application
+          will be removed and you will need to start again.
+        </div>
+      </div>
+
+      <div class="csp-actions-row">
+        <button class="csp-btn csp-btn--secondary" type="button" (click)="newApplication()">Start Another Application</button>
+        <button class="csp-btn csp-btn--primary" type="button" (click)="goToTracking()">Track My Requests →</button>
+      </div>
+    </div>
+
+    <!-- ===================== WIZARD ===================== -->
+    <form [formGroup]="form" (ngSubmit)="apply()" *ngIf="!showSuccess" novalidate>
+
+      <div class="csp-bf-wizard">
+        <!-- Stepper (vertical sidebar on desktop, horizontal on mobile) -->
+        <aside class="csp-bf-wizard__steps">
+          <div class="csp-bf-stepper">
+            <button type="button" class="csp-bf-step" *ngFor="let s of steps; let i = index"
+                    [ngClass]="'csp-bf-step--' + stepState(i)" (click)="goToStep(i)">
+              <span class="csp-bf-step__marker">{{ stepState(i) === 'done' ? '✓' : (i + 1) }}</span>
+              <span class="csp-bf-step__label">{{ s.label }}</span>
+            </button>
+          </div>
+        </aside>
+
+        <div class="csp-bf-wizard__main">
+
+      <!-- ======= STEP 0 · Scope ======= -->
+      <div *ngIf="currentStep === 0" class="csp-bf-step-body">
+        <div class="csp-info-banner">
+          <span>ℹ️</span>
+          <div>Choose the type of contract you need. Fields marked <span class="csp-form-group__label-required">*</span> are mandatory; you can <strong>Save</strong> and return anytime.</div>
+        </div>
+
+        <fieldset class="csp-form-section csp-form-section--editable">
+          <legend class="csp-form-section__legend">
+            <span>Contract Scope</span>
+            <span class="csp-form-section__legend-aside csp-form-section__legend-aside--editable">{{ scopeLabel }}</span>
+          </legend>
+          <div class="csp-form-section__body">
+            <div class="csp-form-row csp-form-row--2-col">
+              <div class="csp-form-group" [class.csp-form-group--invalid]="invalid('applicantType')">
+                <label class="csp-form-group__label">Applicant Type <span class="csp-form-group__label-required">*</span></label>
+                <select class="csp-form-group__select" formControlName="applicantType">
+                  <option *ngFor="let a of applicantTypes" [value]="a">{{ a }}</option>
+                </select>
+              </div>
+              <div class="csp-form-group" [class.csp-form-group--invalid]="invalid('category')">
+                <label class="csp-form-group__label">Customer Category <span class="csp-form-group__label-required">*</span></label>
+                <select class="csp-form-group__select" formControlName="category">
+                  <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="csp-form-row" *ngIf="isExisting">
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Select Existing Customer Account</label>
+                <select class="csp-form-group__select" formControlName="existingCustomerId" (change)="onExistingCustomerChange()">
+                  <option value="">Select your account…</option>
+                  <option *ngFor="let c of existingCustomers" [value]="c.id">{{ c.customerName }} — {{ c.crNumber }}</option>
+                </select>
+                <span class="csp-form-group__hint">Your company, legal &amp; address details will be pre-filled from WOQOD / ERP records.</span>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="csp-form-section" *ngIf="isEvent" formGroupName="event">
+          <legend class="csp-form-section__legend"><span>Event Details</span></legend>
+          <div class="csp-form-section__body">
+            <div class="csp-form-row csp-form-row--2-col">
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Event Name</label>
+                <input class="csp-form-group__input" formControlName="eventName" placeholder="Name of the event" />
+              </div>
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Venue</label>
+                <input class="csp-form-group__input" formControlName="venue" placeholder="Event venue / location" />
+              </div>
+            </div>
+            <div class="csp-form-row csp-form-row--2-col">
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Event Start Date</label>
+                <input type="date" class="csp-form-group__input" formControlName="eventStart" />
+              </div>
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Event End Date</label>
+                <input type="date" class="csp-form-group__input" formControlName="eventEnd" />
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="csp-form-section" *ngIf="isGovernment" formGroupName="entity">
+          <legend class="csp-form-section__legend"><span>Government / Entity Details</span></legend>
+          <div class="csp-form-section__body">
+            <div class="csp-form-row csp-form-row--3-col">
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Entity / Parent Organisation</label>
+                <input class="csp-form-group__input" formControlName="entityName" placeholder="Government entity or subsidiary" />
+              </div>
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Tender / Reference No.</label>
+                <input class="csp-form-group__input" formControlName="tenderNo" />
+              </div>
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Budget Code</label>
+                <input class="csp-form-group__input" formControlName="budgetCode" />
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- ======= STEP 1 · Applicant & Project ======= -->
+      <div *ngIf="currentStep === 1" class="csp-bf-step-body">
+        <fieldset class="csp-form-section csp-form-section--editable">
+          <legend class="csp-form-section__legend"><span>Applicant &amp; Project Details</span></legend>
+          <div class="csp-form-section__body">
+            <div class="csp-form-row csp-form-row--2-col">
+              <div class="csp-form-group" [class.csp-form-group--invalid]="invalid('applicantClassification')">
+                <label class="csp-form-group__label">Applicant Classification <span class="csp-form-group__label-required">*</span></label>
+                <select class="csp-form-group__select" formControlName="applicantClassification">
+                  <option value="">Select classification…</option>
+                  <option *ngFor="let c of applicantClassifications" [value]="c">{{ c }}</option>
+                </select>
+                <span class="csp-form-group__error">Please select an applicant classification.</span>
+              </div>
+              <div class="csp-form-group" [class.csp-form-group--invalid]="invalid('customerName')">
+                <label class="csp-form-group__label">Customer Name <span class="csp-form-group__label-required">*</span></label>
+                <input class="csp-form-group__input" formControlName="customerName" placeholder="Legal customer / company name" />
+                <span class="csp-form-group__error">Customer name is required.</span>
+              </div>
+            </div>
+            <div class="csp-form-row csp-form-row--2-col">
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Customer Name (Arabic)</label>
+                <input class="csp-form-group__input" formControlName="customerNameAr" dir="rtl" placeholder="اسم العميل" />
+              </div>
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Project Location</label>
+                <input class="csp-form-group__input" formControlName="projectLocation" placeholder="Site / project location" />
+              </div>
+            </div>
+            <div class="csp-form-row csp-form-row--2-col">
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Project Start Date</label>
+                <input type="date" class="csp-form-group__input" formControlName="projectStartDate" />
+              </div>
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Project End Date</label>
+                <input type="date" class="csp-form-group__input" formControlName="projectEndDate" />
+              </div>
+            </div>
+            <div class="csp-form-row">
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Purpose of Business of the Refined Product</label>
+                <textarea class="csp-form-group__textarea" formControlName="purposeOfBusiness" rows="3" placeholder="Describe how the fuel will be used"></textarea>
+              </div>
+            </div>
+            <div class="csp-form-row">
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Main Contractor / Facility Details <span class="csp-form-group__hint">(if you are the sub-contractor)</span></label>
+                <textarea class="csp-form-group__textarea" formControlName="mainContractorDetails" rows="3" placeholder="Main contractor or facility details"></textarea>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- ======= STEP 2 · Addresses ======= -->
+      <div *ngIf="currentStep === 2" class="csp-bf-step-body">
+        <fieldset class="csp-form-section">
+          <legend class="csp-form-section__legend"><span>Addresses</span></legend>
+          <div class="csp-form-section__body">
+            <ng-container *ngFor="let addr of [
+              { key: 'companyAddress', label: 'Company Address', required: true },
+              { key: 'projectAddress', label: 'Project Address', required: false },
+              { key: 'purchaserAddress', label: 'Purchaser Address', required: false }
+            ]">
+              <div [formGroupName]="addr.key" class="csp-bf-subgroup">
+                <h4 class="csp-bf-subgroup__title">
+                  {{ addr.label }}
+                  <span class="csp-form-group__label-required" *ngIf="addr.required">*</span>
+                </h4>
+                <div class="csp-form-row csp-form-row--2-col">
+                  <div class="csp-form-group csp-form-group--span-2"
+                       [class.csp-form-group--invalid]="invalidIn($any(form.get(addr.key)), 'address1')">
+                    <label class="csp-form-group__label">Address Line 1
+                      <span class="csp-form-group__label-required" *ngIf="addr.required">*</span></label>
+                    <input class="csp-form-group__input" formControlName="address1" placeholder="Address line 1" />
+                    <span class="csp-form-group__error">Address line 1 is required.</span>
+                  </div>
+                </div>
+                <div class="csp-form-row csp-form-row--3-col">
+                  <div class="csp-form-group"><label class="csp-form-group__label">Address Line 2</label><input class="csp-form-group__input" formControlName="address2" /></div>
+                  <div class="csp-form-group"><label class="csp-form-group__label">Zone</label><input class="csp-form-group__input" formControlName="zone" /></div>
+                  <div class="csp-form-group"><label class="csp-form-group__label">Street</label><input class="csp-form-group__input" formControlName="street" /></div>
+                </div>
+                <div class="csp-form-row csp-form-row--3-col">
+                  <div class="csp-form-group"><label class="csp-form-group__label">Building</label><input class="csp-form-group__input" formControlName="building" /></div>
+                  <div class="csp-form-group">
+                    <label class="csp-form-group__label">City</label>
+                    <select class="csp-form-group__select" formControlName="city">
+                      <option value="">Select city…</option>
+                      <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
+                    </select>
+                  </div>
+                  <div class="csp-form-group"><label class="csp-form-group__label">P.O. Box</label><input class="csp-form-group__input" formControlName="poBox" /></div>
+                </div>
+                <div class="csp-form-row csp-form-row--2-col">
+                  <div class="csp-form-group" [class.csp-form-group--invalid]="invalidIn($any(form.get(addr.key)), 'mobile')">
+                    <label class="csp-form-group__label">Mobile Number</label>
+                    <input class="csp-form-group__input" formControlName="mobile" placeholder="+974-XXXX-XXXX" />
+                    <span class="csp-form-group__error">Enter a valid phone number.</span>
+                  </div>
+                  <div class="csp-form-group"><label class="csp-form-group__label">Fax Number</label><input class="csp-form-group__input" formControlName="fax" /></div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- ======= STEP 3 · Contacts ======= -->
+      <div *ngIf="currentStep === 3" class="csp-bf-step-body">
+        <fieldset class="csp-form-section">
+          <legend class="csp-form-section__legend">
+            <span>Contact Persons</span>
+            <span class="csp-form-section__legend-aside">{{ contacts.length }} contact(s)</span>
+          </legend>
+          <div class="csp-form-section__body" formArrayName="contacts">
+            <div class="csp-bf-row" *ngFor="let c of contacts.controls; let i = index" [formGroupName]="i">
+              <div class="csp-bf-row__head">
+                <span class="csp-bf-row__index">Contact {{ i + 1 }}</span>
+                <button type="button" class="csp-btn--ghost-error csp-btn" (click)="removeContact(i)" *ngIf="contacts.length > 1">Remove</button>
+              </div>
+              <div class="csp-form-row csp-form-row--3-col">
+                <div class="csp-form-group" [class.csp-form-group--invalid]="invalidIn($any(c), 'name')">
+                  <label class="csp-form-group__label">Name <span class="csp-form-group__label-required">*</span></label>
+                  <input class="csp-form-group__input" formControlName="name" />
+                  <span class="csp-form-group__error">Name is required.</span>
+                </div>
+                <div class="csp-form-group"><label class="csp-form-group__label">Designation</label><input class="csp-form-group__input" formControlName="designation" /></div>
+                <div class="csp-form-group">
+                  <label class="csp-form-group__label">Nationality</label>
+                  <select class="csp-form-group__select" formControlName="nationality">
+                    <option value="">Select…</option>
+                    <option *ngFor="let n of nationalities" [value]="n">{{ n }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="csp-form-row csp-form-row--3-col">
+                <div class="csp-form-group" [class.csp-form-group--invalid]="invalidIn($any(c), 'mobile')">
+                  <label class="csp-form-group__label">Mobile <span class="csp-form-group__label-required">*</span></label>
+                  <input class="csp-form-group__input" formControlName="mobile" placeholder="+974-XXXX-XXXX" />
+                  <span class="csp-form-group__error">Valid mobile is required.</span>
+                </div>
+                <div class="csp-form-group"><label class="csp-form-group__label">Landline</label><input class="csp-form-group__input" formControlName="landline" /></div>
+                <div class="csp-form-group" [class.csp-form-group--invalid]="invalidIn($any(c), 'email')">
+                  <label class="csp-form-group__label">Email</label>
+                  <input class="csp-form-group__input" formControlName="email" placeholder="name@example.com" />
+                  <span class="csp-form-group__error">Enter a valid email.</span>
+                </div>
+              </div>
+              <div class="csp-form-row csp-form-row--2-col">
+                <div class="csp-form-group"><label class="csp-form-group__label">Tax Number</label><input class="csp-form-group__input" formControlName="taxNumber" /></div>
+              </div>
+            </div>
+            <button type="button" class="csp-btn csp-btn--secondary csp-bf-add" (click)="addContact()">＋ Add Contact</button>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- ======= STEP 4 · Legal ======= -->
+      <div *ngIf="currentStep === 4" class="csp-bf-step-body">
+        <fieldset class="csp-form-section">
+          <legend class="csp-form-section__legend"><span>Legal &amp; Trade Registration</span></legend>
+          <div class="csp-form-section__body">
+            <div class="csp-form-row csp-form-row--2-col">
+              <div class="csp-form-group" [class.csp-form-group--invalid]="invalid('legalName')">
+                <label class="csp-form-group__label">Registered Legal Name <span class="csp-form-group__label-required">*</span></label>
+                <input class="csp-form-group__input" formControlName="legalName" />
+                <span class="csp-form-group__error">Legal name is required.</span>
+              </div>
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Nationality</label>
+                <select class="csp-form-group__select" formControlName="nationality">
+                  <option value="">Select…</option>
+                  <option *ngFor="let n of nationalities" [value]="n">{{ n }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="csp-form-row csp-form-row--2-col">
+              <div class="csp-form-group" [class.csp-form-group--invalid]="invalid('classification')">
+                <label class="csp-form-group__label">Classification <span class="csp-form-group__label-required">*</span></label>
+                <select class="csp-form-group__select" formControlName="classification">
+                  <option value="">Select…</option>
+                  <option *ngFor="let c of classifications" [value]="c">{{ c }}</option>
+                </select>
+                <span class="csp-form-group__error">Classification is required.</span>
+              </div>
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Classification Type</label>
+                <select class="csp-form-group__select" formControlName="classificationType">
+                  <option value="">Select…</option>
+                  <option *ngFor="let t of classificationTypes" [value]="t">{{ t }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="csp-form-row csp-form-row--3-col">
+              <div class="csp-form-group"><label class="csp-form-group__label">Registration Number</label><input class="csp-form-group__input" formControlName="registrationNumber" /></div>
+              <div class="csp-form-group"><label class="csp-form-group__label">Registration Start Date</label><input type="date" class="csp-form-group__input" formControlName="registrationStartDate" /></div>
+              <div class="csp-form-group"><label class="csp-form-group__label">Registration End Date</label><input type="date" class="csp-form-group__input" formControlName="registrationEndDate" /></div>
+            </div>
+            <p class="csp-form-group__hint">For Commercial Registration, the document should be valid for at least 1 month (plus a 15-day grace period) at the time of application.</p>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- ======= STEP 5 · Products & Equipment ======= -->
+      <div *ngIf="currentStep === 5" class="csp-bf-step-body">
+        <fieldset class="csp-form-section">
+          <legend class="csp-form-section__legend">
+            <span>Products Required</span>
+            <span class="csp-form-section__legend-aside">{{ products.length }} product(s)</span>
+          </legend>
+          <div class="csp-form-section__body" formArrayName="products">
+            <div class="csp-bf-row" *ngFor="let p of products.controls; let i = index" [formGroupName]="i">
+              <div class="csp-bf-row__head">
+                <span class="csp-bf-row__index">Product {{ i + 1 }}</span>
+                <button type="button" class="csp-btn--ghost-error csp-btn" (click)="removeProduct(i)" *ngIf="products.length > 1">Remove</button>
+              </div>
+              <div class="csp-form-row csp-form-row--3-col">
+                <div class="csp-form-group" [class.csp-form-group--invalid]="invalidIn($any(p), 'productName')">
+                  <label class="csp-form-group__label">Product <span class="csp-form-group__label-required">*</span></label>
+                  <select class="csp-form-group__select" formControlName="productName">
+                    <option value="">Select product…</option>
+                    <option *ngFor="let f of fuelProducts" [value]="f">{{ f }}</option>
+                  </select>
+                  <span class="csp-form-group__error">Please select a product.</span>
+                </div>
+                <div class="csp-form-group"><label class="csp-form-group__label">Min Volume (L / month)</label><input type="number" class="csp-form-group__input" formControlName="minVolume" min="0" /></div>
+                <div class="csp-form-group"><label class="csp-form-group__label">Max Volume (L / month)</label><input type="number" class="csp-form-group__input" formControlName="maxVolume" min="0" /></div>
+              </div>
+            </div>
+            <button type="button" class="csp-btn csp-btn--secondary csp-bf-add" (click)="addProduct()">＋ Add Product</button>
+            <div class="csp-form-row" style="margin-top:16px;">
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Estimated Annual Volume (Litres)</label>
+                <input type="number" class="csp-form-group__input" formControlName="estimatedAnnualVolume" min="0" placeholder="Total estimated annual consumption" />
+                <span class="csp-form-group__hint">Used by the WOQOD team to estimate monthly consumption and bank-guarantee requirements.</span>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="csp-form-section">
+          <legend class="csp-form-section__legend">
+            <span>Project Equipment</span>
+            <span class="csp-form-section__legend-aside">{{ equipment.length }} item(s)</span>
+          </legend>
+          <div class="csp-form-section__body" formArrayName="equipment">
+            <div class="csp-bf-row" *ngFor="let e of equipment.controls; let i = index" [formGroupName]="i">
+              <div class="csp-bf-row__head">
+                <span class="csp-bf-row__index">Equipment {{ i + 1 }}</span>
+                <button type="button" class="csp-btn--ghost-error csp-btn" (click)="removeEquipment(i)" *ngIf="equipment.length > 1">Remove</button>
+              </div>
+              <div class="csp-form-row csp-form-row--2-col">
+                <div class="csp-form-group"><label class="csp-form-group__label">Equipment Type</label><input class="csp-form-group__input" formControlName="equipmentType" /></div>
+                <div class="csp-form-group"><label class="csp-form-group__label">Number of Units</label><input type="number" class="csp-form-group__input" formControlName="number" min="0" /></div>
+              </div>
+              <div class="csp-form-row csp-form-row--2-col">
+                <div class="csp-form-group"><label class="csp-form-group__label">Weekly Consumption (Litres)</label><input type="number" class="csp-form-group__input" formControlName="weeklyConsumption" min="0" /></div>
+                <div class="csp-form-group"><label class="csp-form-group__label">Brand</label><input class="csp-form-group__input" formControlName="brand" /></div>
+              </div>
+            </div>
+            <button type="button" class="csp-btn csp-btn--secondary csp-bf-add" (click)="addEquipment()">＋ Add Equipment</button>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- ======= STEP 6 · Tanks & Documents ======= -->
+      <div *ngIf="currentStep === 6" class="csp-bf-step-body">
+        <fieldset class="csp-form-section">
+          <legend class="csp-form-section__legend">
+            <span>Tank &amp; Supply Information</span>
+            <span class="csp-form-section__legend-aside">{{ tanks.length }} tank(s)</span>
+          </legend>
+          <div class="csp-form-section__body" formArrayName="tanks">
+            <div class="csp-bf-row" *ngFor="let t of tanks.controls; let i = index" [formGroupName]="i">
+              <div class="csp-bf-row__head">
+                <span class="csp-bf-row__index">Tank {{ i + 1 }}</span>
+                <button type="button" class="csp-btn--ghost-error csp-btn" (click)="removeTank(i)" *ngIf="tanks.length > 1">Remove</button>
+              </div>
+              <div class="csp-form-row csp-form-row--2-col">
+                <div class="csp-form-group">
+                  <label class="csp-form-group__label">Storage Type</label>
+                  <select class="csp-form-group__select" formControlName="storageType">
+                    <option value="">Select…</option><option *ngFor="let s of storageTypes" [value]="s">{{ s }}</option>
+                  </select>
+                </div>
+                <div class="csp-form-group">
+                  <label class="csp-form-group__label">Delivered By</label>
+                  <select class="csp-form-group__select" formControlName="deliveredBy">
+                    <option value="">Select…</option><option *ngFor="let d of deliveredByOptions" [value]="d">{{ d }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="csp-form-row csp-form-row--2-col">
+                <div class="csp-form-group">
+                  <label class="csp-form-group__label">Supply Type</label>
+                  <select class="csp-form-group__select" formControlName="supplyType">
+                    <option value="">Select…</option><option *ngFor="let s of supplyTypes" [value]="s">{{ s }}</option>
+                  </select>
+                </div>
+                <div class="csp-form-group"><label class="csp-form-group__label">Tank Capacity (Litres)</label><input type="number" class="csp-form-group__input" formControlName="tankCapacity" min="0" /></div>
+              </div>
+            </div>
+            <button type="button" class="csp-btn csp-btn--secondary csp-bf-add" (click)="addTank()">＋ Add Tank</button>
+          </div>
+        </fieldset>
+
+        <fieldset class="csp-form-section">
+          <legend class="csp-form-section__legend"><span>Supporting Documents</span></legend>
+          <div class="csp-form-section__body">
+            <label class="csp-drop-zone" for="bfDocs">
+              <span class="csp-drop-zone__icon">⬆️</span>
+              <span class="csp-drop-zone__text">Click to upload or <span class="csp-drop-zone__text-cta">browse</span></span>
+              <span class="csp-drop-zone__sub">You can attach multiple documents (CR, trade licence, etc.)</span>
+              <input id="bfDocs" type="file" multiple hidden (change)="onFilesSelected($event)" />
+            </label>
+            <div class="csp-bf-doclist" *ngIf="stagedDocs.length">
+              <div class="csp-staged-file" *ngFor="let d of stagedDocs; let i = index">
+                <div><span class="csp-staged-file__name">📄 {{ d.name }}</span><span class="csp-staged-file__meta"> · {{ d.size }}</span></div>
+                <button type="button" class="csp-btn--ghost-error csp-btn" (click)="removeDoc(i)">Remove</button>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- ======= STEP 7 · Review & Submit ======= -->
+      <div *ngIf="currentStep === 7" class="csp-bf-step-body">
+        <div class="csp-card">
+          <div class="csp-card__header"><h3 class="csp-card__title">Review your application</h3></div>
+          <div class="csp-card__body">
+            <div class="csp-info-row"><span class="csp-info-row__label">Contract Scope</span><span class="csp-info-row__value">{{ scopeLabel }}</span></div>
+            <div class="csp-info-row"><span class="csp-info-row__label">Customer Name</span><span class="csp-info-row__value">{{ form.value.customerName || '—' }}</span></div>
+            <div class="csp-info-row"><span class="csp-info-row__label">Applicant Classification</span><span class="csp-info-row__value">{{ form.value.applicantClassification || '—' }}</span></div>
+            <div class="csp-info-row"><span class="csp-info-row__label">Legal Name</span><span class="csp-info-row__value">{{ form.value.legalName || '—' }}</span></div>
+            <div class="csp-info-row"><span class="csp-info-row__label">Classification</span><span class="csp-info-row__value">{{ form.value.classification || '—' }}</span></div>
+            <div class="csp-info-row"><span class="csp-info-row__label">Products Required</span><span class="csp-info-row__value">{{ reviewProducts }}</span></div>
+            <div class="csp-info-row"><span class="csp-info-row__label">Contacts</span><span class="csp-info-row__value">{{ contacts.length }}</span></div>
+            <div class="csp-info-row"><span class="csp-info-row__label">Tanks</span><span class="csp-info-row__value">{{ tanks.length }}</span></div>
+            <div class="csp-info-row"><span class="csp-info-row__label">Documents Attached</span><span class="csp-info-row__value">{{ stagedDocs.length }}</span></div>
+          </div>
+        </div>
+
+        <fieldset class="csp-form-section" [class.csp-form-section--editable]="form.get('declaration')?.value">
+          <legend class="csp-form-section__legend"><span>Declaration</span></legend>
+          <div class="csp-form-section__body">
+            <label class="csp-checkbox" [class.csp-form-group--invalid]="invalid('declaration')">
+              <input type="checkbox" class="csp-checkbox__input" formControlName="declaration" />
+              <span>
+                I declare that the information provided is true and accurate to the best of my knowledge,
+                and I agree to WOQOD’s bulk fuel contract terms and conditions.
+                <span class="csp-form-group__label-required">*</span>
+              </span>
+            </label>
+            <span class="csp-field-error" *ngIf="invalid('declaration')">You must accept the declaration to submit.</span>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- Wizard navigation -->
+      <div class="csp-bf-wizard-nav">
+        <div class="csp-bf-wizard-nav__side">
+          <button type="button" class="csp-btn csp-btn--secondary" (click)="backToBulkFuel()" *ngIf="currentStep === 0">Cancel</button>
+          <button type="button" class="csp-btn csp-btn--secondary" (click)="prev()" *ngIf="currentStep > 0">← Back</button>
+        </div>
+        <div class="csp-bf-wizard-nav__mid">
+          <span class="csp-bf-wizard-nav__count">Step {{ currentStep + 1 }} of {{ steps.length }}</span>
+          <span class="csp-form-actions__status" *ngIf="savedDraftAt">Saved {{ savedDraftAt }}</span>
+        </div>
+        <div class="csp-bf-wizard-nav__side csp-bf-wizard-nav__side--end">
+          <button type="button" class="csp-btn csp-btn--secondary" (click)="saveDraft()">💾 Save</button>
+          <button type="button" class="csp-btn csp-btn--primary" (click)="next()" *ngIf="currentStep < steps.length - 1">Next →</button>
+          <button type="submit" class="csp-btn csp-btn--primary" *ngIf="currentStep === steps.length - 1">Apply &amp; Generate Reference →</button>
+        </div>
+      </div>
+
+        </div><!-- /csp-bf-wizard__main -->
+      </div><!-- /csp-bf-wizard -->
+    </form>
+  </div>
+</div>

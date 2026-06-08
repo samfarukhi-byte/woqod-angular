@@ -1,0 +1,101 @@
+<div class="woqod-announcements-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header woqod-page-header-kenar">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">Announcements</h1>
+            <p class="woqod-page-subtitle">Important updates and notices from WOQOD</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Filters -->
+    <div class="woqod-modern-card mb-4">
+      <div class="woqod-card-body">
+        <div class="row g-3">
+          <div class="col-12 col-md-4">
+            <label class="form-label">Category</label>
+            <select class="form-select" [(ngModel)]="filterCategory" (change)="onFilterChange()">
+              <option value="">All Categories</option>
+              <option *ngFor="let category of categories" [value]="category">
+                {{ category }}
+              </option>
+            </select>
+          </div>
+          <div class="col-12 col-md-3">
+            <label class="form-label">Priority</label>
+            <select class="form-select" [(ngModel)]="filterPriority" (change)="onFilterChange()">
+              <option value="">All Priorities</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-2">
+            <label class="form-label">&nbsp;</label>
+            <button class="woqod-btn woqod-btn-secondary w-100" (click)="clearFilters()">
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Announcements Grid -->
+    <div class="row g-3 g-lg-4">
+      <div class="col-12" *ngFor="let announcement of filteredAnnouncements; let i = index">
+        <article class="woqod-news-card-modern" (click)="viewAnnouncement(announcement)">
+          <div class="woqod-news-image-wrapper" style="height: 200px;">
+            <div class="woqod-news-image" [attr.data-news-index]="i % 6"></div>
+            <div class="woqod-news-image-overlay"></div>
+            <div class="woqod-news-badge" [class.woqod-news-badge-urgent]="announcement.priority === 'High'">
+              {{ announcement.priority }} Priority
+            </div>
+          </div>
+          <div class="woqod-news-body">
+            <div class="woqod-news-meta">
+              <span class="woqod-news-date-badge">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="1.75" y="2.91666" width="10.5" height="9.33333" rx="1.16667" stroke="currentColor" stroke-width="1.16667"/>
+                  <path d="M9.33333 1.75V4.08333M4.66667 1.75V4.08333M1.75 6.41666H12.25" stroke="currentColor" stroke-width="1.16667" stroke-linecap="round"/>
+                </svg>
+                {{ announcement.publishedDate | date:'dd MMM yyyy' }}
+              </span>
+              <span class="woqod-badge woqod-badge-secondary ms-2">
+                {{ announcement.category }}
+              </span>
+            </div>
+            <h3 class="woqod-news-headline">{{ announcement.title }}</h3>
+            <p class="woqod-news-excerpt">{{ announcement.description }}</p>
+            <div class="woqod-news-footer">
+              <span class="woqod-news-read-more">
+                Read Full Announcement
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+          <div class="woqod-news-hover-effect"></div>
+        </article>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredAnnouncements.length === 0" class="woqod-empty-state">
+      <div class="woqod-empty-icon">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19 20H5C3.89543 20 3 19.1046 3 18V6C3 4.89543 3.89543 4 5 4H19C20.1046 4 21 4.89543 21 6V18C21 19.1046 20.1046 20 19 20Z" stroke="currentColor" stroke-width="2"/>
+          <path d="M3 8H21M8 12H16M8 16H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3 class="woqod-empty-title">No Announcements</h3>
+      <p class="woqod-empty-text">There are currently no announcements to display. Check back soon!</p>
+    </div>
+  </div>
+</div>

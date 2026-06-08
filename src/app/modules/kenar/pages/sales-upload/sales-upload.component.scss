@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.woqod-file-upload-area {
+  border: 2px dashed #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  background-color: #f8fafc;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #009a33;
+    background-color: #f0fdf4;
+  }
+
+  input[type="file"] {
+    cursor: pointer;
+  }
+}
+
+.woqod-file-upload-hint {
+  pointer-events: none;
+  user-select: none;
+}

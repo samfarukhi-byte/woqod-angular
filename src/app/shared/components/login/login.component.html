@@ -1,0 +1,85 @@
+<div class="woqod-auth">
+  <div class="woqod-auth__bg"></div>
+
+  <div class="woqod-auth__card">
+    <div class="woqod-auth__brand">
+      <span class="woqod-auth__logo">WOQOD</span>
+      <span class="woqod-auth__sub">{{ 'login.sub' | t }}</span>
+    </div>
+
+    <!-- Step 1: credentials -->
+    <ng-container *ngIf="step === 'credentials'">
+      <h1 class="woqod-auth__title">{{ 'login.title' | t }}</h1>
+      <p class="woqod-auth__lead">{{ 'login.lead' | t }}</p>
+
+      <div class="csp-alert csp-alert--error woqod-auth__error" *ngIf="error">
+        <span>⚠️</span><span>{{ error }}</span>
+      </div>
+
+      <form (ngSubmit)="submit()" novalidate>
+        <div class="csp-form-group">
+          <label class="csp-form-group__label" for="username">{{ 'login.username' | t }}</label>
+          <input id="username" class="csp-form-group__input" type="text" name="username"
+                 [(ngModel)]="username" autocomplete="username" placeholder="e.g. customer" />
+        </div>
+
+        <div class="csp-form-group">
+          <label class="csp-form-group__label" for="password">{{ 'login.password' | t }}</label>
+          <div class="woqod-auth__pwd">
+            <input id="password" class="csp-form-group__input" [type]="showPassword ? 'text' : 'password'"
+                   name="password" [(ngModel)]="password" autocomplete="current-password" placeholder="••••••••" />
+            <button type="button" class="woqod-auth__pwd-toggle" (click)="showPassword = !showPassword"
+                    [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+              {{ showPassword ? '🙈' : '👁️' }}
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="csp-btn csp-btn--primary woqod-auth__submit" [disabled]="submitting">
+          {{ submitting ? ('login.signingIn' | t) : ('login.continue' | t) }}
+        </button>
+      </form>
+
+      <div class="woqod-auth__demo">
+        <span class="woqod-auth__demo-label">{{ 'login.demo' | t }}</span>
+        <div class="woqod-auth__demo-chips">
+          <button type="button" (click)="useDemo('customer')">Customer</button>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Step 2: OTP verification -->
+    <ng-container *ngIf="step === 'otp'">
+      <h1 class="woqod-auth__title">{{ 'login.otpTitle' | t }}</h1>
+      <p class="woqod-auth__lead">{{ 'login.otpLead' | t }}</p>
+
+      <div class="csp-alert csp-alert--error woqod-auth__error" *ngIf="otpError">
+        <span>⚠️</span><span>{{ otpError }}</span>
+      </div>
+
+      <div class="woqod-auth__otp-hint">
+        {{ 'login.otpDemo' | t }} <strong>{{ generatedOtp }}</strong>
+      </div>
+
+      <form (ngSubmit)="verifyOtp()" novalidate>
+        <div class="csp-form-group">
+          <label class="csp-form-group__label" for="otp">{{ 'login.otpLabel' | t }}</label>
+          <input id="otp" class="csp-form-group__input woqod-auth__otp-input" type="text" name="otp"
+                 [(ngModel)]="otp" inputmode="numeric" maxlength="6" autocomplete="one-time-code"
+                 placeholder="••••••" />
+        </div>
+
+        <button type="submit" class="csp-btn csp-btn--primary woqod-auth__submit" [disabled]="submitting">
+          {{ submitting ? ('login.signingIn' | t) : ('login.verify' | t) }}
+        </button>
+      </form>
+
+      <div class="woqod-auth__otp-actions">
+        <button type="button" class="woqod-auth__link" (click)="resendOtp()">{{ 'login.resend' | t }}</button>
+        <button type="button" class="woqod-auth__link" (click)="backToCredentials()">{{ 'login.back' | t }}</button>
+      </div>
+    </ng-container>
+
+    <p class="woqod-auth__foot">WOQOD (Qatar Fuel) · www.woqod.com.qa</p>
+  </div>
+</div>

@@ -1,0 +1,110 @@
+<div class="woqod-utility-bills-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header woqod-page-header-kenar">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">Utility Bills</h1>
+            <p class="woqod-page-subtitle">View and manage your utility bills</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Filters -->
+    <div class="woqod-modern-card mb-4">
+      <div class="woqod-card-body">
+        <div class="row g-3">
+          <div class="col-12 col-md-3">
+            <label class="form-label">Shop</label>
+            <select class="form-select" [(ngModel)]="filterShop" (change)="onFilterChange()">
+              <option value="">All Shops</option>
+              <option *ngFor="let shop of shops" [value]="shop.shopCode">
+                {{ shop.shopCode }} - {{ shop.stationName }}
+              </option>
+            </select>
+          </div>
+          <div class="col-12 col-md-3">
+            <label class="form-label">Utility Type</label>
+            <select class="form-select" [(ngModel)]="filterUtilityType" (change)="onFilterChange()">
+              <option value="">All Types</option>
+              <option *ngFor="let type of utilityTypes" [value]="type">
+                {{ type }}
+              </option>
+            </select>
+          </div>
+          <div class="col-12 col-md-3">
+            <label class="form-label">Status</label>
+            <select class="form-select" [(ngModel)]="filterStatus" (change)="onFilterChange()">
+              <option value="">All Statuses</option>
+              <option value="Paid">Paid</option>
+              <option value="Pending">Pending</option>
+              <option value="Overdue">Overdue</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-3">
+            <label class="form-label">&nbsp;</label>
+            <button class="woqod-btn woqod-btn-secondary w-100" (click)="clearFilters()">
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Utility Bills Table -->
+    <div class="woqod-modern-card">
+      <div class="woqod-card-header">
+        <h3 class="woqod-card-title">Utility Bills ({{ filteredBills.length }})</h3>
+      </div>
+      <div class="woqod-card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Bill #</th>
+                <th>Shop</th>
+                <th>Station</th>
+                <th>Utility Type</th>
+                <th>Billing Period</th>
+                <th>Amount</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let bill of filteredBills">
+                <td><strong>{{ bill.billNumber }}</strong></td>
+                <td>{{ bill.shopCode }}</td>
+                <td>{{ bill.stationName }}</td>
+                <td>{{ bill.utilityType }}</td>
+                <td>{{ bill.billingPeriod }}</td>
+                <td><strong>QAR {{ bill.amount | number:'1.0-0' }}</strong></td>
+                <td>{{ bill.dueDate | date:'dd MMM yyyy' }}</td>
+                <td>
+                  <span class="woqod-badge" [ngClass]="getStatusClass(bill.paymentStatus)">
+                    {{ bill.paymentStatus }}
+                  </span>
+                </td>
+                <td>
+                  <button class="woqod-btn woqod-btn-secondary woqod-btn-small" (click)="viewBill(bill)">
+                    View
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="filteredBills.length === 0">
+                <td colspan="9" class="text-center text-muted py-4">
+                  No utility bills found
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

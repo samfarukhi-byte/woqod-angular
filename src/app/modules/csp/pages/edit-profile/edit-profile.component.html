@@ -1,0 +1,259 @@
+<div class="csp-content">
+  <app-breadcrumb
+    pageTitle="Edit Profile"
+    [trail]="[
+      { label: 'Home', link: '/' },
+      { label: 'My Profile', link: '/csp/profile' },
+      { label: 'Edit Profile' }
+    ]"
+  ></app-breadcrumb>
+
+  <header class="csp-page-heading">
+    <div>
+      <h2 class="csp-page-heading__title">Edit Profile</h2>
+      <p class="csp-page-heading__sub">
+        <strong>{{ customer.customerName }}</strong> · Customer #<span>{{ customer.customerCode }}</span>
+      </p>
+    </div>
+    <div class="csp-page-heading__actions">
+      <a routerLink="/csp/profile" class="csp-btn csp-btn--secondary">← Cancel</a>
+      <button type="submit" form="edit-form" class="csp-btn csp-btn--primary">Save Changes →</button>
+    </div>
+  </header>
+
+  <p class="csp-info-banner" role="note">
+    <span aria-hidden="true">ℹ</span>
+    <span>Sections marked with the green band are editable. Other fields are managed by your account manager. Changes are queued for Maker-Checker approval before they reach the ERP.</span>
+  </p>
+
+  <form id="edit-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <fieldset class="csp-form-section">
+      <legend class="csp-form-section__legend">
+        <span>Basic Information</span>
+        <span class="csp-form-section__legend-aside">Read-only</span>
+      </legend>
+      <div class="csp-form-section__body">
+        <div class="csp-form-row csp-form-row--2-col">
+          <div class="csp-form-group">
+            <label class="csp-form-group__label">Customer Code</label>
+            <input class="csp-form-group__input csp-form-group__input--readonly" type="text" [value]="customer.customerCode" readonly disabled>
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-group__label">Customer Name</label>
+            <input class="csp-form-group__input csp-form-group__input--readonly" type="text" [value]="customer.customerName" readonly disabled>
+          </div>
+        </div>
+        <div class="csp-form-row csp-form-row--2-col">
+          <div class="csp-form-group">
+            <label class="csp-form-group__label">Customer Type</label>
+            <select class="csp-form-group__select csp-form-group__select--readonly" [value]="customer.customerType" disabled>
+              <option *ngFor="let t of customerTypes" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-group__label">Account Status</label>
+            <select class="csp-form-group__select csp-form-group__select--readonly" [value]="customer.status" disabled>
+              <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="csp-form-row csp-form-row--2-col">
+          <div class="csp-form-group">
+            <label class="csp-form-group__label">Registry ID (CR)</label>
+            <input class="csp-form-group__input csp-form-group__input--readonly" type="text" [value]="customer.registryId" readonly disabled>
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-group__label">Classification</label>
+            <input class="csp-form-group__input csp-form-group__input--readonly" type="text" [value]="customer.businessClassification" readonly disabled>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="csp-form-section csp-form-section--editable">
+      <legend class="csp-form-section__legend">
+        <span>Contact Information</span>
+        <span class="csp-form-section__legend-aside csp-form-section__legend-aside--editable">Editable</span>
+      </legend>
+      <div class="csp-form-section__body">
+        <div class="csp-form-row csp-form-row--2-col">
+          <div class="csp-form-group" [class.csp-form-group--invalid]="isInvalid('firstName')" [class.csp-form-group--changed]="isChanged('firstName')">
+            <label class="csp-form-group__label" for="first-name">
+              <span class="csp-form-group__label-required" aria-hidden="true">*</span>First Name
+              <span class="csp-form-group__changed-flag">Changed</span>
+            </label>
+            <input class="csp-form-group__input" type="text" id="first-name" formControlName="firstName" required>
+            <span class="csp-form-group__error">{{ errorFor('firstName') }}</span>
+          </div>
+          <div class="csp-form-group" [class.csp-form-group--invalid]="isInvalid('lastName')" [class.csp-form-group--changed]="isChanged('lastName')">
+            <label class="csp-form-group__label" for="last-name">
+              <span class="csp-form-group__label-required" aria-hidden="true">*</span>Last Name
+              <span class="csp-form-group__changed-flag">Changed</span>
+            </label>
+            <input class="csp-form-group__input" type="text" id="last-name" formControlName="lastName" required>
+            <span class="csp-form-group__error">{{ errorFor('lastName') }}</span>
+          </div>
+        </div>
+        <div class="csp-form-row csp-form-row--2-col">
+          <div class="csp-form-group" [class.csp-form-group--invalid]="isInvalid('email')" [class.csp-form-group--changed]="isChanged('email')">
+            <label class="csp-form-group__label" for="email">
+              <span class="csp-form-group__label-required" aria-hidden="true">*</span>Email
+              <span class="csp-form-group__changed-flag">Changed</span>
+            </label>
+            <input class="csp-form-group__input" type="email" id="email" formControlName="email" required autocomplete="email">
+            <span class="csp-form-group__error">{{ errorFor('email') }}</span>
+          </div>
+          <div class="csp-form-group" [class.csp-form-group--invalid]="isInvalid('phone')" [class.csp-form-group--changed]="isChanged('phone')">
+            <label class="csp-form-group__label" for="phone">
+              <span class="csp-form-group__label-required" aria-hidden="true">*</span>Phone
+              <span class="csp-form-group__changed-flag">Changed</span>
+            </label>
+            <input class="csp-form-group__input" type="tel" id="phone" formControlName="phone" required autocomplete="tel">
+            <span class="csp-form-group__error">{{ errorFor('phone') }}</span>
+          </div>
+        </div>
+        <div class="csp-form-row csp-form-row--2-col">
+          <div class="csp-form-group" [class.csp-form-group--changed]="isChanged('phoneExtension')">
+            <label class="csp-form-group__label" for="extension">Extension <span class="csp-form-group__changed-flag">Changed</span></label>
+            <input class="csp-form-group__input" type="text" id="extension" formControlName="phoneExtension" inputmode="numeric">
+          </div>
+          <div class="csp-form-group" [class.csp-form-group--changed]="isChanged('jobTitle')">
+            <label class="csp-form-group__label" for="job-title">Job Title <span class="csp-form-group__changed-flag">Changed</span></label>
+            <input class="csp-form-group__input" type="text" id="job-title" formControlName="jobTitle">
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="csp-form-section csp-form-section--editable">
+      <legend class="csp-form-section__legend">
+        <span>Billing Address</span>
+        <span class="csp-form-section__legend-aside csp-form-section__legend-aside--editable">Editable</span>
+      </legend>
+      <div class="csp-form-section__body">
+        <div class="csp-form-row csp-form-row--2-col">
+          <div class="csp-form-group csp-form-group--span-2" [class.csp-form-group--invalid]="isInvalid('address1')" [class.csp-form-group--changed]="isChanged('address1')">
+            <label class="csp-form-group__label" for="address1">
+              <span class="csp-form-group__label-required" aria-hidden="true">*</span>Address Line 1
+              <span class="csp-form-group__changed-flag">Changed</span>
+            </label>
+            <input class="csp-form-group__input" type="text" id="address1" formControlName="address1" required>
+            <span class="csp-form-group__error">{{ errorFor('address1') }}</span>
+          </div>
+        </div>
+        <div class="csp-form-row csp-form-row--3-col">
+          <div class="csp-form-group" [class.csp-form-group--invalid]="isInvalid('city')" [class.csp-form-group--changed]="isChanged('city')">
+            <label class="csp-form-group__label" for="city">
+              <span class="csp-form-group__label-required" aria-hidden="true">*</span>City
+              <span class="csp-form-group__changed-flag">Changed</span>
+            </label>
+            <input class="csp-form-group__input" type="text" id="city" formControlName="city" required>
+            <span class="csp-form-group__error">{{ errorFor('city') }}</span>
+          </div>
+          <div class="csp-form-group" [class.csp-form-group--invalid]="isInvalid('postalCode')" [class.csp-form-group--changed]="isChanged('postalCode')">
+            <label class="csp-form-group__label" for="postal-code">
+              <span class="csp-form-group__label-required" aria-hidden="true">*</span>Postal Code
+              <span class="csp-form-group__changed-flag">Changed</span>
+            </label>
+            <input class="csp-form-group__input" type="text" id="postal-code" formControlName="postalCode" required>
+            <span class="csp-form-group__error">{{ errorFor('postalCode') }}</span>
+          </div>
+          <div class="csp-form-group" [class.csp-form-group--invalid]="isInvalid('country')" [class.csp-form-group--changed]="isChanged('country')">
+            <label class="csp-form-group__label" for="country">
+              <span class="csp-form-group__label-required" aria-hidden="true">*</span>Country
+              <span class="csp-form-group__changed-flag">Changed</span>
+            </label>
+            <select class="csp-form-group__select" id="country" formControlName="country" required>
+              <option value="">Select country…</option>
+              <option *ngFor="let c of countries" [value]="c">{{ c }}</option>
+            </select>
+            <span class="csp-form-group__error">{{ errorFor('country') }}</span>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="csp-form-section">
+      <legend class="csp-form-section__legend">
+        <span>Payment Terms</span>
+        <span class="csp-form-section__legend-aside">Read-only · contact account manager</span>
+      </legend>
+      <div class="csp-form-section__body">
+        <div class="csp-form-row csp-form-row--2-col">
+          <div class="csp-form-group">
+            <label class="csp-form-group__label">Payment Terms</label>
+            <input class="csp-form-group__input csp-form-group__input--readonly" type="text" [value]="customer.paymentTerms" readonly disabled>
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-group__label">Account Model</label>
+            <input class="csp-form-group__input csp-form-group__input--readonly" type="text" [value]="customer.accountModel" readonly disabled>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <div *ngIf="showSuccess" class="csp-alert csp-alert--success" role="alert">
+      <span aria-hidden="true">✓</span>
+      <span><strong>Changes saved.</strong> Redirecting to document upload…</span>
+    </div>
+    <div *ngIf="showError" class="csp-alert csp-alert--error" role="alert">
+      <span aria-hidden="true">✗</span>
+      <span [innerHTML]="errorMessage"></span>
+    </div>
+
+    <div class="csp-form-actions">
+      <span class="csp-form-actions__status" aria-live="polite" [innerHTML]="formStatus"></span>
+      <div class="csp-form-actions__group">
+        <a routerLink="/csp/profile" class="csp-btn csp-btn--secondary">← Cancel</a>
+        <button type="button" class="csp-btn csp-btn--secondary" (click)="onReset()">Reset</button>
+        <button type="submit" class="csp-btn csp-btn--primary">Save Changes →</button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Validation Error Modal -->
+  <div *ngIf="showValidationModal" class="csp-modal-overlay" (click)="closeValidationModal()">
+    <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+      <div class="csp-modal-header">
+        <h3 class="csp-modal-title">⚠️ Missing Required Fields</h3>
+        <button class="csp-icon-button" (click)="closeValidationModal()" type="button">✕</button>
+      </div>
+      <div class="csp-modal-body">
+        <p style="color: #45556c; font-size: 14px; margin-bottom: 16px;">
+          Please fix the following validation errors before submitting:
+        </p>
+        <ul class="csp-validation-list">
+          <li *ngFor="let error of validationErrors">{{ error }}</li>
+        </ul>
+      </div>
+      <div class="csp-modal-footer">
+        <button class="csp-button csp-button--primary" (click)="closeValidationModal()" type="button">
+          OK, Got It
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Reset Modal -->
+  <div *ngIf="showConfirmReset" class="csp-modal-overlay" (click)="cancelReset()">
+    <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+      <div class="csp-modal-header">
+        <h3 class="csp-modal-title">⚠️ Confirm Reset</h3>
+        <button class="csp-icon-button" (click)="cancelReset()" type="button">✕</button>
+      </div>
+      <div class="csp-modal-body">
+        <p style="color: #45556c; font-size: 14px;">
+          Discard all unsaved changes and reload the original values?
+        </p>
+      </div>
+      <div class="csp-modal-footer">
+        <button class="csp-button csp-button--secondary" (click)="cancelReset()" type="button">
+          Cancel
+        </button>
+        <button class="csp-button csp-button--primary" (click)="confirmReset()" type="button">
+          Reset Form
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

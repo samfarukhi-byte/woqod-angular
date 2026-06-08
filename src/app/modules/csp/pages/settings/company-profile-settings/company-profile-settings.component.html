@@ -1,0 +1,540 @@
+<div class="csp-settings-section-container">
+  <!-- Header with Edit Toggle -->
+  <div class="csp-section-header">
+    <div>
+      <h2 class="csp-section-title">Company Profile & Information</h2>
+      <p class="csp-section-subtitle">Manage your company details, contacts, and official documents</p>
+    </div>
+    <button
+      class="csp-button"
+      [ngClass]="isEditMode ? 'csp-button--secondary' : 'csp-button--primary'"
+      (click)="toggleEditMode()"
+      type="button"
+    >
+      <span *ngIf="!isEditMode">✏️ Edit Profile</span>
+      <span *ngIf="isEditMode">✕ Cancel</span>
+    </button>
+  </div>
+
+  <!-- Company Basic Information -->
+  <div class="csp-card csp-card--editable" [class.csp-card--editing]="isEditMode">
+    <div class="csp-card-header">
+      <div class="csp-card-header-left">
+        <span class="csp-card-icon">🏢</span>
+        <h3 class="csp-card-title">Company Information</h3>
+      </div>
+      <span class="csp-badge csp-badge--approved" *ngIf="!isEditMode">Active</span>
+      <span class="csp-badge csp-badge--info" *ngIf="isEditMode">Editing</span>
+    </div>
+    <div class="csp-card-body">
+      <form [formGroup]="companyForm" *ngIf="isEditMode; else viewCompanyInfo">
+        <div class="csp-form-row csp-form-row--2-col">
+          <div class="csp-form-group">
+            <label class="csp-form-label">Company Name *</label>
+            <input type="text" class="csp-form-input" formControlName="customerName" />
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-label">Customer Code</label>
+            <input type="text" class="csp-form-input" formControlName="customerCode" readonly />
+          </div>
+        </div>
+        <div class="csp-form-row csp-form-row--2-col">
+          <div class="csp-form-group">
+            <label class="csp-form-label">Registry ID *</label>
+            <input type="text" class="csp-form-input" formControlName="registryId" />
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-label">Business Classification</label>
+            <input type="text" class="csp-form-input" formControlName="businessClassification" />
+          </div>
+        </div>
+        <div class="csp-form-row">
+          <div class="csp-form-group">
+            <label class="csp-form-label">Business Sub-Classification</label>
+            <input type="text" class="csp-form-input" formControlName="businessSubClassification" />
+          </div>
+        </div>
+        <div class="csp-form-row">
+          <div class="csp-form-group">
+            <label class="csp-form-label">Account Description</label>
+            <textarea class="csp-form-textarea" formControlName="accountDescription" rows="3"></textarea>
+          </div>
+        </div>
+      </form>
+
+      <ng-template #viewCompanyInfo>
+        <div class="csp-info-grid-2col">
+          <div class="csp-info-item">
+            <span class="csp-info-label">Company Name</span>
+            <span class="csp-info-value">{{ customer.customerName }}</span>
+          </div>
+          <div class="csp-info-item">
+            <span class="csp-info-label">Customer Code</span>
+            <span class="csp-info-value">{{ customer.customerCode }}</span>
+          </div>
+          <div class="csp-info-item">
+            <span class="csp-info-label">Registry ID</span>
+            <span class="csp-info-value">{{ customer.registryId }}</span>
+          </div>
+          <div class="csp-info-item">
+            <span class="csp-info-label">Customer Type</span>
+            <span class="csp-info-value">{{ customer.customerType }}</span>
+          </div>
+          <div class="csp-info-item">
+            <span class="csp-info-label">Business Classification</span>
+            <span class="csp-info-value">{{ customer.businessClassification }}</span>
+          </div>
+          <div class="csp-info-item">
+            <span class="csp-info-label">Sub-Classification</span>
+            <span class="csp-info-value">{{ customer.businessSubClassification }}</span>
+          </div>
+          <div class="csp-info-item csp-info-item--full">
+            <span class="csp-info-label">Description</span>
+            <span class="csp-info-value">{{ customer.accountDescription }}</span>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Contacts Section (Primary + Secondary side by side) -->
+  <div class="csp-contact-grid">
+    <!-- Primary Contact -->
+    <div class="csp-card csp-card--editable" [class.csp-card--editing]="isEditMode">
+      <div class="csp-card-header">
+        <div class="csp-card-header-left">
+          <span class="csp-card-icon">👤</span>
+          <h3 class="csp-card-title">Primary Contact</h3>
+        </div>
+        <span class="csp-badge csp-badge--info">Main</span>
+      </div>
+      <div class="csp-card-body">
+        <form [formGroup]="primaryContactForm" *ngIf="isEditMode; else viewPrimaryContact">
+          <div class="csp-form-row csp-form-row--3-col">
+            <div class="csp-form-group">
+              <label class="csp-form-label">Prefix</label>
+              <select class="csp-form-input" formControlName="prefix">
+                <option value="Mr.">Mr.</option>
+                <option value="Ms.">Ms.</option>
+                <option value="Mrs.">Mrs.</option>
+                <option value="Dr.">Dr.</option>
+              </select>
+            </div>
+            <div class="csp-form-group">
+              <label class="csp-form-label">First Name *</label>
+              <input type="text" class="csp-form-input" formControlName="firstName" />
+            </div>
+            <div class="csp-form-group">
+              <label class="csp-form-label">Middle Name</label>
+              <input type="text" class="csp-form-input" formControlName="middleName" />
+            </div>
+          </div>
+          <div class="csp-form-row csp-form-row--2-col">
+            <div class="csp-form-group">
+              <label class="csp-form-label">Last Name *</label>
+              <input type="text" class="csp-form-input" formControlName="lastName" />
+            </div>
+            <div class="csp-form-group">
+              <label class="csp-form-label">Job Title</label>
+              <input type="text" class="csp-form-input" formControlName="jobTitle" />
+            </div>
+          </div>
+          <div class="csp-form-row csp-form-row--2-col">
+            <div class="csp-form-group">
+              <label class="csp-form-label">Email *</label>
+              <input type="email" class="csp-form-input" formControlName="email" />
+            </div>
+            <div class="csp-form-group">
+              <label class="csp-form-label">Phone *</label>
+              <input type="tel" class="csp-form-input" formControlName="phone" />
+            </div>
+          </div>
+        </form>
+
+        <ng-template #viewPrimaryContact>
+          <div class="csp-contact-display">
+            <div class="csp-contact-avatar">{{ customer.primaryContact.firstName.charAt(0) }}{{ customer.primaryContact.lastName.charAt(0) }}</div>
+            <div class="csp-contact-details">
+              <div class="csp-contact-name">{{ fullContactName(customer.primaryContact) }}</div>
+              <div class="csp-contact-title">{{ customer.primaryContact.jobTitle }}</div>
+              <div class="csp-contact-info">
+                <div class="csp-contact-info-item">
+                  <span class="csp-contact-icon">📧</span>
+                  <a href="mailto:{{ customer.primaryContact.email }}">{{ customer.primaryContact.email }}</a>
+                </div>
+                <div class="csp-contact-info-item">
+                  <span class="csp-contact-icon">📞</span>
+                  <a href="tel:{{ customer.primaryContact.phone }}">{{ customer.primaryContact.phone }}</a>
+                  <span *ngIf="customer.primaryContact.phoneExtension" class="csp-contact-ext">Ext: {{ customer.primaryContact.phoneExtension }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Secondary Contact -->
+    <div class="csp-card csp-card--editable" [class.csp-card--editing]="isEditMode">
+      <div class="csp-card-header">
+        <div class="csp-card-header-left">
+          <span class="csp-card-icon">👥</span>
+          <h3 class="csp-card-title">Secondary Contact</h3>
+        </div>
+        <span class="csp-badge csp-badge--neutral">Backup</span>
+      </div>
+      <div class="csp-card-body">
+        <form [formGroup]="secondaryContactForm" *ngIf="isEditMode; else viewSecondaryContact">
+          <div class="csp-form-row csp-form-row--3-col">
+            <div class="csp-form-group">
+              <label class="csp-form-label">Prefix</label>
+              <select class="csp-form-input" formControlName="prefix">
+                <option value="Mr.">Mr.</option>
+                <option value="Ms.">Ms.</option>
+                <option value="Mrs.">Mrs.</option>
+                <option value="Dr.">Dr.</option>
+              </select>
+            </div>
+            <div class="csp-form-group">
+              <label class="csp-form-label">First Name *</label>
+              <input type="text" class="csp-form-input" formControlName="firstName" />
+            </div>
+            <div class="csp-form-group">
+              <label class="csp-form-label">Middle Name</label>
+              <input type="text" class="csp-form-input" formControlName="middleName" />
+            </div>
+          </div>
+          <div class="csp-form-row csp-form-row--2-col">
+            <div class="csp-form-group">
+              <label class="csp-form-label">Last Name *</label>
+              <input type="text" class="csp-form-input" formControlName="lastName" />
+            </div>
+            <div class="csp-form-group">
+              <label class="csp-form-label">Job Title</label>
+              <input type="text" class="csp-form-input" formControlName="jobTitle" />
+            </div>
+          </div>
+          <div class="csp-form-row csp-form-row--2-col">
+            <div class="csp-form-group">
+              <label class="csp-form-label">Email *</label>
+              <input type="email" class="csp-form-input" formControlName="email" />
+            </div>
+            <div class="csp-form-group">
+              <label class="csp-form-label">Phone *</label>
+              <input type="tel" class="csp-form-input" formControlName="phone" />
+            </div>
+          </div>
+        </form>
+
+        <ng-template #viewSecondaryContact>
+          <div class="csp-contact-display">
+            <div class="csp-contact-avatar csp-contact-avatar--secondary">{{ secondaryContact.firstName.charAt(0) }}{{ secondaryContact.lastName.charAt(0) }}</div>
+            <div class="csp-contact-details">
+              <div class="csp-contact-name">{{ fullContactName(secondaryContact) }}</div>
+              <div class="csp-contact-title">{{ secondaryContact.jobTitle }}</div>
+              <div class="csp-contact-info">
+                <div class="csp-contact-info-item">
+                  <span class="csp-contact-icon">📧</span>
+                  <a href="mailto:{{ secondaryContact.email }}">{{ secondaryContact.email }}</a>
+                </div>
+                <div class="csp-contact-info-item">
+                  <span class="csp-contact-icon">📞</span>
+                  <a href="tel:{{ secondaryContact.phone }}">{{ secondaryContact.phone }}</a>
+                  <span *ngIf="secondaryContact.phoneExtension" class="csp-contact-ext">Ext: {{ secondaryContact.phoneExtension }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <!-- Registered Address -->
+  <div class="csp-card csp-card--editable" [class.csp-card--editing]="isEditMode">
+    <div class="csp-card-header">
+      <div class="csp-card-header-left">
+        <span class="csp-card-icon">📍</span>
+        <h3 class="csp-card-title">Registered Address</h3>
+      </div>
+    </div>
+    <div class="csp-card-body">
+      <form [formGroup]="addressForm" *ngIf="isEditMode; else viewAddress">
+        <div class="csp-form-row csp-form-row--2-col">
+          <div class="csp-form-group">
+            <label class="csp-form-label">Address Line 1 *</label>
+            <input type="text" class="csp-form-input" formControlName="address1" placeholder="Building, Street" />
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-label">Address Line 2</label>
+            <input type="text" class="csp-form-input" formControlName="address2" placeholder="Area, Zone" />
+          </div>
+        </div>
+        <div class="csp-form-row csp-form-row--3-col">
+          <div class="csp-form-group">
+            <label class="csp-form-label">City *</label>
+            <input type="text" class="csp-form-input" formControlName="city" />
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-label">State / Province</label>
+            <input type="text" class="csp-form-input" formControlName="state" />
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-label">Postal Code *</label>
+            <input type="text" class="csp-form-input" formControlName="postalCode" />
+          </div>
+        </div>
+        <div class="csp-form-row">
+          <div class="csp-form-group">
+            <label class="csp-form-label">Country *</label>
+            <input type="text" class="csp-form-input" formControlName="country" />
+          </div>
+        </div>
+      </form>
+
+      <ng-template #viewAddress>
+        <div class="csp-address-display">
+          <div class="csp-address-icon">🗺️</div>
+          <div class="csp-address-text">
+            <div class="csp-address-line">{{ customer.registeredAddress.address1 }}</div>
+            <div class="csp-address-line" *ngIf="customer.registeredAddress.address2">{{ customer.registeredAddress.address2 }}</div>
+            <div class="csp-address-line">{{ customer.registeredAddress.city }}, {{ customer.registeredAddress.state }} {{ customer.registeredAddress.postalCode }}</div>
+            <div class="csp-address-line csp-address-country">{{ customer.registeredAddress.country }}</div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Save/Cancel Buttons (shown only in edit mode) -->
+  <div class="csp-form-actions-sticky" *ngIf="isEditMode">
+    <div class="csp-form-actions">
+      <button class="csp-button csp-button--secondary" (click)="cancelEdit()" type="button">
+        Cancel Changes
+      </button>
+      <button class="csp-button csp-button--primary" (click)="saveChanges()" type="button">
+        💾 Save Company Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- Company Documents Section -->
+  <div class="csp-section-divider"></div>
+
+  <div class="csp-section-header">
+    <div>
+      <h2 class="csp-section-title">Company Documents</h2>
+      <p class="csp-section-subtitle">Manage official documents and certificates</p>
+    </div>
+    <button class="csp-button csp-button--primary" (click)="toggleUploadSection()" type="button">
+      <span *ngIf="!showUploadSection">➕ Upload Documents</span>
+      <span *ngIf="showUploadSection">✕ Close Upload</span>
+    </button>
+  </div>
+
+  <!-- Upload Section -->
+  <div class="csp-upload-panel" *ngIf="showUploadSection">
+    <div class="csp-card">
+      <div class="csp-card-header">
+        <h3 class="csp-card-title">📤 Upload New Documents</h3>
+      </div>
+      <div class="csp-card-body">
+        <div
+          class="csp-drop-zone"
+          [class.csp-drop-zone--drag-over]="dragOver"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+          (click)="fileInput.click()"
+        >
+          <div class="csp-drop-zone__icon">📄</div>
+          <div class="csp-drop-zone__text">
+            <strong class="csp-drop-zone__text-cta">Click to browse</strong> or drag and drop files here
+          </div>
+          <div class="csp-drop-zone__sub">PDF files only • Maximum 10MB per file</div>
+          <input
+            #fileInput
+            type="file"
+            accept=".pdf"
+            multiple
+            style="display: none;"
+            (change)="onFileSelected($event)"
+          />
+        </div>
+
+        <!-- Uploaded Files List -->
+        <div class="csp-uploaded-files" *ngIf="uploadedFiles.length > 0">
+          <h4 class="csp-uploaded-files-title">Files Ready to Upload ({{ uploadedFiles.length }})</h4>
+          <div class="csp-uploaded-file" *ngFor="let file of uploadedFiles; let i = index">
+            <div class="csp-uploaded-file-icon">📄</div>
+            <div class="csp-uploaded-file-info">
+              <div class="csp-uploaded-file-name">{{ file.name }}</div>
+              <div class="csp-uploaded-file-size">{{ formatFileSize(file.size) }}</div>
+            </div>
+            <button class="csp-icon-button" (click)="removeUploadedFile(i)" type="button" title="Remove">
+              🗑️
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="csp-upload-actions" *ngIf="uploadedFiles.length > 0">
+          <button class="csp-button csp-button--secondary" (click)="uploadedFiles = []" type="button">
+            Clear All
+          </button>
+          <button class="csp-button csp-button--primary csp-button--large" (click)="submitDocuments()" type="button">
+            ✅ Submit {{ uploadedFiles.length }} Document(s)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Documents Table -->
+  <div class="csp-card">
+    <div class="csp-table-container">
+      <table class="csp-documents-table">
+        <thead>
+          <tr>
+            <th>Document</th>
+            <th>Category</th>
+            <th>Uploaded Date</th>
+            <th>Expiry Date</th>
+            <th>Status</th>
+            <th>Size</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let doc of documents">
+            <td>
+              <div class="csp-doc-cell">
+                <div class="csp-doc-icon">📄</div>
+                <div class="csp-doc-info">
+                  <div class="csp-doc-title">{{ doc.title }}</div>
+                  <div class="csp-doc-filename">{{ doc.fileName }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="csp-category-badge">{{ doc.category }}</span>
+            </td>
+            <td>{{ formatDate(doc.uploadedDate) }}</td>
+            <td>
+              <span class="csp-badge" [ngClass]="getExpiryBadgeClass(doc)">
+                {{ getExpiryText(doc) }}
+              </span>
+            </td>
+            <td>
+              <span class="csp-badge" [ngClass]="doc.status === 'Active' ? 'csp-badge--approved' : doc.status === 'Expired' ? 'csp-badge--rejected' : 'csp-badge--pending'">
+                {{ doc.status || 'Active' }}
+              </span>
+            </td>
+            <td>{{ formatFileSize(doc.fileSize) }}</td>
+            <td>
+              <div class="csp-doc-actions">
+                <button class="csp-icon-button" (click)="openPdfViewer(doc); $event.stopPropagation()" type="button" title="View">
+                  👁️
+                </button>
+                <button class="csp-icon-button" (click)="downloadDocument(doc); $event.stopPropagation()" type="button" title="Download">
+                  ⬇️
+                </button>
+                <button
+                  class="csp-icon-button"
+                  (click)="renewDocument(doc); $event.stopPropagation()"
+                  type="button"
+                  title="Renew"
+                  *ngIf="getExpiryStatus(doc) === 'expiring-soon' || getExpiryStatus(doc) === 'expired'"
+                >
+                  🔄
+                </button>
+                <button
+                  class="csp-icon-button csp-icon-button--danger"
+                  (click)="deleteDocument(doc); $event.preventDefault(); $event.stopPropagation();"
+                  type="button"
+                  title="Delete Document"
+                  style="pointer-events: auto; cursor: pointer;"
+                >
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PDF Viewer Modal -->
+<div class="csp-modal-overlay" *ngIf="showPdfViewer" (click)="closePdfViewer()">
+  <div class="csp-modal csp-modal--large" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">📄 {{ selectedDocument?.title }}</h3>
+      <button class="csp-icon-button" (click)="closePdfViewer()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <div class="csp-pdf-placeholder">
+        <div class="csp-pdf-placeholder__icon">📄</div>
+        <div class="csp-pdf-placeholder__title">{{ selectedDocument?.fileName }}</div>
+        <div class="csp-pdf-placeholder__text">
+          PDF viewer would display here<br>
+          File: {{ selectedDocument?.fileName }}<br>
+          Size: {{ selectedDocument ? formatFileSize(selectedDocument.fileSize) : '' }}
+        </div>
+        <p class="csp-text-muted" style="margin-top: 16px; font-size: 13px;">
+          <em>In production, this would load the PDF from the backend and display it using a PDF viewer library.</em>
+        </p>
+      </div>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--secondary" (click)="downloadDocument(selectedDocument!)" type="button">
+        ⬇️ Download
+      </button>
+      <button class="csp-button csp-button--secondary" (click)="closePdfViewer()" type="button">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <!-- Alert Modal -->
+  <div *ngIf="showAlertModal" class="csp-modal-overlay" (click)="closeAlertModal()">
+    <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+      <div class="csp-modal-header">
+        <h3 class="csp-modal-title">{{ alertTitle }}</h3>
+        <button class="csp-icon-button" (click)="closeAlertModal()" type="button">✕</button>
+      </div>
+      <div class="csp-modal-body">
+        <p style="color: #45556c; font-size: 14px;">{{ alertMessage }}</p>
+      </div>
+      <div class="csp-modal-footer">
+        <button class="csp-button csp-button--primary" (click)="closeAlertModal()" type="button">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Modal -->
+  <div *ngIf="showConfirmDelete" class="csp-modal-overlay" (click)="cancelDeleteDocument()">
+    <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+      <div class="csp-modal-header">
+        <h3 class="csp-modal-title">⚠️ Confirm Delete</h3>
+        <button class="csp-icon-button" (click)="cancelDeleteDocument()" type="button">✕</button>
+      </div>
+      <div class="csp-modal-body">
+        <p style="color: #45556c; font-size: 14px;">
+          Delete {{ documentToDelete?.title }}? This action cannot be undone.
+        </p>
+      </div>
+      <div class="csp-modal-footer">
+        <button class="csp-button csp-button--secondary" (click)="cancelDeleteDocument()" type="button">
+          Cancel
+        </button>
+        <button class="csp-button csp-button--primary" (click)="confirmDeleteDocument()" type="button">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<div class="table-header" style="padding-left: 0;">
+  <h3>{{ pageTitle }}</h3>
+  <div class="export-controls">
+    <ng-container *ngFor="let item of trail; let last = last">
+      <ng-container *ngIf="!last">
+        <p class="home">
+          <a *ngIf="item.link; else trailLabel" [routerLink]="item.link" style="color: inherit; text-decoration: none;">
+            {{ item.label }}
+          </a>
+          <ng-template #trailLabel>{{ item.label }}</ng-template>
+        </p>
+        <img src="assets/images/Vector.svg" class="child-arrow-icon" alt="" />
+      </ng-container>
+      <p *ngIf="last" class="detail">{{ item.label }}</p>
+    </ng-container>
+  </div>
+</div>

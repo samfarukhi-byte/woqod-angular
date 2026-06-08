@@ -1,0 +1,69 @@
+<div class="csp-doc-card" [class]="cardClass()">
+  <!-- Header -->
+  <div class="csp-doc-card__header">
+    <div class="csp-doc-card__title-row">
+      <span class="csp-doc-card__name">{{ type.name }}</span>
+      <span class="csp-tag--required" *ngIf="type.required">Required</span>
+      <span class="csp-tag--optional" *ngIf="!type.required">Optional</span>
+    </div>
+    <p class="csp-doc-card__desc">{{ type.description }}</p>
+    <p class="csp-doc-card__meta">
+      Accepted: {{ acceptDisplay() }} &nbsp;·&nbsp; Max {{ type.maxSizeMB }} MB
+    </p>
+  </div>
+
+  <!-- Existing document on file -->
+  <div class="csp-doc-current" *ngIf="existing">
+    <div class="csp-doc-current__row">
+      <div class="csp-doc-current__info">
+        <span class="csp-doc-current__filename">📄 {{ existing.fileName }}</span>
+        <span class="csp-doc-current__meta">
+          {{ formatBytes(existing.fileSize) }} · v{{ existing.version }} · Uploaded {{ formatDate(existing.uploadedDate) }}
+          <ng-container *ngIf="existing.expiryDate"> · Expires {{ formatDate(existing.expiryDate) }}</ng-container>
+        </span>
+      </div>
+      <span class="csp-badge" [ngClass]="badgeClass(existing.status)">{{ badgeIcon(existing.status) }} {{ existing.status }}</span>
+    </div>
+  </div>
+
+  <!-- Error message -->
+  <div class="csp-info-banner csp-info-banner--error" *ngIf="error" role="alert">
+    ⚠ {{ error }}
+  </div>
+
+  <!-- Staged file -->
+  <div class="csp-staged-file" *ngIf="staged; else dropZone">
+    <div class="csp-staged-file__row">
+      <div class="csp-staged-file__info">
+        <span class="csp-staged-file__name">📎 {{ staged.fileName }}</span>
+        <span class="csp-staged-file__meta">{{ formatBytes(staged.fileSize) }} · Staged {{ formatDate(staged.uploadedAt) }}</span>
+      </div>
+      <span class="csp-version-badge">New</span>
+    </div>
+    <button type="button" class="csp-btn csp-btn--ghost-error csp-btn--small" (click)="unstage.emit()">
+      ✕ Remove
+    </button>
+  </div>
+
+  <!-- Drop zone -->
+  <ng-template #dropZone>
+    <div
+      class="csp-drop-zone"
+      [class.csp-drop-zone--over]="isDragOver"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave()"
+      (drop)="onDrop($event)"
+    >
+      <p>Drag & drop here, or</p>
+      <label class="csp-btn csp-btn--secondary csp-btn--small" style="cursor: pointer;">
+        Browse file
+        <input
+          type="file"
+          [accept]="acceptList()"
+          style="display: none;"
+          (change)="onFilePicked($event)"
+        />
+      </label>
+    </div>
+  </ng-template>
+</div>

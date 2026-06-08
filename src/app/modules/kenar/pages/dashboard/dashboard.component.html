@@ -1,0 +1,315 @@
+<div class="woqod-dashboard-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header woqod-page-header-kenar">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">Kenar Dashboard</h1>
+            <p class="woqod-page-subtitle">Overview of your rental shop operations</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Summary Cards -->
+    <div class="row g-3 g-lg-4 mb-4" *ngIf="summary">
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="woqod-stat-card">
+          <div class="woqod-stat-icon woqod-stat-icon-blue">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="woqod-stat-content">
+            <div class="woqod-stat-value">{{ summary.totalShops }}</div>
+            <div class="woqod-stat-label">Total Shops</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="woqod-stat-card">
+          <div class="woqod-stat-icon woqod-stat-icon-green">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M14 2V8H20M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="woqod-stat-content">
+            <div class="woqod-stat-value">{{ summary.activeContracts }}</div>
+            <div class="woqod-stat-label">Active Contracts</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="woqod-stat-card">
+          <div class="woqod-stat-icon woqod-stat-icon-orange">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10.29 3.86L1.82 18C1.64537 18.3024 1.55296 18.6453 1.55199 18.9945C1.55101 19.3437 1.64151 19.6871 1.81445 19.9905C1.98738 20.2939 2.23673 20.5467 2.53771 20.7239C2.83868 20.901 3.18086 20.9962 3.53 21H20.47C20.8191 20.9962 21.1613 20.901 21.4623 20.7239C21.7633 20.5467 22.0126 20.2939 22.1856 19.9905C22.3585 19.6871 22.449 19.3437 22.448 18.9945C22.447 18.6453 22.3546 18.3024 22.18 18L13.71 3.86C13.5317 3.56611 13.2807 3.32312 12.9812 3.15448C12.6817 2.98585 12.3437 2.89725 12 2.89725C11.6563 2.89725 11.3183 2.98585 11.0188 3.15448C10.7193 3.32312 10.4683 3.56611 10.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 9V13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="woqod-stat-content">
+            <div class="woqod-stat-value">{{ summary.expiringContracts }}</div>
+            <div class="woqod-stat-label">Expiring Contracts</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="woqod-stat-card">
+          <div class="woqod-stat-icon woqod-stat-icon-red">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2V6M12 18V22M4.93 4.93L7.76 7.76M16.24 16.24L19.07 19.07M2 12H6M18 12H22M4.93 19.07L7.76 16.24M16.24 7.76L19.07 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="woqod-stat-content">
+            <div class="woqod-stat-value">QAR {{ summary.outstandingRent | number:'1.0-0' }}</div>
+            <div class="woqod-stat-label">Outstanding Rent</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="woqod-stat-card">
+          <div class="woqod-stat-icon woqod-stat-icon-purple">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="woqod-stat-content">
+            <div class="woqod-stat-value">{{ summary.utilityBillsDue }}</div>
+            <div class="woqod-stat-label">Utility Bills Due</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="woqod-stat-card">
+          <div class="woqod-stat-icon woqod-stat-icon-teal">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1" y="4" width="22" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M1 10H23M7 15H7.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="woqod-stat-content">
+            <div class="woqod-stat-value">{{ summary.upcomingCheques }}</div>
+            <div class="woqod-stat-label">Upcoming Cheques</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="woqod-stat-card">
+          <div class="woqod-stat-icon woqod-stat-icon-indigo">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 5H7C6.46957 5 5.96086 5.21071 5.58579 5.58579C5.21071 5.96086 5 6.46957 5 7V19C5 19.5304 5.21071 20.0391 5.58579 20.4142C5.96086 20.7893 6.46957 21 7 21H17C17.5304 21 18.0391 20.7893 18.4142 20.4142C18.7893 20.0391 19 19.5304 19 19V7C19 6.46957 18.7893 5.96086 18.4142 5.58579C18.0391 5.21071 17.5304 5 17 5H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="9" y="3" width="6" height="4" rx="1" stroke="currentColor" stroke-width="2"/>
+              <path d="M9 12H15M9 16H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="woqod-stat-content">
+            <div class="woqod-stat-value">{{ summary.pendingRequests }}</div>
+            <div class="woqod-stat-label">Pending Requests</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="woqod-stat-card">
+          <div class="woqod-stat-icon woqod-stat-icon-pink">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 6.65685 16.3431 8 18 8Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M6 15L2 19V21H22V19L14 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="woqod-stat-content">
+            <div class="woqod-stat-value">{{ summary.unreadNotifications }}</div>
+            <div class="woqod-stat-label">Unread Notifications</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contract Expiry Alerts -->
+    <div class="woqod-modern-card mb-4" *ngIf="contractAlerts.length > 0">
+      <div class="woqod-card-header">
+        <h3 class="woqod-card-title">Contract Expiry Alerts</h3>
+      </div>
+      <div class="woqod-card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Contract Number</th>
+                <th>Shop Name</th>
+                <th>Expiry Date</th>
+                <th>Days Remaining</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let alert of contractAlerts">
+                <td><strong>{{ alert.contractNumber }}</strong></td>
+                <td>{{ alert.shopName }}</td>
+                <td>{{ alert.expiryDate | date:'dd MMM yyyy' }}</td>
+                <td>{{ alert.daysRemaining }} days</td>
+                <td>
+                  <span class="woqod-badge"
+                        [class.woqod-badge-danger]="alert.severity === 'High'"
+                        [class.woqod-badge-warning]="alert.severity === 'Medium'"
+                        [class.woqod-badge-info]="alert.severity === 'Low'">
+                    {{ alert.alertType }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Invoices & Upcoming Cheques -->
+    <div class="row g-3 g-lg-4 mb-4">
+      <div class="col-12 col-lg-6">
+        <div class="woqod-modern-card">
+          <div class="woqod-card-header">
+            <h3 class="woqod-card-title">Recent Invoices</h3>
+            <a routerLink="/kenar/invoices" class="woqod-btn woqod-btn-secondary woqod-btn-small">View All</a>
+          </div>
+          <div class="woqod-card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Invoice #</th>
+                    <th>Period</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let invoice of recentInvoices">
+                    <td><strong>{{ invoice.invoiceNumber }}</strong></td>
+                    <td>{{ invoice.billingPeriod }}</td>
+                    <td><strong>QAR {{ invoice.rentAmount | number:'1.0-0' }}</strong></td>
+                    <td><span class="woqod-badge" [ngClass]="getStatusClass(invoice.paymentStatus)">{{ invoice.paymentStatus }}</span></td>
+                  </tr>
+                  <tr *ngIf="recentInvoices.length === 0">
+                    <td colspan="4" class="text-center text-muted">No invoices available</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="woqod-modern-card">
+          <div class="woqod-card-header">
+            <h3 class="woqod-card-title">Upcoming Cheques</h3>
+            <a routerLink="/kenar/cheques" class="woqod-btn woqod-btn-secondary woqod-btn-small">View All</a>
+          </div>
+          <div class="woqod-card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Cheque #</th>
+                    <th>Bank</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cheque of upcomingCheques">
+                    <td><strong>{{ cheque.chequeNumber }}</strong></td>
+                    <td>{{ cheque.bankName }}</td>
+                    <td>{{ cheque.chequeDate | date:'dd MMM yyyy' }}</td>
+                    <td><strong>QAR {{ cheque.amount | number:'1.0-0' }}</strong></td>
+                  </tr>
+                  <tr *ngIf="upcomingCheques.length === 0">
+                    <td colspan="4" class="text-center text-muted">No upcoming cheques</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Requests & Unread Notifications -->
+    <div class="row g-3 g-lg-4">
+      <div class="col-12 col-lg-6">
+        <div class="woqod-modern-card">
+          <div class="woqod-card-header">
+            <h3 class="woqod-card-title">Recent Requests</h3>
+            <a routerLink="/kenar/requests" class="woqod-btn woqod-btn-secondary woqod-btn-small">View All</a>
+          </div>
+          <div class="woqod-card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Request #</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let request of recentRequests">
+                    <td><strong>{{ request.requestNumber }}</strong></td>
+                    <td>{{ request.requestType }}</td>
+                    <td><span class="woqod-badge" [ngClass]="getStatusClass(request.status)">{{ request.status }}</span></td>
+                    <td>{{ request.submittedDate | date:'dd MMM yyyy' }}</td>
+                  </tr>
+                  <tr *ngIf="recentRequests.length === 0">
+                    <td colspan="4" class="text-center text-muted">No recent requests</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="woqod-modern-card">
+          <div class="woqod-card-header">
+            <h3 class="woqod-card-title">Recent Notifications</h3>
+            <a routerLink="/kenar/notifications" class="woqod-btn woqod-btn-secondary woqod-btn-small">View All</a>
+          </div>
+          <div class="woqod-card-body">
+            <div class="woqod-notification-list" *ngIf="recentNotifications.length > 0">
+              <div *ngFor="let notification of recentNotifications" class="woqod-notification-card-compact">
+                <div class="woqod-notification-icon-wrapper" [class.woqod-notification-high]="notification.priority === 'High'">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 6.65685 16.3431 8 18 8Z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M6 15L2 19V21H22V19L14 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="woqod-notification-content">
+                  <div class="woqod-notification-title">{{ notification.title }}</div>
+                  <div class="woqod-notification-message">{{ notification.message }}</div>
+                  <div class="woqod-notification-time">{{ notification.createdDate | date:'dd MMM yyyy, HH:mm' }}</div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="recentNotifications.length === 0" class="woqod-empty-state">
+              <p class="woqod-empty-text">No unread notifications</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<div class="woqod-bulkfuel-wrapper" *ngIf="service">
+  <div class="woqod-page-header woqod-page-header-tenders">
+    <div class="container">
+      <div class="row"><div class="col-12">
+        <button class="woqod-back-btn" type="button" (click)="backToServices()">← Back to All Services</button>
+        <div class="woqod-header-content">
+          <h1 class="woqod-page-title">{{ icon(service.serviceCode) }} {{ service.serviceName }}</h1>
+          <p class="woqod-page-subtitle">{{ service.description }}</p>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="container csp-bf-form-wrap">
+    <div class="csp-bf-section-head">
+      <h3 class="csp-bf-section-title">{{ service.serviceName }} Services</h3>
+      <p class="csp-bf-section-sub">Choose a section to continue</p>
+    </div>
+
+    <!-- Sub-sections use the same premium card layout as the main Services page -->
+    <div class="row g-3 g-lg-4">
+      <div class="col-xl-3 col-lg-4 col-md-6 col-12" *ngFor="let sub of service.subServices">
+        <div class="woqod-service-card-premium" (click)="open(sub)">
+          <div class="woqod-service-card-glow"></div>
+          <div class="woqod-service-icon-wrapper">
+            <div class="woqod-service-icon-bg"></div>
+            <div class="woqod-service-icon-text">{{ sub.icon }}</div>
+            <img
+              *ngIf="sub.imageUrl"
+              class="woqod-service-icon-img"
+              [src]="sub.imageUrl"
+              [alt]="sub.name"
+              loading="lazy"
+              (error)="onImageError(sub)"
+            />
+          </div>
+          <div class="woqod-service-card-content">
+            <h3 class="woqod-service-card-title">{{ sub.name }}</h3>
+            <p class="woqod-service-card-description">{{ sub.description }}</p>
+          </div>
+          <div class="woqod-service-card-footer">
+            <span class="woqod-service-link">
+              Open
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+          <div class="woqod-service-card-shine"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

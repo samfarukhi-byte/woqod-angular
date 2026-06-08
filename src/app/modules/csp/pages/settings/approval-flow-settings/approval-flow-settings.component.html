@@ -1,0 +1,139 @@
+<div class="csp-settings-section-container">
+  <h2 class="csp-section-title">Dynamic Approval Flow Configuration</h2>
+  <p class="csp-section-subtitle">Configure approval workflows for invoices and transactions before ERP synchronization</p>
+
+  <!-- Info Banner -->
+  <div class="csp-info-banner">
+    <span class="csp-info-icon">ℹ️</span>
+    <div>
+      <strong>How it works:</strong> When enabled, invoices and transactions require approval from designated users before data is transferred to your ERP system. Configure approval steps, assign roles, and set amount thresholds for each line of business.
+    </div>
+  </div>
+
+  <!-- Approval Flows Grid -->
+  <div class="csp-approval-flows-grid">
+    <div class="csp-card csp-flow-card" *ngFor="let flow of approvalFlows">
+      <div class="csp-card-header">
+        <div class="csp-card-header-left">
+          <span class="csp-card-icon">{{ getFlowIcon(flow.flowType) }}</span>
+          <div>
+            <h3 class="csp-card-title">{{ getFlowLabel(flow.flowType) }}</h3>
+            <span class="csp-lob-badge" [ngClass]="getLOBBadgeClass(flow.lob)">{{ flow.lob }}</span>
+          </div>
+        </div>
+        <label class="csp-toggle">
+          <input
+            type="checkbox"
+            class="csp-toggle__input"
+            [checked]="flow.enabled"
+            (change)="toggleFlow(flow)"
+          />
+          <span class="csp-toggle__switch"></span>
+          <span class="csp-toggle__label">{{ flow.enabled ? 'Enabled' : 'Disabled' }}</span>
+        </label>
+      </div>
+
+      <div class="csp-card-body">
+        <!-- Flow Description -->
+        <p class="csp-flow-description" *ngIf="flow.description">{{ flow.description }}</p>
+
+        <!-- Approval Steps -->
+        <div class="csp-approval-steps">
+          <h4 class="csp-subsection-title">Approval Steps ({{ flow.steps.length }})</h4>
+          <div class="csp-approval-step" *ngFor="let step of flow.steps; let i = index">
+            <div class="csp-step-number">{{ i + 1 }}</div>
+            <div class="csp-step-details">
+              <div class="csp-step-role">
+                <strong>{{ step.approverRole }}</strong>
+                <span class="csp-badge" [ngClass]="step.isRequired ? 'csp-badge--approved' : 'csp-badge--info'">
+                  {{ step.isRequired ? 'Required' : 'Optional' }}
+                </span>
+              </div>
+              <div class="csp-step-conditions" *ngIf="step.minAmount || step.maxAmount">
+                Amount:
+                <span *ngIf="step.minAmount">≥ {{ step.minAmount | number:'1.0-0' }} QAR</span>
+                <span *ngIf="step.minAmount && step.maxAmount"> - </span>
+                <span *ngIf="step.maxAmount">≤ {{ step.maxAmount | number:'1.0-0' }} QAR</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="csp-flow-settings">
+          <div class="csp-setting-row">
+            <label class="csp-checkbox">
+              <input
+                type="checkbox"
+                [checked]="flow.requireAllApprovals"
+                disabled
+              />
+              <span>Require all approval steps to complete</span>
+            </label>
+          </div>
+          <div class="csp-setting-row">
+            <label class="csp-toggle">
+              <input
+                type="checkbox"
+                class="csp-toggle__input"
+                [checked]="flow.autoSyncToERP"
+                (change)="toggleAutoSync(flow)"
+                [disabled]="!flow.enabled"
+              />
+              <span class="csp-toggle__switch"></span>
+              <span class="csp-toggle__label">Auto-sync to ERP after approval</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="csp-flow-actions">
+          <button
+            class="csp-button csp-button--secondary"
+            (click)="openConfigModal(flow)"
+            type="button"
+            [disabled]="!flow.enabled"
+          >
+            ⚙️ Configure Flow
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="csp-empty-state" *ngIf="approvalFlows.length === 0">
+    <h3 class="csp-empty-state__title">No Approval Flows Configured</h3>
+    <p class="csp-empty-state__sub">Contact your administrator to set up approval workflows</p>
+  </div>
+</div>
+
+<!-- Configuration Modal -->
+<div class="csp-modal-overlay" *ngIf="showConfigModal" (click)="closeConfigModal()">
+  <div class="csp-modal csp-modal--large" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">⚙️ Configure Approval Flow</h3>
+      <button class="csp-icon-button" (click)="closeConfigModal()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body" *ngIf="editingFlow">
+      <div class="csp-config-preview">
+        <h4>{{ getFlowLabel(editingFlow.flowType) }} - {{ editingFlow.lob }}</h4>
+        <p class="csp-text-muted" style="margin-top: 8px;">
+          This flow has {{ editingFlow.steps.length }} approval steps.
+          {{ editingFlow.requireAllApprovals ? 'All steps are required.' : 'Some steps are optional.' }}
+        </p>
+        <div class="csp-info-banner" style="margin-top: 16px;">
+          <span class="csp-info-icon">💡</span>
+          <div>
+            Advanced configuration options (adding/removing steps, changing roles, setting thresholds) are available through your system administrator.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--secondary" (click)="closeConfigModal()" type="button">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,107 @@
+<div class="woqod-tenders-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header woqod-page-header-tenders">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <button class="woqod-back-btn" (click)="goBack()" type="button">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back to Home
+          </button>
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">WOQOD Tenders</h1>
+            <p class="woqod-page-subtitle">Explore available business opportunities and procurement tenders</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="woqod-loading-container">
+    <div class="woqod-spinner-large"></div>
+    <p class="woqod-loading-message">Loading active tenders...</p>
+  </div>
+
+  <!-- Tenders List -->
+  <div *ngIf="!isLoading && tendersList.length > 0" class="woqod-tenders-content">
+    <div class="container">
+      <div class="row g-4">
+        <div *ngFor="let tender of tendersList" class="col-12">
+          <article class="woqod-tender-card-premium" (click)="openTenderDetails(tender)">
+            <div class="woqod-tender-status">
+              <span class="woqod-tender-status-badge woqod-status-active">
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="4" cy="4" r="4" fill="currentColor"/>
+                </svg>
+                Active
+              </span>
+            </div>
+
+            <div class="row align-items-center">
+              <div class="col-lg-3">
+                <div class="woqod-tender-visual">
+                  <div class="woqod-tender-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M14 2V8H20M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-6">
+                <div class="woqod-tender-main-content">
+                  <div class="woqod-tender-ref-num">{{ tender.tenderReferenceNo }}</div>
+                  <h3 class="woqod-tender-title">{{ tender.tenderTitle }}</h3>
+                  <p class="woqod-tender-description">{{ tender.description }}</p>
+                </div>
+              </div>
+
+              <div class="col-lg-3">
+                <div class="woqod-tender-meta">
+                  <div class="woqod-tender-deadline">
+                    <div class="woqod-deadline-icon">
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M10 6V10L13 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                    <div class="woqod-deadline-content">
+                      <div class="woqod-deadline-label">Closing Date</div>
+                      <div class="woqod-deadline-date">{{ formatDate(tender.closingDate) }}</div>
+                    </div>
+                  </div>
+
+                  <button class="woqod-tender-view-btn" type="button">
+                    View Details
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="woqod-tender-hover-line"></div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && tendersList.length === 0" class="woqod-empty-state">
+    <div class="woqod-empty-icon">
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M14 2V8H20M16 13H8M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h3 class="woqod-empty-title">No Active Tenders</h3>
+    <p class="woqod-empty-text">There are currently no active tenders. Please check back later for new opportunities.</p>
+  </div>
+</div>
+

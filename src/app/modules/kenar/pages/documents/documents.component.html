@@ -1,0 +1,115 @@
+<div class="woqod-documents-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header woqod-page-header-kenar">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">Documents</h1>
+            <p class="woqod-page-subtitle">Manage your uploaded documents</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Filters and Actions -->
+    <div class="woqod-modern-card mb-4">
+      <div class="woqod-card-body">
+        <div class="row g-3">
+          <div class="col-12 col-md-4">
+            <label class="form-label">Document Type</label>
+            <select class="form-select" [(ngModel)]="filterType" (change)="onFilterChange()">
+              <option value="">All Types</option>
+              <option *ngFor="let type of documentTypes" [value]="type">
+                {{ type }}
+              </option>
+            </select>
+          </div>
+          <div class="col-12 col-md-3">
+            <label class="form-label">Status</label>
+            <select class="form-select" [(ngModel)]="filterStatus" (change)="onFilterChange()">
+              <option value="">All Statuses</option>
+              <option value="Submitted">Submitted</option>
+              <option value="Under Review">Under Review</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Expired">Expired</option>
+              <option value="Renewal Required">Renewal Required</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-2">
+            <label class="form-label">&nbsp;</label>
+            <button class="woqod-btn woqod-btn-secondary w-100" (click)="clearFilters()">
+              Clear Filters
+            </button>
+          </div>
+          <div class="col-12 col-md-3">
+            <label class="form-label">&nbsp;</label>
+            <button class="woqod-btn woqod-btn-primary w-100" (click)="uploadDocument()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M17 8L12 3L7 8M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Upload Document
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documents Table -->
+    <div class="woqod-modern-card">
+      <div class="woqod-card-header">
+        <h3 class="woqod-card-title">Documents ({{ filteredDocuments.length }})</h3>
+      </div>
+      <div class="woqod-card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Document Name</th>
+                <th>Type</th>
+                <th>Related Shop</th>
+                <th>Upload Date</th>
+                <th>Expiry Date</th>
+                <th>File Size</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let document of filteredDocuments">
+                <td><strong>{{ document.documentName }}</strong></td>
+                <td>{{ document.documentType }}</td>
+                <td>{{ document.relatedShop || '-' }}</td>
+                <td>{{ document.uploadedDate | date:'dd MMM yyyy' }}</td>
+                <td>{{ document.expiryDate ? (document.expiryDate | date:'dd MMM yyyy') : '-' }}</td>
+                <td>-</td>
+                <td>
+                  <span class="woqod-badge" [ngClass]="getStatusClass(document.status)">
+                    {{ document.status }}
+                  </span>
+                </td>
+                <td>
+                  <button class="woqod-btn woqod-btn-secondary woqod-btn-small me-2" (click)="viewDocument(document)">
+                    View
+                  </button>
+                  <button class="woqod-btn woqod-btn-secondary woqod-btn-small" (click)="downloadDocument(document)">
+                    Download
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="filteredDocuments.length === 0">
+                <td colspan="8" class="text-center text-muted py-4">
+                  No documents found
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

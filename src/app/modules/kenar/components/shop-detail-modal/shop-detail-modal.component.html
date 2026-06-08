@@ -1,0 +1,124 @@
+<div class="csp-modal-backdrop" *ngIf="open" (click)="closed.emit()" aria-hidden="true"></div>
+
+<div
+  class="csp-modal"
+  [class.csp-modal--open]="open"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="shopDetail ? 'Shop details ' + shopDetail.shopCode : 'Shop details'"
+  *ngIf="open && shopDetail"
+>
+  <!-- Header -->
+  <div class="csp-modal__head">
+    <div>
+      <h3 class="csp-modal__title">{{ shopDetail.shopCode }}</h3>
+      <p class="csp-modal__sub">{{ shopDetail.stationName }}</p>
+    </div>
+    <button type="button" class="csp-btn-icon" aria-label="Close" (click)="closed.emit()">✕</button>
+  </div>
+
+  <!-- Body -->
+  <div class="csp-modal__body">
+
+    <!-- Status Section -->
+    <div class="csp-modal__section">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="csp-badge" [ngClass]="statusBadgeClass()">{{ shopDetail.contractStatus }}</span>
+        <span class="csp-badge" [ngClass]="operationalBadgeClass()">{{ shopDetail.operationalStatus }}</span>
+      </div>
+    </div>
+
+    <!-- Basic Details -->
+    <div class="csp-modal__section">
+      <h4 class="csp-card__title" style="font-size:14px; font-weight:600; margin-bottom:12px;">Shop Details</h4>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Shop Type</p>
+          <p style="font-size:14px; color:#020618;">{{ shopDetail.shopType }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Location</p>
+          <p style="font-size:14px; color:#020618;">{{ shopDetail.location }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Shop Size</p>
+          <p style="font-size:14px; color:#020618;">{{ shopDetail.shopSize }} sqm</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Permitted Business Activity</p>
+          <p style="font-size:14px; color:#020618;">{{ shopDetail.permittedBusinessActivity }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contract Information -->
+    <div class="csp-modal__section">
+      <h4 class="csp-card__title" style="font-size:14px; font-weight:600; margin-bottom:12px;">Contract Information</h4>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Contract Reference</p>
+          <p style="font-size:14px; color:#020618;">{{ shopDetail.contractReference || '—' }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Rent Amount</p>
+          <p style="font-size:14px; color:#020618; font-weight:600;">{{ formatCurrency(shopDetail.rentAmount) }} / month</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Contract Start Date</p>
+          <p style="font-size:14px; color:#020618;">{{ formatDate(shopDetail.contractStartDate) }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Contract End Date</p>
+          <p style="font-size:14px; color:#020618;">{{ formatDate(shopDetail.contractEndDate) }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Security Deposit</p>
+          <p style="font-size:14px; color:#020618;">{{ formatCurrency(shopDetail.securityDeposit) }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Payment Frequency</p>
+          <p style="font-size:14px; color:#020618;">{{ shopDetail.paymentFrequency }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Utility Meter Details -->
+    <div class="csp-modal__section" *ngIf="shopDetail.utilityMeterDetails">
+      <h4 class="csp-card__title" style="font-size:14px; font-weight:600; margin-bottom:12px;">Utility Meter Details</h4>
+      <div class="row g-3">
+        <div class="col-md-4" *ngIf="shopDetail.utilityMeterDetails.electricityMeter">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Electricity Meter</p>
+          <p style="font-size:14px; color:#020618;">{{ shopDetail.utilityMeterDetails.electricityMeter }}</p>
+        </div>
+        <div class="col-md-4" *ngIf="shopDetail.utilityMeterDetails.waterMeter">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Water Meter</p>
+          <p style="font-size:14px; color:#020618;">{{ shopDetail.utilityMeterDetails.waterMeter }}</p>
+        </div>
+        <div class="col-md-4" *ngIf="shopDetail.utilityMeterDetails.coolingMeter">
+          <p class="mb-1" style="font-size:12px; color:#62748e; font-weight:500;">Cooling Meter</p>
+          <p style="font-size:14px; color:#020618;">{{ shopDetail.utilityMeterDetails.coolingMeter }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Information -->
+    <div class="csp-modal__section">
+      <h4 class="csp-card__title" style="font-size:14px; font-weight:600; margin-bottom:12px;">WOQOD Contact</h4>
+      <p style="font-size:14px; color:#020618;">{{ shopDetail.woqodContactPerson }}</p>
+    </div>
+
+    <!-- Active Requests -->
+    <div class="csp-modal__section" *ngIf="shopDetail.activeRequestsCount > 0">
+      <div class="d-flex align-items-center justify-content-between">
+        <h4 class="csp-card__title" style="font-size:14px; font-weight:600; margin:0;">Active Requests</h4>
+        <span class="csp-badge csp-badge--pending">{{ shopDetail.activeRequestsCount }}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="csp-modal__footer">
+    <button type="button" class="csp-btn csp-btn--secondary" (click)="closed.emit()">Close</button>
+  </div>
+</div>

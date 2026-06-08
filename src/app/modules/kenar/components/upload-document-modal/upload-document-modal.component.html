@@ -1,0 +1,131 @@
+<div class="csp-modal-backdrop" *ngIf="open" (click)="cancel()" aria-hidden="true"></div>
+
+<div
+  class="csp-modal"
+  [class.csp-modal--open]="open"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Upload document"
+  *ngIf="open"
+>
+  <!-- Header -->
+  <div class="csp-modal__head">
+    <div>
+      <h3 class="csp-modal__title">Upload Document</h3>
+      <p class="csp-modal__sub">Submit required documents for review</p>
+    </div>
+    <button type="button" class="csp-btn-icon" aria-label="Close" (click)="cancel()">✕</button>
+  </div>
+
+  <!-- Body -->
+  <div class="csp-modal__body">
+    <form [formGroup]="documentForm" (ngSubmit)="onSubmit()">
+
+      <!-- Document Type -->
+      <div class="csp-form-group" [class.csp-form-group--invalid]="hasError('documentType')">
+        <label class="csp-form-group__label" for="documentType">
+          Document Type <span class="csp-form-group__label-required">*</span>
+        </label>
+        <select
+          id="documentType"
+          class="csp-form-group__select"
+          formControlName="documentType"
+        >
+          <option value="">Select document type</option>
+          <option *ngFor="let type of documentTypes" [value]="type">{{ type }}</option>
+        </select>
+        <p class="csp-form-group__error" *ngIf="hasError('documentType')">
+          {{ getFieldError('documentType') }}
+        </p>
+      </div>
+
+      <!-- Document Name -->
+      <div class="csp-form-group" [class.csp-form-group--invalid]="hasError('documentName')">
+        <label class="csp-form-group__label" for="documentName">
+          Document Name <span class="csp-form-group__label-required">*</span>
+        </label>
+        <input
+          id="documentName"
+          type="text"
+          class="csp-form-group__input"
+          formControlName="documentName"
+          placeholder="e.g., CR Certificate 2024"
+        />
+        <p class="csp-form-group__error" *ngIf="hasError('documentName')">
+          {{ getFieldError('documentName') }}
+        </p>
+      </div>
+
+      <!-- Related Shop -->
+      <div class="csp-form-group">
+        <label class="csp-form-group__label" for="relatedShop">Related Shop (Optional)</label>
+        <select
+          id="relatedShop"
+          class="csp-form-group__select"
+          formControlName="relatedShop"
+        >
+          <option value="">None / General</option>
+          <option *ngFor="let shop of shops" [value]="shop.shopCode">
+            {{ shop.shopCode }} - {{ shop.stationName }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Expiry Date -->
+      <div class="csp-form-group">
+        <label class="csp-form-group__label" for="expiryDate">Expiry Date (Optional)</label>
+        <input
+          id="expiryDate"
+          type="date"
+          class="csp-form-group__input"
+          formControlName="expiryDate"
+        />
+        <p class="csp-form-group__hint">Leave blank if document does not expire</p>
+      </div>
+
+      <!-- File Upload -->
+      <div class="csp-form-group">
+        <label class="csp-form-group__label">
+          File Upload <span class="csp-form-group__label-required">*</span>
+        </label>
+        <div class="file-upload-wrapper">
+          <input
+            type="file"
+            id="fileInput"
+            class="file-input"
+            accept=".pdf,.jpg,.jpeg,.png"
+            (change)="onFileSelected($event)"
+          />
+          <label for="fileInput" class="file-upload-label">
+            <span class="file-upload-icon">📎</span>
+            <span *ngIf="!selectedFileName">Choose file...</span>
+            <span *ngIf="selectedFileName" class="selected-file">{{ selectedFileName }}</span>
+          </label>
+        </div>
+        <p class="csp-form-group__hint">Accepted formats: PDF, JPG, PNG (Max 5MB)</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <div class="csp-modal__footer">
+    <button
+      type="button"
+      class="csp-btn csp-btn--secondary"
+      (click)="cancel()"
+      [disabled]="isUploading"
+    >
+      Cancel
+    </button>
+    <button
+      type="button"
+      class="csp-btn csp-btn--primary"
+      (click)="onSubmit()"
+      [disabled]="isUploading || documentForm.invalid || !selectedFileName"
+    >
+      <span *ngIf="!isUploading">Upload Document</span>
+      <span *ngIf="isUploading">Uploading...</span>
+    </button>
+  </div>
+</div>

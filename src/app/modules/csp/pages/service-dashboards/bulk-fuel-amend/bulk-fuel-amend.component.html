@@ -1,0 +1,172 @@
+<div class="woqod-bulkfuel-wrapper">
+  <div class="woqod-page-header woqod-page-header-tenders">
+    <div class="container">
+      <div class="row"><div class="col-12">
+        <button class="woqod-back-btn" type="button" (click)="backToBulkFuel()">← Back to Bulk Fuel</button>
+        <div class="woqod-header-content">
+          <h1 class="woqod-page-title">Amend Bulk Fuel Contract</h1>
+          <p class="woqod-page-subtitle">Adjust consumption or shift tanks on an active contract</p>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="container csp-bf-form-wrap">
+
+    <!-- Success -->
+    <div class="csp-bf-success" *ngIf="showSuccess">
+      <div class="csp-bf-success__check">✓</div>
+      <h2 class="csp-bf-success__title">Amendment Request Submitted</h2>
+      <p class="csp-bf-success__sub">Your amendment for contract <strong>{{ selected?.contractNo }}</strong> has been received. Approval will follow the standard review process.</p>
+      <div class="csp-bf-ticket">
+        <div class="csp-bf-ticket__row">
+          <span class="csp-bf-ticket__label">Reference Number</span>
+          <span class="csp-bf-ticket__value">{{ referenceNumber }}</span>
+        </div>
+        <div class="csp-bf-barcode" aria-hidden="true">
+          <span class="csp-bf-barcode__bar" *ngFor="let w of barcodeBars" [style.width.px]="w"></span>
+        </div>
+        <div class="csp-bf-barcode__text">{{ referenceNumber }}</div>
+      </div>
+      <div class="csp-actions-row">
+        <button class="csp-btn csp-btn--secondary" type="button" (click)="backToBulkFuel()">Back to Bulk Fuel</button>
+        <button class="csp-btn csp-btn--primary" type="button" (click)="goToTracking()">Track My Requests →</button>
+      </div>
+    </div>
+
+    <ng-container *ngIf="!showSuccess">
+      <!-- Step 1: select active contract (only when none chosen) -->
+      <ng-container *ngIf="!selected">
+        <div class="csp-bf-section-head">
+          <h3 class="csp-bf-section-title">Select Active Contract</h3>
+          <p class="csp-bf-section-sub">Choose the contract you wish to amend</p>
+        </div>
+
+        <div class="csp-empty-state" *ngIf="contracts.length === 0">
+          <p class="csp-empty-state__title">No active contracts</p>
+          <p class="csp-empty-state__sub">You don't have any active bulk fuel contracts to amend.</p>
+        </div>
+
+        <div class="csp-bf-contract-grid">
+          <button class="csp-bf-contract" type="button" *ngFor="let c of contracts" (click)="select(c)">
+            <div class="csp-bf-contract__top">
+              <span class="csp-bf-contract__no">{{ c.contractNo }}</span>
+              <span class="csp-badge csp-badge--approved">{{ c.status }}</span>
+            </div>
+            <div class="csp-bf-contract__product">{{ c.product }}</div>
+            <div class="csp-bf-contract__meta">📍 {{ c.site }}</div>
+            <div class="csp-bf-contract__meta">⛽ {{ c.minVolume | number }}–{{ c.maxVolume | number }} L/month · {{ c.tanks.length }} tank(s)</div>
+          </button>
+        </div>
+      </ng-container>
+
+      <!-- Step 2: master–detail (summary aside + amendment form) -->
+      <div class="csp-bf-detail" *ngIf="selected">
+        <aside class="csp-bf-detail__aside">
+          <div class="csp-bf-summary">
+            <div class="csp-bf-summary__head">
+              <div class="csp-bf-summary__no">{{ selected.contractNo }}</div>
+              <div class="csp-bf-summary__product">{{ selected.product }}</div>
+            </div>
+            <div class="csp-bf-summary__body">
+              <div class="csp-bf-summary__row"><span>Status</span><span><span class="csp-badge csp-badge--approved">{{ selected.status }}</span></span></div>
+              <div class="csp-bf-summary__row"><span>Site</span><span>{{ selected.site }}</span></div>
+              <div class="csp-bf-summary__row"><span>Current Min</span><span>{{ selected.minVolume | number }} L/mo</span></div>
+              <div class="csp-bf-summary__row"><span>Current Max</span><span>{{ selected.maxVolume | number }} L/mo</span></div>
+              <div class="csp-bf-summary__row"><span>Approved Qty</span><span>{{ selected.approvedQuantity | number }} L/yr</span></div>
+              <div class="csp-bf-summary__row"><span>Credit Limit</span><span>QAR {{ selected.creditLimit | number }}</span></div>
+              <div class="csp-bf-summary__row"><span>Tanks</span><span>{{ selected.tanks.length }}</span></div>
+            </div>
+            <div class="csp-bf-summary__foot">
+              <button type="button" class="csp-btn csp-btn--secondary csp-btn--small" (click)="clearSelection()">← Change contract</button>
+            </div>
+          </div>
+        </aside>
+
+        <div class="csp-bf-detail__main">
+          <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+            <fieldset class="csp-form-section csp-form-section--editable">
+              <legend class="csp-form-section__legend">
+                <span>Amendment Type</span>
+                <span class="csp-form-section__legend-aside csp-form-section__legend-aside--editable">{{ selected.contractNo }}</span>
+              </legend>
+              <div class="csp-form-section__body">
+                <div class="csp-bf-segctrl">
+                  <button type="button" class="csp-bf-seg" [class.csp-bf-seg--active]="amendType==='increase'" (click)="setAmendType('increase')">⬆️ Increase Consumption</button>
+                  <button type="button" class="csp-bf-seg" [class.csp-bf-seg--active]="amendType==='decrease'" (click)="setAmendType('decrease')">⬇️ Decrease Consumption</button>
+                  <button type="button" class="csp-bf-seg" [class.csp-bf-seg--active]="amendType==='shift'" (click)="setAmendType('shift')">🔄 Shift Tanks</button>
+                </div>
+
+                <!-- Increase / Decrease -->
+                <div *ngIf="amendType !== 'shift'" class="csp-form-row csp-form-row--2-col" style="margin-top:16px;">
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">New Min Volume (L/month)</label>
+                <input type="number" class="csp-form-group__input" formControlName="newMinVolume" min="0" />
+              </div>
+              <div class="csp-form-group" [class.csp-form-group--invalid]="submitted && !form.get('newMaxVolume')?.value">
+                <label class="csp-form-group__label">New Max Volume (L/month) <span class="csp-form-group__label-required">*</span></label>
+                <input type="number" class="csp-form-group__input" formControlName="newMaxVolume" min="0" />
+                <span class="csp-form-group__error" style="display:block" *ngIf="submitted && !form.get('newMaxVolume')?.value">Enter the new max volume.</span>
+              </div>
+            </div>
+            <div class="csp-info-banner" *ngIf="amendType === 'increase' && extraTanksNeeded > 0" style="margin-top:16px;">
+              <span>ℹ️</span>
+              <div>Based on the new volume, an estimated <strong>{{ extraTanksNeeded }} additional tank(s)</strong> may be required. The WOQOD team will confirm and arrange installation.</div>
+            </div>
+            <div class="csp-info-banner" *ngIf="amendType === 'decrease'" style="margin-top:16px;">
+              <span>ℹ️</span>
+              <div>Decreasing consumption may free up tanks. Any empty tanks can be returned or shifted to another active contract.</div>
+            </div>
+
+            <!-- Shift tanks -->
+            <div *ngIf="amendType === 'shift'" style="margin-top:16px;">
+              <div class="csp-empty-block" *ngIf="emptyTanks.length === 0">
+                This contract has no empty tanks available to shift. Tanks must be emptied before they can be shifted.
+              </div>
+              <div class="csp-form-row csp-form-row--2-col" *ngIf="emptyTanks.length > 0">
+                <div class="csp-form-group" [class.csp-form-group--invalid]="submitted && !form.get('tankNo')?.value">
+                  <label class="csp-form-group__label">Empty Tank to Shift <span class="csp-form-group__label-required">*</span></label>
+                  <select class="csp-form-group__select" formControlName="tankNo">
+                    <option value="">Select tank…</option>
+                    <option *ngFor="let t of emptyTanks" [value]="t.tankNo">{{ t.tankNo }} — {{ t.capacity | number }} L</option>
+                  </select>
+                  <span class="csp-form-group__error" style="display:block" *ngIf="submitted && !form.get('tankNo')?.value">Select a tank to shift.</span>
+                </div>
+                <div class="csp-form-group" [class.csp-form-group--invalid]="submitted && !form.get('targetContractNo')?.value">
+                  <label class="csp-form-group__label">Shift to Contract <span class="csp-form-group__label-required">*</span></label>
+                  <select class="csp-form-group__select" formControlName="targetContractNo">
+                    <option value="">Select target contract…</option>
+                    <option *ngFor="let c of otherContracts" [value]="c.contractNo">{{ c.contractNo }} — {{ c.site }}</option>
+                  </select>
+                  <span class="csp-form-group__error" style="display:block" *ngIf="submitted && !form.get('targetContractNo')?.value">Select a target contract.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="csp-form-row" style="margin-top:16px;">
+              <div class="csp-form-group">
+                <label class="csp-form-group__label">Remarks</label>
+                <textarea class="csp-form-group__textarea" formControlName="remarks" rows="3" placeholder="Reason / notes for this amendment"></textarea>
+              </div>
+            </div>
+
+            <label class="csp-checkbox" [class.csp-form-group--invalid]="invalid('declaration')">
+              <input type="checkbox" class="csp-checkbox__input" formControlName="declaration" />
+              <span>I confirm the amendment details are accurate. <span class="csp-form-group__label-required">*</span></span>
+            </label>
+            <span class="csp-field-error" *ngIf="invalid('declaration')">You must confirm to submit.</span>
+          </div>
+        </fieldset>
+
+            <div class="csp-form-actions">
+              <div class="csp-form-actions__group"></div>
+              <div class="csp-form-actions__group">
+                <button type="submit" class="csp-btn csp-btn--primary">Submit Amendment →</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

@@ -1,0 +1,413 @@
+<div class="csp-settings-section-container">
+  <h2 class="csp-section-title">Open API Integration</h2>
+  <p class="csp-section-subtitle">Access your customer data programmatically via secure REST APIs</p>
+
+  <!-- Info Banner -->
+  <div class="csp-info-banner">
+    <span class="csp-info-icon">📡</span>
+    <div>
+      <strong>Secure API Access:</strong> Generate API credentials to integrate your systems with WOQOD Total Control. Access invoices, vehicles, consumption data, and more through our Open API endpoints. All requests are authenticated and audited for security.
+    </div>
+  </div>
+
+  <!-- Main API Credentials Card -->
+  <div class="csp-card">
+    <!-- Header -->
+    <div class="csp-card-header">
+      <div class="csp-card-header-left">
+        <span class="csp-card-icon">🔑</span>
+        <div>
+          <h3 class="csp-card-title">API Credentials</h3>
+          <p class="csp-text-muted" style="font-size: 13px; margin: 4px 0 0 0;">Customer-level access for all API endpoints</p>
+        </div>
+      </div>
+      <label class="csp-toggle" *ngIf="apiCredential">
+        <input
+          type="checkbox"
+          class="csp-toggle__input"
+          [checked]="apiEnabled"
+          (change)="toggleAPIAccess()"
+          [disabled]="apiCredential.status === 'Revoked'"
+        />
+        <span class="csp-toggle__switch"></span>
+        <span class="csp-toggle__label">{{ apiEnabled ? 'Enabled' : 'Disabled' }}</span>
+      </label>
+    </div>
+
+    <div class="csp-card-body">
+      <!-- Has Credentials -->
+      <div class="csp-api-credentials" *ngIf="apiCredential; else noCredentials">
+        <div class="csp-credential-item">
+          <div class="csp-credential-label">API Key</div>
+          <div class="csp-credential-value">
+            <code class="csp-code">{{ maskApiKey(apiCredential.apiKey) }}</code>
+            <button
+              class="csp-icon-button"
+              (click)="copyToClipboard(apiCredential.apiKey)"
+              type="button"
+              title="Copy API Key"
+            >
+              📋
+            </button>
+          </div>
+        </div>
+
+        <div class="csp-credential-item">
+          <div class="csp-credential-label">Secret Key</div>
+          <div class="csp-credential-value">
+            <code class="csp-code" style="font-size: 11px; color: #999;">••••••••••••••••••••••••••••</code>
+            <span class="csp-text-muted" style="font-size: 12px; margin-left: 8px;">Hidden for security</span>
+          </div>
+        </div>
+
+        <div class="csp-credential-meta">
+          <div class="csp-meta-item">
+            <span class="csp-meta-label">Status:</span>
+            <span class="csp-badge" [ngClass]="getStatusBadgeClass(apiCredential.status)">
+              {{ apiCredential.status }}
+            </span>
+          </div>
+          <div class="csp-meta-item">
+            <span class="csp-meta-label">Created:</span>
+            <span>{{ formatDate(apiCredential.createdAt) }}</span>
+          </div>
+          <div class="csp-meta-item" *ngIf="apiCredential.lastUsedAt">
+            <span class="csp-meta-label">Last Used:</span>
+            <span>{{ formatDate(apiCredential.lastUsedAt) }}</span>
+          </div>
+          <div class="csp-meta-item" *ngIf="apiCredential.createdBy">
+            <span class="csp-meta-label">Created By:</span>
+            <span>{{ apiCredential.createdBy }}</span>
+          </div>
+        </div>
+
+        <div class="csp-credential-actions">
+          <button
+            class="csp-button csp-button--secondary csp-button--small"
+            (click)="openRegenerateModal()"
+            type="button"
+            [disabled]="!apiEnabled || apiCredential.status === 'Revoked'"
+          >
+            🔄 Regenerate
+          </button>
+          <button
+            class="csp-button csp-button--secondary csp-button--small"
+            (click)="openRevokeModal()"
+            type="button"
+            [disabled]="!apiEnabled || apiCredential.status === 'Revoked'"
+          >
+            🚫 Revoke
+          </button>
+        </div>
+
+        <!-- Security Notice -->
+        <div class="csp-info-banner" style="margin-top: 20px; background-color: #fff3cd; border-color: #ffc107;">
+          <span class="csp-info-icon">⚠️</span>
+          <div style="font-size: 13px;">
+            <strong>Security Best Practices:</strong>
+            <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+              <li>Never share your API credentials publicly</li>
+              <li>Store credentials securely (e.g., environment variables, secret managers)</li>
+              <li>Regenerate credentials if compromised</li>
+              <li>Monitor API usage logs regularly</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Credentials -->
+      <ng-template #noCredentials>
+        <div class="csp-no-credentials">
+          <p class="csp-text-muted">No API credentials generated yet. Generate credentials to start using the Open API.</p>
+          <button
+            class="csp-button csp-button--primary"
+            (click)="openGenerateModal()"
+            type="button"
+          >
+            🔑 Generate API Credentials
+          </button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Available Endpoints Section -->
+  <div class="csp-card" style="margin-top: 24px;" *ngIf="availableEndpoints.length > 0">
+    <div class="csp-card-header">
+      <div class="csp-card-header-left">
+        <span class="csp-card-icon">📡</span>
+        <h3 class="csp-card-title">Available Endpoints ({{ availableEndpoints.length }})</h3>
+      </div>
+    </div>
+    <div class="csp-card-body">
+      <p class="csp-text-muted" style="margin-bottom: 16px; font-size: 13px;">
+        All endpoints require authentication via <code class="csp-code" style="font-size: 12px;">X-API-KEY</code> and <code class="csp-code" style="font-size: 12px;">X-API-SECRET</code> headers.
+      </p>
+
+      <div class="csp-endpoints-grid">
+        <div
+          class="csp-endpoint-card"
+          *ngFor="let endpoint of availableEndpoints"
+          (click)="openEndpointDetails(endpoint)"
+        >
+          <div class="csp-endpoint-header">
+            <span class="csp-method-badge" [ngClass]="getMethodBadgeClass(endpoint.method)">
+              {{ endpoint.method }}
+            </span>
+            <span class="csp-category-badge" [ngClass]="getCategoryBadgeClass(endpoint.category)">
+              {{ endpoint.category }}
+            </span>
+          </div>
+          <div class="csp-endpoint-name">{{ endpoint.name }}</div>
+          <code class="csp-endpoint-path">{{ endpoint.path }}</code>
+        </div>
+      </div>
+
+      <!-- API Documentation Link -->
+      <div class="csp-info-banner" style="margin-top: 24px;">
+        <span class="csp-info-icon">📚</span>
+        <div style="font-size: 13px;">
+          <strong>Need Help?</strong> Check the complete API documentation with sample requests, response formats, error codes, and best practices.
+          <div style="margin-top: 8px;">
+            <button class="csp-button csp-button--secondary csp-button--small" type="button">
+              📄 View API Documentation
+            </button>
+            <button class="csp-button csp-button--secondary csp-button--small" type="button" style="margin-left: 8px;">
+              📦 Download Postman Collection
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Generate Credentials Modal -->
+<div class="csp-modal-overlay" *ngIf="showGenerateModal" (click)="closeGenerateModal()">
+  <div class="csp-modal" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">🔑 Generate API Credentials</h3>
+      <button class="csp-icon-button" (click)="closeGenerateModal()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <p style="margin-bottom: 16px;">Generate API credentials for secure programmatic access to your customer data?</p>
+
+      <div class="csp-info-banner" style="background-color: #fff3cd; border-color: #ffc107;">
+        <span class="csp-info-icon">⚠️</span>
+        <div style="font-size: 13px;">
+          <strong>Important:</strong> Your Secret Key will be displayed <strong>only once</strong>. Store it securely immediately after generation. If lost, you must regenerate new credentials.
+        </div>
+      </div>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--secondary" (click)="closeGenerateModal()" type="button">
+        Cancel
+      </button>
+      <button class="csp-button csp-button--primary" (click)="confirmGenerate()" type="button">
+        🔑 Generate Credentials
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Show Secret Modal (Only Once) -->
+<div class="csp-modal-overlay" *ngIf="showSecretModal && generatedCredential" (click)="closeSecretModal()">
+  <div class="csp-modal csp-modal--large" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">✅ API Credentials Generated</h3>
+      <button class="csp-icon-button" (click)="closeSecretModal()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <div class="csp-info-banner" style="background-color: #d1ecf1; border-color: #0c5460; margin-bottom: 20px;">
+        <span class="csp-info-icon">🔒</span>
+        <div style="font-size: 13px; color: #0c5460;">
+          <strong>IMPORTANT:</strong> This is the <strong>only time</strong> you will see your Secret Key. Copy and store it securely now. Once you close this dialog, it cannot be retrieved.
+        </div>
+      </div>
+
+      <div class="csp-credential-item" style="margin-bottom: 16px;">
+        <div class="csp-credential-label">API Key</div>
+        <div class="csp-credential-value">
+          <code class="csp-code" style="font-size: 12px; background-color: #f8fafc; padding: 12px; border-radius: 4px; display: block; word-break: break-all;">{{ generatedCredential.apiKey }}</code>
+          <button
+            class="csp-icon-button"
+            (click)="copyToClipboard(generatedCredential.apiKey)"
+            type="button"
+            title="Copy API Key"
+            style="margin-top: 8px;"
+          >
+            📋 Copy API Key
+          </button>
+        </div>
+      </div>
+
+      <div class="csp-credential-item">
+        <div class="csp-credential-label">Secret Key <span style="color: #e7000b; font-weight: bold;">(⚠️ Shown only once)</span></div>
+        <div class="csp-credential-value">
+          <code class="csp-code" style="font-size: 12px; background-color: #fff3cd; padding: 12px; border-radius: 4px; display: block; word-break: break-all; color: #020618;">{{ generatedCredential.plainSecret }}</code>
+          <button
+            class="csp-icon-button"
+            (click)="copyToClipboard(generatedCredential.plainSecret!)"
+            type="button"
+            title="Copy Secret Key"
+            style="margin-top: 8px;"
+          >
+            📋 Copy Secret Key
+          </button>
+        </div>
+      </div>
+
+      <div class="csp-info-banner" style="margin-top: 20px; background-color: #f8fafc; border-color: #e2e8f0;">
+        <span class="csp-info-icon">💡</span>
+        <div style="font-size: 13px;">
+          <strong>Next Steps:</strong>
+          <ol style="margin: 8px 0 0 0; padding-left: 20px;">
+            <li>Copy both the API Key and Secret Key</li>
+            <li>Store them securely (environment variables, secret manager, etc.)</li>
+            <li>Include them in your API requests as headers: <code class="csp-code" style="font-size: 11px;">X-API-KEY</code> and <code class="csp-code" style="font-size: 11px;">X-API-SECRET</code></li>
+            <li>Refer to the API documentation for endpoint details</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--primary" (click)="closeSecretModal()" type="button">
+        I've Saved My Credentials
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Regenerate Confirmation Modal -->
+<div class="csp-modal-overlay" *ngIf="showRegenerateModal" (click)="closeRegenerateModal()">
+  <div class="csp-modal" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">⚠️ Regenerate API Credentials</h3>
+      <button class="csp-icon-button" (click)="closeRegenerateModal()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <p style="margin-bottom: 16px;">Regenerating will <strong>immediately invalidate</strong> your current API credentials. Any systems using the old credentials will stop working.</p>
+
+      <div class="csp-info-banner" style="background-color: #f8d7da; border-color: #e7000b;">
+        <span class="csp-info-icon">🚨</span>
+        <div style="font-size: 13px; color: #721c24;">
+          <strong>Warning:</strong> This action cannot be undone. Ensure all systems are updated with the new credentials after regeneration.
+        </div>
+      </div>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--secondary" (click)="closeRegenerateModal()" type="button">
+        Cancel
+      </button>
+      <button class="csp-button csp-button--primary" (click)="confirmRegenerate()" type="button">
+        🔄 Regenerate Credentials
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Revoke Confirmation Modal -->
+<div class="csp-modal-overlay" *ngIf="showRevokeModal" (click)="closeRevokeModal()">
+  <div class="csp-modal" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">⚠️ Revoke API Credentials</h3>
+      <button class="csp-icon-button" (click)="closeRevokeModal()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <p style="margin-bottom: 16px;">Revoking will <strong>permanently disable</strong> these API credentials. You'll need to generate new credentials to regain API access.</p>
+
+      <div class="csp-info-banner" style="background-color: #f8d7da; border-color: #e7000b;">
+        <span class="csp-info-icon">🚨</span>
+        <div style="font-size: 13px; color: #721c24;">
+          <strong>Warning:</strong> All API calls using these credentials will be rejected immediately after revocation.
+        </div>
+      </div>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--secondary" (click)="closeRevokeModal()" type="button">
+        Cancel
+      </button>
+      <button class="csp-button csp-button--primary" (click)="confirmRevoke()" type="button">
+        🚫 Revoke Credentials
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Endpoint Details Modal -->
+<div class="csp-modal-overlay" *ngIf="showEndpointModal && selectedEndpoint" (click)="closeEndpointModal()">
+  <div class="csp-modal csp-modal--large" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">📡 API Endpoint Details</h3>
+      <button class="csp-icon-button" (click)="closeEndpointModal()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <div class="csp-endpoint-details">
+        <div class="csp-detail-row">
+          <span class="csp-detail-label">Name:</span>
+          <span class="csp-detail-value">{{ selectedEndpoint.name }}</span>
+        </div>
+        <div class="csp-detail-row">
+          <span class="csp-detail-label">Method:</span>
+          <span class="csp-method-badge" [ngClass]="getMethodBadgeClass(selectedEndpoint.method)">
+            {{ selectedEndpoint.method }}
+          </span>
+        </div>
+        <div class="csp-detail-row">
+          <span class="csp-detail-label">Path:</span>
+          <code class="csp-code">{{ selectedEndpoint.path }}</code>
+        </div>
+        <div class="csp-detail-row">
+          <span class="csp-detail-label">Category:</span>
+          <span class="csp-category-badge" [ngClass]="getCategoryBadgeClass(selectedEndpoint.category)">
+            {{ selectedEndpoint.category }}
+          </span>
+        </div>
+        <div class="csp-detail-row">
+          <span class="csp-detail-label">Authentication:</span>
+          <span class="csp-badge" [ngClass]="selectedEndpoint.requiresAuth ? 'csp-badge--pending' : 'csp-badge--info'">
+            {{ selectedEndpoint.requiresAuth ? 'Required' : 'Not Required' }}
+          </span>
+        </div>
+        <div class="csp-detail-row" *ngIf="selectedEndpoint.rateLimit">
+          <span class="csp-detail-label">Rate Limit:</span>
+          <span>{{ selectedEndpoint.rateLimit }}</span>
+        </div>
+        <div class="csp-detail-row csp-detail-row--full">
+          <span class="csp-detail-label">Description:</span>
+          <span class="csp-detail-value">{{ selectedEndpoint.description }}</span>
+        </div>
+      </div>
+
+      <div class="csp-info-banner" style="margin-top: 24px;">
+        <span class="csp-info-icon">📚</span>
+        <div style="font-size: 13px;">
+          For complete documentation including request parameters, response schemas, error codes, and code examples, view the full API documentation.
+        </div>
+      </div>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--secondary" (click)="closeEndpointModal()" type="button">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="csp-modal-overlay" *ngIf="showSuccessModal" (click)="closeSuccessModal()">
+  <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+    <div class="csp-modal-header">
+      <h3 class="csp-modal-title">✓ Success</h3>
+      <button class="csp-icon-button" (click)="closeSuccessModal()" type="button">✕</button>
+    </div>
+    <div class="csp-modal-body">
+      <p style="color: #45556c; font-size: 14px;">{{ successMessage }}</p>
+    </div>
+    <div class="csp-modal-footer">
+      <button class="csp-button csp-button--primary" (click)="closeSuccessModal()" type="button">
+        OK
+      </button>
+    </div>
+  </div>
+</div>

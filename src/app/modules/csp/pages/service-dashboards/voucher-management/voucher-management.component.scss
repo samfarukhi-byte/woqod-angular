@@ -1,0 +1,212 @@
+:host {
+  display: block;
+}
+
+.csp-vch-back {
+  margin-bottom: 16px;
+}
+
+// Credit allocation progress bar
+.csp-vch-progress {
+  position: relative;
+  height: 28px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 4px 0 20px;
+
+  &__bar {
+    height: 100%;
+    background: linear-gradient(90deg, #009a33, #10b981);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+
+  &__label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #020618;
+  }
+}
+
+// Per-row utilization mini bar
+.csp-vch-mini-progress {
+  height: 6px;
+  width: 110px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 4px 0 2px;
+
+  &__bar {
+    height: 100%;
+    background: #009a33;
+    border-radius: 999px;
+  }
+}
+
+.csp-vch-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.csp-vch-code {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #020618;
+}
+
+.csp-vch-sub {
+  font-size: 12px;
+  margin: 2px 0 0;
+}
+
+// Selectable chips for stations / days
+.csp-vch-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.csp-vch-chip {
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #45556c;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: #009a33;
+  }
+
+  &--on {
+    background: #009a33;
+    border-color: #009a33;
+    color: #ffffff;
+    font-weight: 600;
+  }
+}
+
+.csp-vch-errors {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  border-radius: 8px;
+  padding: 12px 12px 12px 28px;
+  margin-bottom: 16px;
+  color: #b91c1c;
+}
+
+// QR modal
+.csp-vch-qr-body {
+  text-align: center;
+}
+
+.csp-vch-qr-intro {
+  text-align: left;
+  margin-bottom: 12px;
+}
+
+.csp-vch-qr {
+  display: inline-block;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 8px;
+  background: #ffffff;
+  line-height: 0;
+
+  ::ng-deep img {
+    display: block;
+    width: 220px;
+    height: 220px;
+  }
+}
+
+.csp-vch-link {
+  margin: 12px auto 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #009a33;
+  word-break: break-all;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.csp-vch-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  text-align: left;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 14px;
+
+    span { font-size: 12px; }
+  }
+
+  @media (max-width: 540px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Reports summary cards
+.csp-vch-report-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.csp-vch-report-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px;
+
+  &__label {
+    font-size: 13px;
+    color: #45556c;
+  }
+  &__value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #020618;
+  }
+}
+
+// Danger button (scoped — not in the global sheet)
+.csp-button--danger {
+  background: #e7000b;
+  border-color: #e7000b;
+  color: #ffffff;
+
+  &:hover {
+    background: #c50009;
+    border-color: #c50009;
+  }
+}
+
+.csp-icon-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}

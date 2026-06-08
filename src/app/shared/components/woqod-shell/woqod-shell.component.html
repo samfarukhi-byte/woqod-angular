@@ -1,0 +1,210 @@
+<a class="woqod-skip-link" href="#main-content">{{ 'a11y.skip' | t }}</a>
+<div class="dashboard versionthree">
+  <nav
+    class="sidebar offcanvas-lg offcanvas-start d-lg-flex flex-column"
+    tabindex="-1"
+    id="sidebarMenu"
+  >
+    <img src="assets/images/whitelogo.png" alt="logo" class="logo defaultlogo" />
+    <img src="assets/images/smalllogo.png" class="collpsedlogo" alt="logo" />
+
+    <div class="menu-scroll">
+      <p class="insight-text">{{ 'nav.insights' | t }}</p>
+      <a routerLink="/csp/home" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }" [attr.data-title]="'nav.home' | t">
+        <img src="assets/images/home.svg" alt="" /><span>{{ 'nav.home' | t }}</span>
+      </a>
+      <a routerLink="/csp/news" class="nav-link" routerLinkActive="active" [attr.data-title]="'nav.news' | t">
+        <img src="assets/images/bill.svg" alt="" /><span>{{ 'nav.news' | t }}</span>
+      </a>
+      <a routerLink="/csp/tenders" class="nav-link" routerLinkActive="active" [attr.data-title]="'nav.tenders' | t">
+        <img src="assets/images/history.svg" alt="" /><span>{{ 'nav.tenders' | t }}</span>
+      </a>
+
+      <!-- View All Services → services homepage (all services as cards) -->
+      <a routerLink="/csp/services" class="nav-link" routerLinkActive="active" [attr.data-title]="'nav.viewAllServices' | t">
+        <img src="assets/images/fleet.svg" alt="" /><span>{{ 'nav.viewAllServices' | t }}</span>
+      </a>
+
+
+      <!-- Hidden: Fleet Management
+      <a class="nav-link collapsed" data-bs-toggle="collapse" href="#collapseOne" role="button" aria-expanded="false">
+        <img src="assets/images/fleet.svg" alt="" />
+        <span>Fleet Management</span>
+        <img src="assets/images/Vector.svg" class="dropdown-arrow-icon" alt="" />
+      </a>
+      <div class="collapse" id="collapseOne">
+        <div class="tree-nav">
+          <div class="tree-item"><a href="#" class="nav-link tree-link"><span>list of vehicles</span><img src="assets/images/Vector.svg" class="child-arrow-icon" alt="" /></a></div>
+          <div class="tree-item"><a href="#" class="nav-link tree-link"><span>Active Status</span><img src="assets/images/Vector.svg" class="child-arrow-icon" alt="" /></a></div>
+          <div class="tree-item"><a href="#" class="nav-link tree-link"><span>Transfer Screen</span><img src="assets/images/Vector.svg" class="child-arrow-icon" alt="" /></a></div>
+          <div class="tree-item"><a href="#" class="nav-link tree-link"><span>Transfer On the fleet</span><img src="assets/images/Vector.svg" class="child-arrow-icon" alt="" /></a></div>
+        </div>
+      </div>
+      -->
+
+      <!-- Hidden: Limit Management
+      <a href="#" class="nav-link"><img src="assets/images/stopwatch.svg" alt="" /><span>Limit Management</span></a>
+      -->
+      <!-- Hidden: Reports
+      <a href="#" class="nav-link"><img src="assets/images/report.svg" alt="" /><span>Reports</span></a>
+      -->
+
+      <p class="insight-text mt-4">{{ 'nav.portalManagement' | t }}</p>
+      <!-- Hidden: My Profile
+      <a routerLink="/csp/profile" class="nav-link" routerLinkActive="active">
+        <img src="assets/images/user-circle.png" alt="" style="width: 20px; height: 20px; filter: brightness(0) invert(1);" /><span>My Profile</span>
+      </a>
+      -->
+      <a routerLink="/csp/track-requests" class="nav-link" routerLinkActive="active" [attr.data-title]="'nav.submitTrack' | t">
+        <img src="assets/images/history.svg" alt="" /><span>{{ 'nav.submitTrack' | t }}</span>
+      </a>
+      <a routerLink="/csp/notifications" class="nav-link" routerLinkActive="active" [attr.data-title]="'nav.notifications' | t">
+        <img src="assets/images/bell.svg" alt="" /><span>{{ 'nav.notifications' | t }}</span>
+      </a>
+      <a routerLink="/kenar/announcements" class="nav-link" routerLinkActive="active" [attr.data-title]="'nav.announcements' | t">
+        <img src="assets/images/bell.svg" alt="" /><span>{{ 'nav.announcements' | t }}</span>
+      </a>
+
+      <a class="nav-link collapsed" data-bs-toggle="collapse" href="#collapseSettings" role="button" aria-expanded="false" [attr.data-title]="'nav.settings' | t">
+        <img src="assets/images/settings.svg" alt="" />
+        <span>{{ 'nav.settings' | t }}</span>
+        <img src="assets/images/Vector.svg" class="dropdown-arrow-icon" alt="" />
+      </a>
+      <div class="collapse" id="collapseSettings">
+        <div class="tree-nav">
+          <div class="tree-item">
+            <a routerLink="/csp/settings/company-profile" class="nav-link tree-link" routerLinkActive="active">
+              <span>🏢 {{ 'nav.companyProfile' | t }}</span>
+              <img src="assets/images/Vector.svg" class="child-arrow-icon" alt="" />
+            </a>
+          </div>
+          <div class="tree-item">
+            <a routerLink="/csp/settings/user-access" class="nav-link tree-link" routerLinkActive="active">
+              <span>👥 {{ 'nav.userAccess' | t }}</span>
+              <img src="assets/images/Vector.svg" class="child-arrow-icon" alt="" />
+            </a>
+          </div>
+          <div class="tree-item">
+            <a routerLink="/csp/settings/configurations" class="nav-link tree-link" routerLinkActive="active">
+              <span>🧩 {{ 'nav.configurations' | t }}</span>
+              <img src="assets/images/Vector.svg" class="child-arrow-icon" alt="" />
+            </a>
+          </div>
+          <!-- Hidden: Approval Flows
+          <div class="tree-item">
+            <a routerLink="/csp/settings/approval-flows" class="nav-link tree-link" routerLinkActive="active">
+              <span>✓ Approval Flows</span>
+              <img src="assets/images/Vector.svg" class="child-arrow-icon" alt="" />
+            </a>
+          </div>
+          -->
+          <div class="tree-item">
+            <a routerLink="/csp/settings/api-integration" class="nav-link tree-link" routerLinkActive="active">
+              <span>🔌 {{ 'nav.apiIntegration' | t }}</span>
+              <img src="assets/images/Vector.svg" class="child-arrow-icon" alt="" />
+            </a>
+          </div>
+          <div class="tree-item">
+            <a routerLink="/csp/settings/security" class="nav-link tree-link" routerLinkActive="active">
+              <span>🔒 {{ 'nav.security' | t }}</span>
+              <img src="assets/images/Vector.svg" class="child-arrow-icon" alt="" />
+            </a>
+          </div>
+          <div class="tree-item">
+            <a routerLink="/csp/settings/system" class="nav-link tree-link" routerLinkActive="active">
+              <span>⚙️ {{ 'nav.system' | t }}</span>
+              <img src="assets/images/Vector.svg" class="child-arrow-icon" alt="" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-panel">
+    <header class="main-header d-flex">
+      <div class="d-flex align-items-center gap-4">
+        <button class="btn btn-outline-secondary d-lg-none me-2 border-0" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+          <img src="assets/images/burgoricon.png" alt="" />
+        </button>
+        <img src="assets/images/smalllogo.png" class="d-block d-md-none" alt="logo" />
+        <img src="assets/images/burgoricon.png" id="sidebarToggle" class="d-none d-lg-block" alt="logo" (click)="toggleSidebar()" style="cursor: pointer;" />
+        <div class="search-container">
+          <img src="assets/images/search.png" class="search-icon" alt="" />
+          <input type="search" [placeholder]="'header.search' | t" class="search-input" [attr.aria-label]="'header.search' | t" />
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2 profile_header">
+        <div class="lang-switch" [class.active]="isRtl" (click)="toggleLang()">
+          <span class="en">EN</span>
+          <span class="ar">ع</span>
+          <div class="switch-btn"></div>
+        </div>
+        <button class="btn btn-outline-secondary border-0">
+          <img src="assets/images/Group22.png" alt="info" />
+        </button>
+        <button class="btn btn-outline-secondary border-0">
+          <img src="assets/images/bell-svgrepo-com2.png" alt="bell" />
+        </button>
+        <div class="dropdown">
+          <button
+            class="btn btn-outline-secondary border-0 dropdown-toggle"
+            type="button"
+            (click)="toggleProfileDropdown(); $event.stopPropagation()"
+          >
+            <img src="assets/images/profile.png" alt="Profile Picture" />
+          </button>
+          <ul
+            class="dropdown-menu dropdown-menu-end profile-menu"
+            [class.show]="isProfileDropdownOpen"
+            [style.display]="isProfileDropdownOpen ? 'block' : 'none'"
+          >
+            <div class="dropdown-uparrow"></div>
+            <li class="woqod-user-head" *ngIf="authUser">
+              <div class="woqod-user-head__name">{{ authUser.name }}</div>
+              <div class="woqod-user-head__role">{{ authUser.role }} · {{ authUser.email }}</div>
+            </li>
+            <li *ngIf="authUser"><hr class="dropdown-divider" /></li>
+            <li>
+              <a class="dropdown-item" routerLink="/csp/profile" (click)="closeProfileDropdown()">
+                <img src="assets/images/user-circle.png" alt="" />
+                👤 {{ 'profile.viewProfile' | t }}
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" routerLink="/csp/track-requests" (click)="closeProfileDropdown()">
+                <img src="assets/images/history.svg" alt="" />
+                📋 {{ 'profile.trackRequests' | t }}
+              </a>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <a class="dropdown-item logout" href="#" (click)="logout($event)">
+                <img src="assets/images/logout.png" alt="" />
+                {{ 'profile.logout' | t }}
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content" id="main-content" tabindex="-1">
+      <router-outlet></router-outlet>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-left">App Version : 5.0.6.13 &nbsp; | &nbsp; Chrome : 136.0</div>
+        <div class="footer-center">
+          WOQOD (Qatar Fuel) &nbsp; | &nbsp;
+          <a href="https://www.woqod.com.qa" target="_blank">www.woqod.com.qa</a>
+        </div>
+        <div class="footer-right"><a href="#">{{ 'footer.contactUs' | t }}</a></div>
+      </div>
+    </footer>
+
+    <app-woqod-chatbot></app-woqod-chatbot>
+  </div>
+</div>

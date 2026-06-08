@@ -1,0 +1,162 @@
+<div class="woqod-dashboard-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header woqod-page-header-kenar">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">Sales Reports</h1>
+            <p class="woqod-page-subtitle">Generate and download sales reports</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Report Filters Card -->
+    <div class="woqod-modern-card mb-4">
+      <div class="woqod-card-header">
+        <h3 class="woqod-card-title">Report Filters</h3>
+      </div>
+      <div class="woqod-card-body">
+        <div class="row g-3">
+          <div class="col-12 col-md-6 col-lg-3">
+            <label for="reportType" class="form-label"><strong>Report Type</strong></label>
+            <select
+              id="reportType"
+              class="form-select"
+              [(ngModel)]="selectedReport"
+            >
+              <option value="">-- Select Report Type --</option>
+              <option *ngFor="let report of reportTypes" [value]="report.id">
+                {{ report.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-3">
+            <label for="startDate" class="form-label"><strong>Start Date</strong></label>
+            <input
+              type="date"
+              id="startDate"
+              class="form-control"
+              [(ngModel)]="filterStartDate"
+            />
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-3">
+            <label for="endDate" class="form-label"><strong>End Date</strong></label>
+            <input
+              type="date"
+              id="endDate"
+              class="form-control"
+              [(ngModel)]="filterEndDate"
+            />
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-3">
+            <label for="shopFilter" class="form-label"><strong>Shop</strong></label>
+            <select
+              id="shopFilter"
+              class="form-select"
+              [(ngModel)]="filterShop"
+            >
+              <option value="">All Shops</option>
+              <option *ngFor="let shop of shops" [value]="shop.shopCode">
+                {{ shop.shopCode }} - {{ shop.stationName }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-12">
+            <div class="d-flex gap-2">
+              <button
+                type="button"
+                class="woqod-btn woqod-btn-primary"
+                (click)="downloadReport()"
+                [disabled]="!selectedReport || !filterStartDate || !filterEndDate"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 4px;">
+                  <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M7 10L12 15M12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Generate Report
+              </button>
+              <button type="button" class="woqod-btn woqod-btn-secondary" (click)="clearFilters()">
+                Clear Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Available Reports Grid -->
+    <div class="row g-3 g-lg-4">
+      <div class="col-12">
+        <h4 class="mb-3">Available Reports</h4>
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4" *ngFor="let report of reportTypes">
+        <div class="woqod-modern-card woqod-report-card">
+          <div class="woqod-card-body">
+            <div class="woqod-report-icon mb-3">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path [attr.d]="getReportIcon(report.icon)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h5 class="woqod-report-title">{{ report.name }}</h5>
+            <p class="woqod-report-description text-muted">{{ report.description }}</p>
+            <button
+              type="button"
+              class="woqod-btn woqod-btn-primary w-100"
+              (click)="generateReport(report.id)"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 4px;">
+                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M7 10L12 15M12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Download
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Report Information -->
+    <div class="woqod-modern-card mt-4">
+      <div class="woqod-card-header">
+        <h3 class="woqod-card-title">Report Information</h3>
+      </div>
+      <div class="woqod-card-body">
+        <div class="row">
+          <div class="col-12 col-md-6">
+            <h6><strong>Report Formats Available:</strong></h6>
+            <ul>
+              <li>PDF - For viewing and printing</li>
+              <li>Excel (.xlsx) - For data analysis and manipulation</li>
+              <li>CSV - For integration with other systems</li>
+            </ul>
+          </div>
+          <div class="col-12 col-md-6">
+            <h6><strong>Report Features:</strong></h6>
+            <ul>
+              <li>Customizable date ranges</li>
+              <li>Shop-specific or consolidated views</li>
+              <li>Detailed transaction breakdowns</li>
+              <li>Visual charts and graphs (PDF/Excel only)</li>
+              <li>Historical comparisons</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="alert alert-info mt-3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 8px;">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 16V12M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <strong>Note:</strong> Reports are generated based on confirmed sales data only. Disputed or pending records are excluded from the calculations.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

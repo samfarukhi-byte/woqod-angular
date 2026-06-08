@@ -1,0 +1,132 @@
+<div class="csp-page-container">
+  <app-breadcrumb></app-breadcrumb>
+
+  <div class="csp-page-header">
+    <div>
+      <h1 class="csp-page-title">Notifications</h1>
+      <p class="csp-page-subtitle">Stay updated with important alerts and announcements from WOQOD</p>
+    </div>
+    <button *ngIf="getUnreadCount() > 0" class="csp-button csp-button--secondary" (click)="markAllAsRead()" type="button">
+      Mark All as Read
+    </button>
+  </div>
+
+  <!-- Category Filters -->
+  <div class="csp-category-filters">
+    <button
+      *ngFor="let cat of categories"
+      class="csp-category-chip"
+      [class.csp-category-chip--active]="activeCategory === cat.type"
+      (click)="setCategory(cat.type)"
+      type="button"
+    >
+      <span class="csp-category-chip__icon">{{ cat.icon }}</span>
+      <span class="csp-category-chip__label">{{ cat.label }}</span>
+      <span class="csp-category-chip__count">{{ getCategoryCount(cat.type) }}</span>
+    </button>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="csp-notification-filters">
+    <button
+      class="csp-filter-tab"
+      [class.csp-filter-tab--active]="activeFilter === 'all'"
+      (click)="setFilter('all')"
+      type="button"
+    >
+      All
+      <span class="csp-filter-count">{{ notifications.length }}</span>
+    </button>
+    <button
+      class="csp-filter-tab"
+      [class.csp-filter-tab--active]="activeFilter === 'unread'"
+      (click)="setFilter('unread')"
+      type="button"
+    >
+      Unread
+      <span class="csp-filter-count csp-filter-count--unread">{{ getUnreadCount() }}</span>
+    </button>
+  </div>
+
+  <!-- Notifications List -->
+  <div class="csp-notification-list">
+    <div
+      *ngFor="let notification of filteredNotifications"
+      class="csp-notification-card"
+      [class.csp-notification-card--unread]="!notification.isRead"
+      (click)="openDetail(notification)"
+    >
+      <div class="csp-notification-card__image-container" *ngIf="notification.imageUrl">
+        <img [src]="notification.imageUrl" [alt]="notification.title" class="csp-notification-card__image">
+        <div class="csp-notification-card__image-overlay" [style.background-color]="getNotificationColor(notification.type)">
+          <span class="csp-notification-card__overlay-icon">{{ getNotificationIcon(notification.type) }}</span>
+        </div>
+      </div>
+      <div class="csp-notification-card__content">
+        <div class="csp-notification-card__header">
+          <div class="csp-notification-card__title-wrapper">
+            <h3 class="csp-notification-card__title">{{ notification.title }}</h3>
+            <span class="csp-notification-card__time">{{ formatTimestamp(notification.timestamp) }}</span>
+          </div>
+          <span class="csp-notification-card__status" *ngIf="!notification.isRead">
+            <span class="csp-notification-card__unread-dot"></span>
+          </span>
+        </div>
+        <p class="csp-notification-card__message">{{ notification.message }}</p>
+        <button class="csp-notification-card__action" type="button" (click)="$event.stopPropagation(); openDetail(notification)">
+          View Details →
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="filteredNotifications.length === 0" class="csp-empty-state">
+      <p class="csp-empty-state__title">No notifications</p>
+      <p class="csp-empty-state__sub">You're all caught up!</p>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div *ngIf="showDetailModal" class="csp-modal-overlay" (click)="closeDetail()">
+    <div class="csp-modal csp-modal--large" (click)="$event.stopPropagation()" *ngIf="selectedNotification">
+      <div class="csp-modal-header">
+        <div style="flex: 1;">
+          <h3 class="csp-modal-title">
+            <span [style.margin-right.px]="8">{{ getNotificationIcon(selectedNotification.type) }}</span>
+            {{ selectedNotification.title }}
+          </h3>
+          <p style="margin: 8px 0 0; color: #62748e; font-size: 13px;">
+            {{ formatTimestamp(selectedNotification.timestamp) }}
+          </p>
+        </div>
+        <button class="csp-icon-button" (click)="closeDetail()" type="button">✕</button>
+      </div>
+      <div class="csp-modal-body">
+        <div class="csp-notification-detail-image" *ngIf="selectedNotification.imageUrl">
+          <img [src]="selectedNotification.imageUrl" [alt]="selectedNotification.title" class="csp-notification-detail-img">
+          <div class="csp-notification-detail-banner" [style.background-color]="getNotificationColor(selectedNotification.type)">
+            <span class="csp-notification-detail-icon">{{ getNotificationIcon(selectedNotification.type) }}</span>
+          </div>
+        </div>
+        <div style="white-space: pre-line; line-height: 1.8; color: #020618; font-size: 14px; margin-top: 20px;">
+          {{ selectedNotification.details || selectedNotification.message }}
+        </div>
+      </div>
+      <div class="csp-modal-footer">
+        <button class="csp-button csp-button--secondary" (click)="closeDetail()" type="button">
+          Close
+        </button>
+        <button class="csp-button csp-button--primary" (click)="acknowledgeNotification()" type="button" [disabled]="showAcknowledgeSuccess">
+          Acknowledge
+        </button>
+      </div>
+
+      <!-- Success Message Overlay -->
+      <div *ngIf="showAcknowledgeSuccess" class="csp-acknowledge-success">
+        <div class="csp-acknowledge-success__content">
+          <span class="csp-acknowledge-success__icon">✓</span>
+          <p class="csp-acknowledge-success__message">Thanks for acknowledgement</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

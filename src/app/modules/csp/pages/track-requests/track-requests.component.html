@@ -1,0 +1,295 @@
+<div class="csp-content">
+  <app-breadcrumb pageTitle="Submit and Track Request" [trail]="[{ label: 'Home', link: '/' }, { label: 'Submit and Track Request' }]"></app-breadcrumb>
+
+  <header class="csp-page-heading">
+    <div>
+      <h2 class="csp-page-heading__title">Submit and Track Request</h2>
+      <p class="csp-page-heading__sub">Submit requests, complaints, or communicate with WOQOD</p>
+    </div>
+  </header>
+
+  <!-- Submit New Request Form -->
+  <div class="csp-card" style="margin-bottom: 32px;">
+    <div class="csp-card-header">
+      <h3 class="csp-card-title">Submit New Request</h3>
+    </div>
+    <div class="csp-card-body">
+      <form>
+        <div class="csp-form-row">
+          <div class="csp-form-group">
+            <label class="csp-form-label">Request Type <span class="csp-required">*</span></label>
+            <select
+              class="csp-form-input"
+              [class.csp-form-input--invalid]="isFieldInvalid('type')"
+              [(ngModel)]="newRequest.type"
+              name="requestType"
+              required
+            >
+              <option value="">Select request type</option>
+              <option value="complaint">Complaint</option>
+              <option value="inquiry">General Inquiry</option>
+              <option value="support">Technical Support</option>
+              <option value="feedback">Feedback</option>
+              <option value="service_request">Service Request</option>
+              <option value="billing">Billing Issue</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="csp-form-group">
+            <label class="csp-form-label">Priority</label>
+            <select class="csp-form-input" [(ngModel)]="newRequest.priority" name="priority" required>
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="csp-form-group">
+          <label class="csp-form-label">Subject <span class="csp-required">*</span></label>
+          <input
+            type="text"
+            class="csp-form-input"
+            [class.csp-form-input--invalid]="isFieldInvalid('subject')"
+            [(ngModel)]="newRequest.subject"
+            name="subject"
+            placeholder="Brief description of your request"
+            required
+          />
+        </div>
+
+        <div class="csp-form-group">
+          <label class="csp-form-label">Description <span class="csp-required">*</span></label>
+          <textarea
+            class="csp-form-input"
+            [class.csp-form-input--invalid]="isFieldInvalid('description')"
+            [(ngModel)]="newRequest.description"
+            name="description"
+            rows="5"
+            placeholder="Please provide detailed information about your request..."
+            required
+          ></textarea>
+        </div>
+
+        <div class="csp-form-group">
+          <label class="csp-form-label">Attachment (Optional)</label>
+          <input
+            type="file"
+            class="csp-form-input"
+            (change)="onFileSelected($event)"
+            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+          />
+          <p class="csp-form-help">Supported formats: PDF, JPG, PNG, DOC, DOCX (Max 5MB)</p>
+        </div>
+
+        <div class="csp-form-actions">
+          <button type="button" class="csp-button csp-button--secondary" (click)="resetForm()">
+            Clear Form
+          </button>
+          <button type="button" class="csp-button csp-button--primary" (click)="submitRequest()" [disabled]="showSubmitSuccess">
+            Submit Request
+          </button>
+        </div>
+      </form>
+
+      <!-- Success Message Popup -->
+      <div *ngIf="showSubmitSuccess" class="csp-submit-success">
+        <div class="csp-submit-success__content">
+          <span class="csp-submit-success__icon">✓</span>
+          <div class="csp-submit-success__text">
+            <p class="csp-submit-success__title">Request Submitted Successfully!</p>
+            <p class="csp-submit-success__id">Request ID: <strong>{{ generatedRequestId }}</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Validation Error Modal -->
+  <div *ngIf="showValidationError" class="csp-modal-overlay" (click)="closeValidationError()">
+    <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+      <div class="csp-modal-header">
+        <h3 class="csp-modal-title">⚠️ Missing Required Fields</h3>
+        <button class="csp-icon-button" (click)="closeValidationError()" type="button">✕</button>
+      </div>
+      <div class="csp-modal-body">
+        <p style="color: #45556c; font-size: 14px; margin-bottom: 16px;">
+          Please fill in the following required fields before submitting:
+        </p>
+        <ul class="csp-validation-list">
+          <li *ngFor="let field of missingFields">{{ field }}</li>
+        </ul>
+      </div>
+      <div class="csp-modal-footer">
+        <button class="csp-button csp-button--primary" (click)="closeValidationError()" type="button">
+          OK, Got It
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Modal -->
+  <div *ngIf="showAlertModal" class="csp-modal-overlay" (click)="closeAlertModal()">
+    <div class="csp-modal csp-modal--small" (click)="$event.stopPropagation()">
+      <div class="csp-modal-header">
+        <h3 class="csp-modal-title">⚠️ Alert</h3>
+        <button class="csp-icon-button" (click)="closeAlertModal()" type="button">✕</button>
+      </div>
+      <div class="csp-modal-body">
+        <p style="color: #45556c; font-size: 14px;">{{ alertMessage }}</p>
+      </div>
+      <div class="csp-modal-footer">
+        <button class="csp-button csp-button--primary" (click)="closeAlertModal()" type="button">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Track Requests Section -->
+  <h3 class="csp-section-title">Your Submitted Requests</h3>
+  <p class="csp-section-subtitle">Track the status of all your submitted requests</p>
+
+  <div class="csp-filter-bar" role="tablist" aria-label="Filter requests by status">
+    <span class="csp-filter-bar__label">Filter:</span>
+    <button *ngFor="let f of [
+      { id: 'all', label: 'All' },
+      { id: 'pending', label: 'Pending' },
+      { id: 'approved', label: 'Approved' },
+      { id: 'returned', label: 'Returned' },
+      { id: 'rejected', label: 'Rejected' }
+    ]"
+      type="button"
+      class="csp-filter-chip"
+      [class.csp-filter-chip--active]="activeFilter === f.id"
+      role="tab"
+      [attr.aria-selected]="activeFilter === f.id"
+      (click)="setFilter($any(f.id))">
+      {{ f.label }}
+      <span class="csp-filter-chip__count">{{ count($any(f.id)) }}</span>
+    </button>
+  </div>
+
+  <div class="csp-request-list" aria-live="polite">
+    <article
+      *ngFor="let r of filtered"
+      class="csp-request-card"
+      [ngClass]="'csp-request-card--' + metaFor(r.status).cardMod"
+    >
+      <header class="csp-request-card__header">
+        <div>
+          <p class="csp-request-card__id">{{ r.requestId }}</p>
+          <h3 class="csp-request-card__title">
+            {{ r.requestType }}
+            <span class="csp-bf-tag" *ngIf="isBulkFuel(r)">🛢️ Bulk Fuel</span>
+            <span class="csp-badge" [ngClass]="'csp-badge--' + metaFor(r.status).tone">{{ metaFor(r.status).badge }}</span>
+          </h3>
+          <div class="csp-request-card__meta">
+            <span>Submitted {{ formatDate(r.submittedAt) }} · {{ daysAgo(r.submittedAt) }}</span>
+            <span>· by {{ r.submittedBy }}</span>
+          </div>
+        </div>
+      </header>
+      <div class="csp-request-card__body">
+        <div class="csp-request-card__summary">
+          <p style="margin:0;"><strong>Summary:</strong> {{ summaryFor(r) }}</p>
+          <p *ngIf="r.comments" style="margin:0;color:#62748e;font-style:italic;">"{{ r.comments }}"</p>
+          <ul class="csp-timeline" aria-label="Approval trail">
+            <li *ngFor="let s of r.approvalTrail; let idx = index"
+                class="csp-timeline__step"
+                [ngClass]="timelineStepClass(r.approvalTrail, idx, r.status)">
+              <span class="csp-timeline__dot" aria-hidden="true"></span>
+              <div class="csp-timeline__head">
+                <span class="csp-timeline__stage">{{ s.stage }}</span>
+                <span class="csp-timeline__date">{{ formatDateTime(s.timestamp) }}</span>
+              </div>
+              <p class="csp-timeline__action">
+                {{ s.action }} <span style="color:#62748e;">— by {{ s.user }}</span>
+              </p>
+              <p *ngIf="s.remarks" class="csp-timeline__remarks">"{{ s.remarks }}"</p>
+            </li>
+          </ul>
+        </div>
+        <div class="csp-request-card__actions">
+          <button type="button" class="csp-btn csp-btn--secondary csp-btn--small" (click)="openDetails(r)">View Details</button>
+          <a *ngIf="isResubmittable(r)" routerLink="/csp/edit-profile" class="csp-btn csp-btn--primary csp-btn--small">Resubmit</a>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div *ngIf="filtered.length === 0" class="csp-empty-state">
+    <p class="csp-empty-state__title">No requests in this view</p>
+    <p class="csp-empty-state__sub">Try a different filter, or start a new request.</p>
+    <a routerLink="/csp/edit-profile" class="csp-btn csp-btn--primary">+ Start a Request</a>
+  </div>
+
+  <!-- Details modal -->
+  <div *ngIf="modalOpen" class="csp-modal-overlay" (click)="closeModal()">
+    <div *ngIf="modalRequest as r" class="csp-modal csp-modal--large" (click)="$event.stopPropagation()">
+      <header class="csp-modal-header">
+        <div>
+          <h3 class="csp-modal-title">
+            {{ r.requestType }}
+            <span class="csp-bf-tag" *ngIf="isBulkFuel(r)">🛢️ Bulk Fuel</span>
+            <span class="csp-badge" [ngClass]="'csp-badge--' + metaFor(r.status).tone">{{ metaFor(r.status).badge }}</span>
+          </h3>
+          <p style="margin: 4px 0 0; color: #62748e; font-size: 13px;">{{ r.requestId }} · Submitted {{ formatDateTime(r.submittedAt) }} by {{ r.submittedBy }}</p>
+        </div>
+        <button type="button" class="csp-icon-button" aria-label="Close" (click)="closeModal()">✕</button>
+      </header>
+      <div class="csp-modal-body">
+        <section style="margin-bottom: 24px;">
+          <h4 style="margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #020618; text-transform: uppercase; letter-spacing: 0.5px;">Profile Changes</h4>
+          <ng-container *ngIf="r.profileChanges && r.profileChanges.changedFields.length; else noProfile">
+            <div *ngFor="let k of r.profileChanges.changedFields" class="csp-modal__diff-row">
+              <span class="csp-modal__diff-key">{{ fieldLabel(k) }}</span>
+              <span class="csp-modal__diff-old">{{ r.profileChanges.oldValues[k] || '—' }}</span>
+              <span class="csp-modal__diff-new">{{ r.profileChanges.newValues[k] || '—' }}</span>
+            </div>
+          </ng-container>
+          <ng-template #noProfile><p style="margin:0;color:#62748e;">No profile changes in this request.</p></ng-template>
+        </section>
+        <section style="margin-bottom: 24px;">
+          <h4 style="margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #020618; text-transform: uppercase; letter-spacing: 0.5px;">Documents Submitted</h4>
+          <ng-container *ngIf="documentKeys(r).length; else noDocs">
+            <div *ngFor="let code of documentKeys(r)" class="csp-modal__doc-row">
+              <span>
+                <strong>{{ docLabel(code) }}</strong> — {{ r.documents[code].fileName }}
+                <ng-container *ngIf="r.documents[code].fileSize"> · {{ formatBytes(r.documents[code].fileSize) }}</ng-container>
+              </span>
+              <span class="csp-badge csp-badge--info">NEW</span>
+            </div>
+          </ng-container>
+          <ng-template #noDocs><p style="margin:0;color:#62748e;">No documents in this request.</p></ng-template>
+        </section>
+        <section style="margin-bottom: 24px;">
+          <h4 style="margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #020618; text-transform: uppercase; letter-spacing: 0.5px;">Approval Trail</h4>
+          <ul class="csp-timeline" aria-label="Approval trail">
+            <li *ngFor="let s of r.approvalTrail; let idx = index"
+                class="csp-timeline__step"
+                [ngClass]="timelineStepClass(r.approvalTrail, idx, r.status)">
+              <span class="csp-timeline__dot" aria-hidden="true"></span>
+              <div class="csp-timeline__head">
+                <span class="csp-timeline__stage">{{ s.stage }}</span>
+                <span class="csp-timeline__date">{{ formatDateTime(s.timestamp) }}</span>
+              </div>
+              <p class="csp-timeline__action">{{ s.action }} <span style="color:#62748e;">— by {{ s.user }}</span></p>
+              <p *ngIf="s.remarks" class="csp-timeline__remarks">"{{ s.remarks }}"</p>
+            </li>
+          </ul>
+        </section>
+        <section *ngIf="r.reason || r.comments" style="margin-bottom: 24px;">
+          <h4 style="margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #020618; text-transform: uppercase; letter-spacing: 0.5px;">Reason &amp; Comments</h4>
+          <p *ngIf="r.reason" style="margin:0 0 6px;"><strong>Reason:</strong> {{ r.reason }}</p>
+          <p *ngIf="r.comments" style="margin:0;font-style:italic;color:#45556c;">"{{ r.comments }}"</p>
+        </section>
+      </div>
+      <footer class="csp-modal-footer">
+        <button type="button" class="csp-button csp-button--secondary" (click)="closeModal()">Close</button>
+        <button *ngIf="isResubmittable(r)" type="button" class="csp-button csp-button--primary" (click)="resubmit()">Resubmit</button>
+      </footer>
+    </div>
+  </div>
+</div>

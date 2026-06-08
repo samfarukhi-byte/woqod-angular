@@ -1,0 +1,35 @@
+<div class="dropdown" (clickOutside)="close()">
+  <button
+    class="btn btn-outline-secondary border-0 dropdown-toggle"
+    type="button"
+    (click)="toggle($event)"
+  >
+    <img src="assets/images/profile.png" alt="Profile Picture" />
+  </button>
+  <ul
+    class="dropdown-menu dropdown-menu-end profile-menu"
+    [class.show]="isOpen"
+    [style.display]="isOpen ? 'block' : 'none'"
+  >
+    <div class="dropdown-uparrow"></div>
+    <li>
+      <a class="dropdown-item" routerLink="/csp/profile" (click)="close()">
+        <img src="assets/images/user-circle.png" alt="" />
+        👤 View Profile
+      </a>
+    </li>
+    <li>
+      <a class="dropdown-item" routerLink="/csp/track-requests" (click)="close()">
+        <img src="assets/images/history.svg" alt="" />
+        📋 Track Requests
+      </a>
+    </li>
+    <li><hr class="dropdown-divider" /></li>
+    <li>
+      <a class="dropdown-item logout" href="#" (click)="close()">
+        <img src="assets/images/logout.png" alt="" />
+        Logout
+      </a>
+    </li>
+  </ul>
+</div>

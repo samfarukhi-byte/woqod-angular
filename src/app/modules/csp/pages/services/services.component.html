@@ -1,0 +1,103 @@
+<div class="woqod-services-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <button class="woqod-back-btn" (click)="goBack()" type="button">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back to Home
+          </button>
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">WOQOD Services</h1>
+            <p class="woqod-page-subtitle">Comprehensive fuel solutions tailored to your business needs</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="woqod-loading-container">
+    <div class="woqod-spinner-large"></div>
+    <p class="woqod-loading-message">Loading our services...</p>
+  </div>
+
+  <!-- Services Grid -->
+  <div *ngIf="!isLoading" class="woqod-services-content">
+    <div class="container">
+      <div class="row g-3 g-lg-4">
+        <div *ngFor="let service of services" class="col-xl-3 col-lg-4 col-md-6 col-12">
+          <div class="woqod-service-card-premium" (click)="onServiceClick(service)">
+            <div class="woqod-service-card-glow"></div>
+            <span class="woqod-service-badge" *ngIf="isHub(service)">{{ service.subServices?.length }} sections</span>
+            <div class="woqod-service-icon-wrapper">
+              <div class="woqod-service-icon-bg"></div>
+              <div class="woqod-service-icon-text">{{ serviceIcon(service.serviceCode) }}</div>
+              <img
+                class="woqod-service-icon-img"
+                [src]="service.thumbnailUrl"
+                [alt]="service.serviceName"
+                loading="lazy"
+                (error)="onImageError($event)"
+              />
+            </div>
+            <div class="woqod-service-card-content">
+              <h3 class="woqod-service-card-title">{{ service.serviceName }}</h3>
+              <p class="woqod-service-card-description">{{ service.description }}</p>
+            </div>
+            <div class="woqod-service-card-footer">
+              <span class="woqod-service-link">
+                View Service
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </div>
+            <div class="woqod-service-card-shine"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Not Eligible Modal - Premium Design -->
+<div class="woqod-modal-overlay" *ngIf="showNotEligibleModal && selectedService" (click)="closeNotEligibleModal()">
+  <div class="woqod-modal woqod-modal-premium" (click)="$event.stopPropagation()">
+    <button class="woqod-modal-close" (click)="closeNotEligibleModal()" type="button">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div class="woqod-modal-icon woqod-modal-icon-warning">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+        <path d="M12 8V12M12 16H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <h3 class="woqod-modal-title">Service Not Available</h3>
+    <p class="woqod-modal-text">
+      You are currently not registered for <strong>{{ selectedService.serviceName }}</strong>.
+    </p>
+    <p class="woqod-modal-text-secondary">
+      Would you like to express your interest in availing this service? Our team will contact you with more information.
+    </p>
+
+    <div class="woqod-modal-actions">
+      <button class="woqod-btn woqod-btn-secondary" (click)="closeNotEligibleModal()" type="button">
+        Maybe Later
+      </button>
+      <button class="woqod-btn woqod-btn-primary" (click)="recordInterest()" type="button">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+          <path d="M17.5 5.83333L7.5 15.8333L2.5 10.8333" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Yes, I'm Interested
+      </button>
+    </div>
+  </div>
+</div>

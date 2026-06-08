@@ -1,0 +1,194 @@
+<div class="woqod-bulkfuel-wrapper">
+  <div class="woqod-page-header woqod-page-header-tenders">
+    <div class="container">
+      <div class="row"><div class="col-12">
+        <button class="woqod-back-btn" type="button" (click)="backToBulkFuel()">← Back to Bulk Fuel</button>
+        <div class="woqod-header-content">
+          <h1 class="woqod-page-title">Invoices &amp; Reports</h1>
+          <p class="woqod-page-subtitle">View invoices and generate the contract-status report</p>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="container csp-bf-form-wrap">
+    <!-- Tabs -->
+    <div class="csp-tabs">
+      <button class="csp-tab" [class.csp-tab--active]="activeTab==='invoices'" (click)="setTab('invoices')" type="button">🧾 Invoices</button>
+      <button class="csp-tab" [class.csp-tab--active]="activeTab==='report'" (click)="setTab('report')" type="button">📊 Contract Status Report</button>
+    </div>
+
+    <!-- INVOICES TAB -->
+    <div *ngIf="activeTab==='invoices'">
+      <div class="csp-stats-grid" style="margin-bottom:20px;">
+        <div class="csp-stat-card">
+          <div class="csp-stat-icon csp-stat-icon--info">🧾</div>
+          <div class="csp-stat-content"><div class="csp-stat-value">{{ invoices.length }}</div><div class="csp-stat-label">Total Invoices</div></div>
+        </div>
+        <div class="csp-stat-card">
+          <div class="csp-stat-icon csp-stat-icon--warning">⏳</div>
+          <div class="csp-stat-content"><div class="csp-stat-value">{{ pendingCount }}</div><div class="csp-stat-label">Unpaid / Overdue</div></div>
+        </div>
+        <div class="csp-stat-card">
+          <div class="csp-stat-icon csp-stat-icon--primary">💰</div>
+          <div class="csp-stat-content"><div class="csp-stat-value">QAR {{ totalAmount | number }}</div><div class="csp-stat-label">Filtered Total</div></div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="csp-toolbar">
+        <select class="csp-form-input csp-toolbar__select" [(ngModel)]="filterContract">
+          <option value="">All Contracts</option>
+          <option *ngFor="let c of contracts" [value]="c.contractNo">{{ c.contractNo }}</option>
+        </select>
+        <select class="csp-form-input csp-toolbar__select" [(ngModel)]="filterStatus">
+          <option value="">All Statuses</option>
+          <option value="Paid">Paid</option>
+          <option value="Pending">Pending</option>
+          <option value="Overdue">Overdue</option>
+        </select>
+        <button class="csp-button csp-button--secondary csp-button--small" type="button" (click)="clearFilters()">Clear</button>
+        <span class="csp-toolbar__count">Showing <strong>{{ filteredInvoices.length }}</strong> of {{ invoices.length }}</span>
+        <button class="csp-btn csp-btn--primary csp-btn--small" type="button" (click)="downloadInvoicesReport()" style="margin-left:8px;">⬇️ Export CSV</button>
+      </div>
+
+      <div class="csp-card">
+        <div class="csp-table-container">
+          <table class="csp-settings-table">
+            <thead>
+              <tr><th>Invoice No</th><th>Contract</th><th>Product</th><th>Period</th><th>Volume</th><th>Amount</th><th>Issued</th><th>Status</th><th class="csp-col-actions">Action</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let inv of filteredInvoices" class="csp-bf-invrow" (click)="openInvoice(inv)">
+                <td><button type="button" class="csp-link-strong">{{ inv.invoiceNo }}</button></td>
+                <td>{{ inv.contractNo }}</td>
+                <td>{{ inv.product }}</td>
+                <td>{{ inv.period }}</td>
+                <td>{{ inv.volume | number }} L</td>
+                <td>QAR {{ inv.amount | number }}</td>
+                <td>{{ inv.issuedDate }}</td>
+                <td><span class="csp-badge" [ngClass]="statusClass(inv.status)">{{ inv.status }}</span></td>
+                <td class="csp-col-actions" (click)="$event.stopPropagation()">
+                  <div class="csp-action-buttons">
+                    <button class="csp-icon-button" type="button" title="View details" (click)="openInvoice(inv)">👁️</button>
+                    <button class="csp-icon-button" type="button" title="Download CSV" (click)="downloadInvoice(inv)">⬇️</button>
+                    <button class="csp-icon-button" type="button" title="Print" (click)="printInvoice(inv)">🖨️</button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="filteredInvoices.length === 0">
+                <td colspan="9">
+                  <div class="csp-table-empty">
+                    <div class="csp-table-empty__icon">🧾</div>
+                    <p class="csp-table-empty__title">No invoices found</p>
+                    <p class="csp-table-empty__sub">Try adjusting your filters.</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTRACT STATUS REPORT TAB -->
+    <div *ngIf="activeTab==='report'">
+      <div class="csp-bf-section-head">
+        <h3 class="csp-bf-section-title">Contract Status Report</h3>
+        <p class="csp-bf-section-sub">All your bulk fuel contracts with their current status</p>
+      </div>
+      <div class="csp-toolbar">
+        <span class="csp-toolbar__count">{{ contracts.length }} contract(s)</span>
+        <button class="csp-btn csp-btn--primary csp-btn--small" type="button" (click)="downloadContractReport()" style="margin-left:8px;">⬇️ Download Report (CSV)</button>
+      </div>
+      <div class="csp-card">
+        <div class="csp-table-container">
+          <table class="csp-settings-table">
+            <thead>
+              <tr><th>Contract No</th><th>Product</th><th>Site</th><th>Min–Max (L/mo)</th><th>Approved Qty</th><th>Period</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of contracts">
+                <td><strong>{{ c.contractNo }}</strong></td>
+                <td>{{ c.product }}</td>
+                <td>{{ c.site }}</td>
+                <td>{{ c.minVolume | number }}–{{ c.maxVolume | number }}</td>
+                <td>{{ c.approvedQuantity | number }} L/yr</td>
+                <td>{{ c.startDate }} → {{ c.endDate }}</td>
+                <td><span class="csp-badge" [ngClass]="statusClass(c.status)">{{ c.status }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== INVOICE DETAIL MODAL ===================== -->
+  <div class="csp-modal-overlay" *ngIf="selectedInvoice" (click)="closeInvoice()">
+    <div class="csp-modal csp-modal--large" role="dialog" aria-modal="true" aria-label="Invoice details"
+         appFocusTrap (escape)="closeInvoice()" (click)="$event.stopPropagation()">
+      <div class="csp-modal-header">
+        <div>
+          <h3 class="csp-modal-title">
+            Invoice {{ selectedInvoice.invoiceNo }}
+            <span class="csp-bf-tag">🛢️ Bulk Fuel</span>
+            <span class="csp-badge" [ngClass]="statusClass(selectedInvoice.status)">{{ selectedInvoice.status }}</span>
+          </h3>
+          <p class="csp-modal-sub">{{ selectedInvoice.product }} · {{ selectedInvoice.period }} · Contract {{ selectedInvoice.contractNo }}</p>
+        </div>
+        <button class="csp-icon-button" type="button" (click)="closeInvoice()" aria-label="Close">✕</button>
+      </div>
+
+      <div class="csp-modal-body">
+        <!-- Supporting information -->
+        <div class="csp-bf-inv-grid">
+          <div><span class="csp-bf-inv-grid__label">Customer</span><span class="csp-bf-inv-grid__value">{{ contractFor(selectedInvoice)?.customerName || '—' }}</span></div>
+          <div><span class="csp-bf-inv-grid__label">Site</span><span class="csp-bf-inv-grid__value">{{ contractFor(selectedInvoice)?.site || '—' }}</span></div>
+          <div><span class="csp-bf-inv-grid__label">Billing Period</span><span class="csp-bf-inv-grid__value">{{ selectedInvoice.period }}</span></div>
+          <div><span class="csp-bf-inv-grid__label">Issued Date</span><span class="csp-bf-inv-grid__value">{{ selectedInvoice.issuedDate }}</span></div>
+          <div><span class="csp-bf-inv-grid__label">Due Date</span><span class="csp-bf-inv-grid__value">{{ dueDate(selectedInvoice) }}</span></div>
+          <div><span class="csp-bf-inv-grid__label">Total Volume</span><span class="csp-bf-inv-grid__value">{{ selectedInvoice.volume | number }} L</span></div>
+        </div>
+
+        <!-- Related transactions -->
+        <div class="csp-modal__section">
+          <h4 class="csp-modal__section-title">Related Delivery Transactions</h4>
+          <div class="csp-table-container">
+            <table class="csp-settings-table">
+              <thead>
+                <tr><th>Delivery Ref</th><th>Date</th><th>Qty (L)</th><th>Rate (QAR)</th><th>Amount (QAR)</th></tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let l of invoiceLines(selectedInvoice)">
+                  <td><strong>{{ l.ref }}</strong></td>
+                  <td>{{ l.date }}</td>
+                  <td>{{ l.qty | number }}</td>
+                  <td>{{ l.rate | number:'1.2-2' }}</td>
+                  <td>QAR {{ l.amount | number }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Totals -->
+        <div class="csp-bf-inv-totals">
+          <div class="csp-bf-inv-totals__row"><span>Subtotal</span><span>QAR {{ invoiceSubtotal(selectedInvoice) | number }}</span></div>
+          <div class="csp-bf-inv-totals__row"><span>VAT (0%)</span><span>QAR 0</span></div>
+          <div class="csp-bf-inv-totals__row csp-bf-inv-totals__row--grand"><span>Total Due</span><span>QAR {{ selectedInvoice.amount | number }}</span></div>
+        </div>
+
+        <p class="csp-modal-message" style="margin-top:16px;font-size:12px;">
+          This is a system-generated invoice from WOQOD Total Control. For queries call <strong>16007</strong> or email <strong>customercare&#64;woqod.com.qa</strong>.
+        </p>
+      </div>
+
+      <div class="csp-modal-footer">
+        <button class="csp-button csp-button--secondary" type="button" (click)="downloadInvoice(selectedInvoice)">⬇️ Download CSV</button>
+        <button class="csp-button csp-button--secondary" type="button" (click)="printInvoice(selectedInvoice)">🖨️ Print</button>
+        <button class="csp-button csp-button--primary" type="button" (click)="closeInvoice()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

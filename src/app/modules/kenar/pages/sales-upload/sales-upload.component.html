@@ -1,0 +1,215 @@
+<div class="woqod-dashboard-wrapper">
+  <!-- Page Header -->
+  <div class="woqod-page-header woqod-page-header-kenar">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="woqod-header-content">
+            <h1 class="woqod-page-title">Upload Sales Data</h1>
+            <p class="woqod-page-subtitle">Submit your sales data via file upload</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row g-3 g-lg-4">
+      <!-- Upload Instructions Card -->
+      <div class="col-12 col-lg-5">
+        <div class="woqod-modern-card">
+          <div class="woqod-card-header">
+            <h3 class="woqod-card-title">Upload Instructions</h3>
+          </div>
+          <div class="woqod-card-body">
+            <div class="alert alert-info">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 8px;">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 16V12M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <strong>Important:</strong> Follow these guidelines for successful upload
+            </div>
+
+            <div class="mb-3">
+              <h6><strong>Supported Formats:</strong></h6>
+              <ul class="mb-0">
+                <li>CSV (.csv)</li>
+                <li>Excel (.xlsx, .xls)</li>
+              </ul>
+            </div>
+
+            <div class="mb-3">
+              <h6><strong>Required Data Fields:</strong></h6>
+              <ul class="mb-0">
+                <li>Sales Date</li>
+                <li>Total Sales Amount</li>
+                <li>Transaction Count</li>
+                <li>Payment Method Breakdown (Cash, Card, Digital Wallet)</li>
+                <li>Shop Code</li>
+              </ul>
+            </div>
+
+            <div class="mb-3">
+              <h6><strong>File Requirements:</strong></h6>
+              <ul class="mb-0">
+                <li>Maximum file size: 10 MB</li>
+                <li>Date format: DD/MM/YYYY or YYYY-MM-DD</li>
+                <li>Amount values: Numeric only (no currency symbols)</li>
+              </ul>
+            </div>
+
+            <button type="button" class="woqod-btn woqod-btn-secondary w-100" (click)="downloadTemplate()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 4px;">
+                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M7 10L12 15M12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Download Template
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Form Card -->
+      <div class="col-12 col-lg-7">
+        <div class="woqod-modern-card">
+          <div class="woqod-card-header">
+            <h3 class="woqod-card-title">Upload Sales File</h3>
+          </div>
+          <div class="woqod-card-body">
+            <div class="mb-3">
+              <label for="shopSelect" class="form-label"><strong>Select Shop</strong></label>
+              <select
+                id="shopSelect"
+                class="form-select"
+                [(ngModel)]="selectedShop"
+                [disabled]="uploading"
+              >
+                <option value="">-- Select a Shop --</option>
+                <option *ngFor="let shop of shops" [value]="shop.shopCode">
+                  {{ shop.shopCode }} - {{ shop.stationName }} ({{ shop.shopType }})
+                </option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="fileInput" class="form-label"><strong>Select File</strong></label>
+              <div class="woqod-file-upload-area">
+                <input
+                  type="file"
+                  id="fileInput"
+                  class="form-control"
+                  accept=".csv,.xlsx,.xls"
+                  (change)="onFileSelected($event)"
+                  [disabled]="uploading"
+                />
+                <div class="woqod-file-upload-hint text-center text-muted mt-2">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.3;">
+                    <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M17 8L12 3M12 3L7 8M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <p>Drag & drop or browse to select a file</p>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="selectedFile" class="alert alert-success">
+              <strong>Selected File:</strong> {{ selectedFile.name }}<br>
+              <small>Size: {{ formatFileSize(selectedFile.size) }}</small>
+            </div>
+
+            <div *ngIf="uploading" class="mb-3">
+              <div class="progress">
+                <div
+                  class="progress-bar progress-bar-striped progress-bar-animated"
+                  role="progressbar"
+                  [style.width.%]="uploadProgress"
+                  [attr.aria-valuenow]="uploadProgress"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                >
+                  {{ uploadProgress }}%
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button
+                type="button"
+                class="woqod-btn woqod-btn-primary"
+                (click)="uploadFile()"
+                [disabled]="!selectedFile || !selectedShop || uploading"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 4px;">
+                  <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M17 8L12 3M12 3L7 8M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                {{ uploading ? 'Uploading...' : 'Upload File' }}
+              </button>
+              <button
+                *ngIf="uploading"
+                type="button"
+                class="woqod-btn woqod-btn-secondary"
+                (click)="cancelUpload()"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload History Table -->
+    <div class="woqod-modern-card mt-4">
+      <div class="woqod-card-header">
+        <h3 class="woqod-card-title">Upload History</h3>
+      </div>
+      <div class="woqod-card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>File Name</th>
+                <th>Upload Date</th>
+                <th>Shop</th>
+                <th>Records Count</th>
+                <th>Status</th>
+                <th>Processed / Failed</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let upload of uploadHistory">
+                <td>
+                  <strong>{{ upload.fileName }}</strong><br>
+                  <small class="text-muted">{{ formatFileSize(upload.fileSize) }}</small>
+                </td>
+                <td>{{ upload.uploadDate | date:'dd MMM yyyy, HH:mm' }}</td>
+                <td>Shop Code</td>
+                <td>{{ upload.recordsCount | number }}</td>
+                <td>
+                  <span class="woqod-badge" [ngClass]="getStatusClass(upload.status)">
+                    {{ upload.status }}
+                  </span>
+                </td>
+                <td>
+                  <span class="text-success">{{ upload.processedRecords }}</span> /
+                  <span class="text-danger">{{ upload.failedRecords }}</span>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-primary"
+                    (click)="viewUploadDetails(upload.uploadId)"
+                  >
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="uploadHistory.length === 0">
+                <td colspan="7" class="text-center text-muted">No upload history available</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

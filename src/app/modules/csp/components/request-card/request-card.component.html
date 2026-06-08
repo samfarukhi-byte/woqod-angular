@@ -1,0 +1,36 @@
+<div class="csp-request-card" [ngClass]="cardModClass()">
+  <div class="csp-request-card__header">
+    <div class="csp-request-card__id-row">
+      <span class="csp-request-card__id">{{ request.requestId }}</span>
+      <span class="csp-badge" [ngClass]="badgeClass()">{{ badgeIcon() }} {{ request.status }}</span>
+    </div>
+    <p class="csp-request-card__type">{{ request.requestType }}</p>
+  </div>
+  <div class="csp-request-card__body">
+    <div class="csp-info-row">
+      <span class="csp-info-row__label">Submitted</span>
+      <span class="csp-info-row__value">{{ formatDate(request.submittedAt) }}</span>
+    </div>
+    <div class="csp-info-row" *ngIf="request.reason">
+      <span class="csp-info-row__label">Reason</span>
+      <span class="csp-info-row__value">{{ request.reason }}</span>
+    </div>
+    <div class="csp-info-row" *ngIf="request.stage">
+      <span class="csp-info-row__label">Stage</span>
+      <span class="csp-info-row__value">{{ request.stage }}</span>
+    </div>
+  </div>
+  <div class="csp-request-card__footer">
+    <button type="button" class="csp-btn csp-btn--secondary csp-btn--small" (click)="viewDetails.emit(request)">
+      View Details
+    </button>
+    <button
+      *ngIf="request.status === 'Rejected' || request.status === 'Returned'"
+      type="button"
+      class="csp-btn csp-btn--primary csp-btn--small"
+      (click)="resubmit.emit(request)"
+    >
+      Resubmit
+    </button>
+  </div>
+</div>
